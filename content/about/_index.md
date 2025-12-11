@@ -16,8 +16,8 @@ description: "了解更多关于我"
 
 ## 联系我
 
-- 📧 邮箱：magicbude1998@gmail.com
-- 🐙 GitHub：https://github.com/MagicBude
-- 📚 Gitee：https://gitee.com/MagicBude
+- [![Gmail](/icons/gmail.svg) 邮箱](mailto:magicbude1998@gmail.com)
+- [![GitHub](/icons/github.svg) GitHub](https://github.com/MagicBude)
+- [![Gitee](/icons/gitee.svg) Gitee](https://gitee.com/MagicBude)
 
 期待与你交流！

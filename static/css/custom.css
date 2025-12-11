@@ -1,0 +1,19 @@
+/* ===== 自定义样式 ===== */
+
+/* 工具库和关于页面的图标大小 */
+.post-content img {
+  height: 24px;  /* 图标高度 */
+  width: 24px;   /* 图标宽度 */
+  display: inline;  /* 内联显示 */
+  margin-right: 8px;  /* 右边距 */
+  vertical-align: middle;  /* 垂直居中 */
+}
+
+/* 链接中的图标 */
+a img {
+  height: 24px;
+  width: 24px;
+  display: inline;
+  margin-right: 8px;
+  vertical-align: middle;
+}

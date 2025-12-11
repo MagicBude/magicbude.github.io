@@ -59,15 +59,15 @@ params:
   # ===== 导航栏标签配置 =====
   label:
     text: "MagicBude"  # 导航栏显示的文本
-    icon: /apple-touch-icon.png  # 导航栏图标路径
+    icon: /images/avatar.png  # 导航栏图标路径（使用头像）
     iconHeight: 35  # 图标高度
 
   # ===== 个人资料模式（首页显示个人信息）=====
   profileMode:
-    enabled: false  # 是否启用个人资料模式
+    enabled: true  # 是否启用个人资料模式
     title: MagicBude  # 个人资料标题
     subtitle: "分享开发工具、技术见解和优质项目"  # 个人资料副标题
-    imageUrl: "<img location>"  # 个人头像 URL
+    imageUrl: "/images/avatar.png"  # 个人头像 URL
     imageWidth: 120  # 头像宽度
     imageHeight: 120  # 头像高度
     imageTitle: "MagicBude"  # 头像标题
