@@ -3,6 +3,10 @@ baseURL: "https://magicbude.github.io/"  # 网站的基础 URL
 title: MagicBude  # 网站标题
 theme: PaperMod  # 使用的主题
 
+# ===== 多语言配置 =====
+defaultContentLanguage: zh  # 默认语言为中文
+defaultContentLanguageInSubdir: false  # 默认语言不使用子目录
+
 # 分页配置
 pagination:
   pagerSize: 5  # 每页显示的文章数
@@ -157,3 +161,84 @@ markup:
     # guessSyntax: true  # 自动检测代码语言
     # lineNos: true  # 显示行号
     # style: monokai  # 代码高亮主题
+
+# ===== 语言配置 =====
+languages:
+  zh:
+    languageName: "中文"
+    weight: 1
+    title: MagicBude
+    params:
+      profileMode:
+        enabled: true
+        title: MagicBude
+        subtitle: "分享开发工具、技术见解和优质项目"
+        imageUrl: "/images/avatar.png"
+        imageWidth: 120
+        imageHeight: 120
+        imageTitle: "MagicBude"
+        buttons:
+          - name: 工具库
+            url: toolbox
+          - name: 博客
+            url: blog
+      homeInfoParams:
+        Title: "欢迎来到 MagicBude 👋"
+        Content: "这是我的个人网站，分享开发工具、技术见解和优质项目"
+    menu:
+      main:
+        - identifier: toolbox
+          name: 工具库
+          url: /toolbox/
+          weight: 10
+        - identifier: blog
+          name: 博客
+          url: /blog/
+          weight: 20
+        - identifier: portfolio
+          name: 作品集
+          url: /portfolio/
+          weight: 30
+        - identifier: about
+          name: 关于
+          url: /about/
+          weight: 40
+  en:
+    languageName: "English"
+    weight: 2
+    title: MagicBude
+    params:
+      profileMode:
+        enabled: true
+        title: MagicBude
+        subtitle: "Sharing development tools, technical insights and quality projects"
+        imageUrl: "/images/avatar.png"
+        imageWidth: 120
+        imageHeight: 120
+        imageTitle: "MagicBude"
+        buttons:
+          - name: Toolbox
+            url: toolbox
+          - name: Blog
+            url: blog
+      homeInfoParams:
+        Title: "Welcome to MagicBude 👋"
+        Content: "This is my personal website, sharing development tools, technical insights and quality projects"
+    menu:
+      main:
+        - identifier: toolbox
+          name: Toolbox
+          url: toolbox/
+          weight: 10
+        - identifier: blog
+          name: Blog
+          url: blog/
+          weight: 20
+        - identifier: portfolio
+          name: Portfolio
+          url: portfolio/
+          weight: 30
+        - identifier: about
+          name: About
+          url: about/
+          weight: 40

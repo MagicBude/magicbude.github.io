@@ -1,12 +1,15 @@
 /**
- * 工具库交互脚本
+ * 工具库交互脚本 - 多语言版本
  * 负责渲染分类按钮、工具卡片，以及处理分类筛选功能
+ * 支持中文和英文
  */
 
 class Toolbox {
     constructor() {
         // 记录当前选中的分类（默认显示全部）
         this.currentCategory = 'all';
+        // 获取当前语言
+        this.language = getCurrentLang();
         this.init();
     }
 
@@ -23,6 +26,7 @@ class Toolbox {
     /**
      * 渲染分类筛选按钮
      * 创建"全部"按钮和各分类按钮，添加到页面
+     * 支持多语言显示
      */
     renderCategoryButtons() {
         const filterContainer = document.getElementById('category-filter');
@@ -30,7 +34,7 @@ class Toolbox {
         // 创建"全部"按钮（默认激活）
         const allBtn = document.createElement('button');
         allBtn.className = 'category-btn active';
-        allBtn.textContent = '全部';
+        allBtn.textContent = this.language === 'en' ? 'All' : '全部';
         allBtn.dataset.category = 'all';
         filterContainer.appendChild(allBtn);
 
@@ -38,7 +42,7 @@ class Toolbox {
         categoryOrder.forEach(category => {
             const btn = document.createElement('button');
             btn.className = 'category-btn';
-            btn.textContent = categoryMap[category];  // 从 categoryMap 获取中文名称
+            btn.textContent = getText(categoryMap[category], this.language);
             btn.dataset.category = category;
             filterContainer.appendChild(btn);
         });
@@ -47,6 +51,7 @@ class Toolbox {
     /**
      * 渲染工具卡片
      * 遍历 tools 数组，为每个工具创建卡片 HTML
+     * 支持多语言显示
      */
     renderTools() {
         const toolsGrid = document.getElementById('tools-grid');
@@ -57,20 +62,27 @@ class Toolbox {
             card.className = 'tool-card';
             card.dataset.category = tool.category;  // 存储分类，用于筛选
 
+            // 获取对应语言的工具名称
+            const toolName = getText(tool.name, this.language);
+            
             // 判断图标类型：如果以 / 开头则是 SVG 文件路径，否则是 Emoji
             let iconHTML = '';
             if (tool.icon.startsWith('/')) {
-                iconHTML = `<img src="${tool.icon}" alt="${tool.name}">`;
+                iconHTML = `<img src="${tool.icon}" alt="${toolName}">`;
             } else {
                 iconHTML = `<span class="tool-icon-emoji">${tool.icon}</span>`;
             }
 
+            // 获取对应语言的工具描述和下载按钮文本
+            const description = getText(tool.description, this.language);
+            const downloadText = this.language === 'en' ? 'Download' : '下载';
+
             // 组装卡片 HTML
             card.innerHTML = `
                 <div class="tool-icon">${iconHTML}</div>
-                <div class="tool-name">${tool.name}</div>
-                <div class="tool-description">${tool.description}</div>
-                <a href="${tool.downloadUrl}" target="_blank" class="tool-download">下载</a>
+                <div class="tool-name">${toolName}</div>
+                <div class="tool-description">${description}</div>
+                <a href="${tool.downloadUrl}" target="_blank" class="tool-download">${downloadText}</a>
             `;
 
             toolsGrid.appendChild(card);
