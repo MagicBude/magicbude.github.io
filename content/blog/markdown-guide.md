@@ -113,7 +113,7 @@ ___
 
 ### 5. 列表中的代码块
 
-```markdown
+````markdown
 1. 第一步
    ```python
    code here
@@ -123,7 +123,7 @@ ___
    ```javascript
    code here
    ```
-```
+````
 
 ### 6. 脚注
 
@@ -154,7 +154,7 @@ ___
 
 提供可运行的代码示例，包括导入和完整的上下文：
 
-```markdown
+````markdown
 ❌ 不好的做法：
 ```python
 result = function(data)
@@ -168,7 +168,7 @@ data = [1, 2, 3]
 result = function(data)
 print(result)
 ```
-```
+````
 
 ### 3. 使用列表组织信息
 
@@ -213,7 +213,7 @@ print(result)
 
 ### 7. 代码块语言标注
 
-```markdown
+````markdown
 ❌ 不好的做法：
 ```
 code here
@@ -223,7 +223,7 @@ code here
 ```python
 code here
 ```
-```
+````
 
 ## 常见错误
 
@@ -255,7 +255,7 @@ code here
 
 ### 3. 代码块前后没有空行
 
-```markdown
+````markdown
 ❌ 错误：
 这是说明
 ```python
@@ -271,7 +271,7 @@ code
 ```
 
 继续说明
-```
+````
 
 ## 工具推荐
 
