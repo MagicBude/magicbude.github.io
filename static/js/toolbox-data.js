@@ -146,24 +146,6 @@ const tools = [
         description: { zh: '效率提升工具，快捷操作', en: 'Productivity tool with quick actions' },
         downloadUrl: 'https://getquicker.net/'
     },
-
-    // ===== 其他工具 =====
-    {
-        id: 16,
-        name: { zh: 'IDM', en: 'IDM' },
-        category: 'other',
-        icon: '/icons/idman.svg',
-        description: { zh: '强大的下载管理器', en: 'Powerful download manager' },
-        downloadUrl: 'https://www.internetdownloadmanager.com/'
-    },
-    {
-        id: 17,
-        name: { zh: 'Telegram', en: 'Telegram' },
-        category: 'other',
-        icon: '/icons/telegram.svg',
-        description: { zh: '安全的即时通讯应用', en: 'Secure instant messaging app' },
-        downloadUrl: 'https://telegram.org/'
-    },
     {
         id: 18,
         name: { zh: '图吧工具箱', en: 'TuBar Toolbox' },
@@ -209,6 +191,24 @@ const tools = [
         icon: '/icons/Bandizip.svg',
         description: { zh: '快速压缩工具，支持多种格式', en: 'Fast compression tool supporting multiple formats' },
         downloadUrl: 'https://www.bandisoft.com/bandizip/'
+    },
+
+    // ===== 其他工具 =====
+    {
+        id: 16,
+        name: { zh: 'IDM', en: 'IDM' },
+        category: 'other',
+        icon: '/icons/idman.svg',
+        description: { zh: '强大的下载管理器', en: 'Powerful download manager' },
+        downloadUrl: 'https://www.internetdownloadmanager.com/'
+    },
+    {
+        id: 17,
+        name: { zh: 'Telegram', en: 'Telegram' },
+        category: 'other',
+        icon: '/icons/telegram.svg',
+        description: { zh: '安全的即时通讯应用', en: 'Secure instant messaging app' },
+        downloadUrl: 'https://telegram.org/'
     }
 ];
 
