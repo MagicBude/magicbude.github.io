@@ -184,7 +184,7 @@ const tools = [
         id: 20,
         name: { zh: 'Snipaste', en: 'Snipaste' },
         category: 'other',
-        icon: '/icons/snipaste.svg',
+        icon: '/icons/Snipaste.svg',
         description: { zh: '强大的截图工具，支持标注和分享', en: 'Powerful screenshot tool with annotation and sharing' },
         downloadUrl: 'https://www.snipaste.com/'
     },
@@ -192,7 +192,7 @@ const tools = [
         id: 21,
         name: { zh: 'PixPin', en: 'PixPin' },
         category: 'other',
-        icon: '/icons/pixpin.png',
+        icon: '/icons/PixPin.png',
         description: { zh: '现代化的截图和标注工具', en: 'Modern screenshot and annotation tool' },
         downloadUrl: 'https://pixpinapp.com/'
     }
