@@ -1,6 +1,7 @@
 ---
 title: "开发工具"
 description: "编程和开发必备工具"
+layout: "toolbox"
 ---
 
 # 开发工具

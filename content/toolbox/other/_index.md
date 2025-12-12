@@ -1,6 +1,7 @@
 ---
 title: "其他工具"
 description: "实用的日常工具"
+layout: "toolbox"
 ---
 
 # 其他工具

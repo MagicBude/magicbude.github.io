@@ -1,6 +1,7 @@
 ---
 title: "系统工具"
 description: "Windows 系统优化和管理"
+layout: "toolbox"
 ---
 
 # 系统工具

@@ -1,6 +1,7 @@
 ---
 title: "浏览器"
 description: "高效的网络浏览器"
+layout: "toolbox"
 ---
 
 # 浏览器

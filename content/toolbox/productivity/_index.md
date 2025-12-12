@@ -1,6 +1,7 @@
 ---
 title: "生产力工具"
 description: "提升工作效率的工具"
+layout: "toolbox"
 ---
 
 # 生产力工具
