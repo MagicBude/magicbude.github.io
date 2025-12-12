@@ -14,7 +14,7 @@ layout: "toolbox"
 
 强大的笔记管理和知识库工具。支持双向链接、图谱视图，是构建个人知识库的最佳选择。
 
-[下载](https://obsidian.md/)
+[官网](https://obsidian.md/)
 
 ---
 
@@ -22,7 +22,7 @@ layout: "toolbox"
 
 简洁优雅的 Markdown 编辑器。所见即所得的编辑体验，完美支持 Markdown 语法。
 
-[下载](https://typora.io/)
+[官网](https://typora.io/)
 
 ---
 
@@ -30,4 +30,4 @@ layout: "toolbox"
 
 一体化工作空间，集笔记、数据库、看板于一身。功能强大，适合个人和团队使用。
 
-[下载](https://www.notion.so/)
+[官网](https://www.notion.so/)

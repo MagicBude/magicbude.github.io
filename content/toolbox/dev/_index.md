@@ -14,7 +14,7 @@ layout: "toolbox"
 
 轻量级代码编辑器，功能强大，扩展丰富。支持多种编程语言，拥有强大的扩展生态。
 
-[下载](https://code.visualstudio.com/)
+[官网](https://code.visualstudio.com/)
 
 ---
 
@@ -24,7 +24,7 @@ layout: "toolbox"
 
 分布式版本控制系统，开发必备。用于管理代码版本和团队协作。
 
-[下载](https://git-scm.com/)
+[官网](https://git-scm.com/)
 
 ---
 
@@ -32,4 +32,4 @@ layout: "toolbox"
 
 静态网站生成器，快速高效。用于构建静态网站和博客。
 
-[下载](https://gohugo.io/)
+[官网](https://gohugo.io/)

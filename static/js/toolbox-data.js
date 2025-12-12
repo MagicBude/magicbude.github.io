@@ -158,22 +158,6 @@ const tools = [
     },
     {
         id: 17,
-        name: { zh: 'Clash', en: 'Clash' },
-        category: 'other',
-        icon: '/icons/clash.svg',
-        description: { zh: '网络代理工具', en: 'Network proxy tool' },
-        downloadUrl: 'https://github.com/Dreamacro/clash'
-    },
-    {
-        id: 18,
-        name: { zh: 'Proxifier', en: 'Proxifier' },
-        category: 'other',
-        icon: '/icons/proxifier.svg',
-        description: { zh: '全局代理工具', en: 'Global proxy tool' },
-        downloadUrl: 'https://www.proxifier.com/'
-    },
-    {
-        id: 19,
         name: { zh: 'Telegram', en: 'Telegram' },
         category: 'other',
         icon: '/icons/telegram.svg',
@@ -181,20 +165,50 @@ const tools = [
         downloadUrl: 'https://telegram.org/'
     },
     {
-        id: 20,
+        id: 18,
+        name: { zh: '图吧工具箱', en: 'TuBar Toolbox' },
+        category: 'system',
+        icon: '/icons/dawnstd_logo.png',
+        description: { zh: '专业的硬件检测工具集合，纯净无捆绑', en: 'Professional hardware detection toolbox, clean and ad-free' },
+        downloadUrl: 'https://www.tbtool.cn/'
+    },
+
+    // ===== 截图工具 =====
+    {
+        id: 19,
         name: { zh: 'Snipaste', en: 'Snipaste' },
-        category: 'other',
+        category: 'screenshot',
         icon: '/icons/Snipaste.svg',
         description: { zh: '强大的截图工具，支持标注和分享', en: 'Powerful screenshot tool with annotation and sharing' },
         downloadUrl: 'https://www.snipaste.com/'
     },
     {
-        id: 21,
+        id: 20,
         name: { zh: 'PixPin', en: 'PixPin' },
-        category: 'other',
+        category: 'screenshot',
         icon: '/icons/PixPin.png',
         description: { zh: '现代化的截图和标注工具', en: 'Modern screenshot and annotation tool' },
         downloadUrl: 'https://pixpinapp.com/'
+    },
+
+    // ===== 媒体工具 =====
+    {
+        id: 21,
+        name: { zh: 'PotPlayer', en: 'PotPlayer' },
+        category: 'media',
+        icon: '/icons/PotPlayer.svg',
+        description: { zh: '功能强大的视频播放器，支持多种格式', en: 'Powerful video player supporting multiple formats' },
+        downloadUrl: 'https://potplayer.daum.net/'
+    },
+
+    // ===== 压缩工具 =====
+    {
+        id: 22,
+        name: { zh: 'Bandizip', en: 'Bandizip' },
+        category: 'compression',
+        icon: '/icons/Bandizip.svg',
+        description: { zh: '快速压缩工具，支持多种格式', en: 'Fast compression tool supporting multiple formats' },
+        downloadUrl: 'https://www.bandisoft.com/bandizip/'
     }
 ];
 
@@ -208,6 +222,9 @@ const categoryMap = {
     'browser': { zh: '浏览器', en: 'Browsers' },
     'productivity': { zh: '生产力工具', en: 'Productivity' },
     'system': { zh: '系统工具', en: 'System Tools' },
+    'screenshot': { zh: '截图工具', en: 'Screenshot Tools' },
+    'media': { zh: '媒体工具', en: 'Media' },
+    'compression': { zh: '压缩工具', en: 'Compression' },
     'other': { zh: '其他工具', en: 'Others' }
 };
 
@@ -216,7 +233,15 @@ const categoryMap = {
  * 定义分类按钮在页面上的显示顺序
  * toolbox.js 会根据这个顺序创建分类按钮
  */
-const categoryOrder = ['dev', 'browser', 'productivity', 'system', 'other'];
+const categoryOrder = ['dev', 'browser', 'productivity', 'system', 'screenshot', 'media', 'compression', 'other'];
+
+/**
+ * 按钮文本配置 - 多语言版本
+ * 统一管理所有按钮的显示文本
+ */
+const buttonTexts = {
+    officialWebsite: { zh: '官网', en: 'Official Website' }
+};
 
 /**
  * 获取指定语言的文本

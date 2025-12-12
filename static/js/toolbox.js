@@ -73,9 +73,9 @@ class Toolbox {
                 iconHTML = `<span class="tool-icon-emoji">${tool.icon}</span>`;
             }
 
-            // 获取对应语言的工具描述和下载按钮文本
+            // 获取对应语言的工具描述和官网按钮文本
             const description = getText(tool.description, this.language);
-            const downloadText = this.language === 'en' ? 'Download' : '下载';
+            const downloadText = getText(buttonTexts.officialWebsite, this.language);
 
             // 组装卡片 HTML
             card.innerHTML = `
