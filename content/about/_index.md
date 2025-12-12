@@ -3,8 +3,6 @@ title: "关于"
 description: "了解更多关于我"
 ---
 
-# 关于我
-
 你好！我是 MagicBude。
 
 ## 我的兴趣
