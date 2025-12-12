@@ -1,6 +1,7 @@
 ---
 title: "Hugo 静态网站生成器完全指南"
 date: 2025-12-12
+weight: 1
 description: "深入了解 Hugo，学习如何快速构建高性能的静态网站"
 tags: ["Hugo", "静态网站生成器", "Web开发"]
 categories: ["技术教程"]

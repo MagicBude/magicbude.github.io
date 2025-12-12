@@ -1,6 +1,7 @@
 ---
 title: "PaperMod 主题完全使用指南"
 date: 2025-12-12
+weight: 2
 description: "深入了解 PaperMod 主题，学习如何自定义和优化你的 Hugo 网站"
 tags: ["PaperMod", "Hugo主题", "网站定制"]
 categories: ["技术教程"]

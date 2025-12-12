@@ -1,7 +1,7 @@
 ---
 title: "Git 和 GitHub 完全使用指南"
 date: 2025-12-12
-weight: 2
+weight: 4
 description: "从入门到精通，掌握版本控制和协作开发的核心技能"
 tags: ["Git", "GitHub", "版本控制"]
 categories: ["技术教程"]

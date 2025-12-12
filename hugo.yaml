@@ -189,19 +189,31 @@ languages:
       main:
         - identifier: toolbox
           name: 工具库
-          url: /toolbox/
+          url: toolbox/
           weight: 10
         - identifier: blog
           name: 博客
-          url: /blog/
+          url: blog/
           weight: 20
+        - identifier: tags
+          name: 标签
+          url: tags/
+          weight: 21
+        - identifier: categories
+          name: 分类
+          url: categories/
+          weight: 22
+        - identifier: archives
+          name: 归档
+          url: archives/
+          weight: 23
         - identifier: portfolio
           name: 作品集
-          url: /portfolio/
+          url: portfolio/
           weight: 30
         - identifier: about
           name: 关于
-          url: /about/
+          url: about/
           weight: 40
   en:
     languageName: "English"
@@ -234,6 +246,18 @@ languages:
           name: Blog
           url: blog/
           weight: 20
+        - identifier: tags
+          name: Tags
+          url: tags/
+          weight: 21
+        - identifier: categories
+          name: Categories
+          url: categories/
+          weight: 22
+        - identifier: archives
+          name: Archives
+          url: archives/
+          weight: 23
         - identifier: portfolio
           name: Portfolio
           url: portfolio/

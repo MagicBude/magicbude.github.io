@@ -1,6 +1,7 @@
 ---
 title: "Markdown 写作技巧和最佳实践"
 date: 2025-12-12
+weight: 3
 description: "掌握 Markdown 的高级用法，提升文档质量和写作效率"
 tags: ["Markdown", "写作技巧", "文档"]
 categories: ["技术教程"]
