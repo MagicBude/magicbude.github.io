@@ -37,3 +37,19 @@ layout: "toolbox"
 安全的即时通讯应用。端到端加密，注重隐私保护。
 
 [下载](https://telegram.org/)
+
+---
+
+## Snipaste
+
+强大的截图工具。支持标注、编辑和快速分享截图。
+
+[下载](https://www.snipaste.com/)
+
+---
+
+## PixPin
+
+现代化的截图和标注工具。功能强大，操作简便。
+
+[下载](https://pixpinapp.com/)
