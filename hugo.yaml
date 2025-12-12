@@ -29,12 +29,12 @@ params:
   description: "用 Hugo 构建的个人网站 - 包含工具库、博客和作品集"  # 网站描述
   keywords: [开发工具, 博客, 作品集]  # 网站关键词
   author: MagicBude  # 作者名称
-  DateFormat: "January 2, 2006"  # 日期格式
+  DateFormat: "2006-01-02"  # 日期格式（ISO 格式）
   defaultTheme: auto  # 默认主题（auto/dark/light）
   disableThemeToggle: false  # 是否禁用主题切换按钮
 
   # ===== 文章显示选项 =====
-  ShowReadingTime: true  # 显示阅读时间
+  ShowReadingTime: false  # 显示阅读时间
   ShowShareButtons: true  # 显示分享按钮
   ShowPostNavLinks: true  # 显示文章导航链接
   ShowBreadCrumbs: true  # 显示面包屑导航
