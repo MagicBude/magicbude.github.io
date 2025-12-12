@@ -22,6 +22,15 @@ minify:
   disableXML: true  # 禁用 XML 压缩
   minifyOutput: true  # 启用输出压缩
 
+# 输出格式配置
+outputs:
+  home:
+    - HTML
+    - JSON  # 为首页生成 JSON 索引（用于搜索）
+  section:
+    - HTML
+    - JSON
+
 # ===== 网站参数配置 =====
 params:
   env: production  # 环境设置（production 用于启用分析和 SEO 功能）
@@ -139,10 +148,26 @@ menu:
       name: 博客
       url: /blog/
       weight: 20
+    - identifier: tags  # 标签
+      name: 标签
+      url: /tags/
+      weight: 21
+    - identifier: categories  # 分类
+      name: 分类
+      url: /categories/
+      weight: 22
+    - identifier: archives  # 归档
+      name: 归档
+      url: /archives/
+      weight: 23
     - identifier: portfolio  # 作品集
       name: 作品集
       url: /portfolio/
       weight: 30
+    - identifier: search  # 搜索
+      name: 搜索
+      url: /search/
+      weight: 35
     - identifier: about  # 关于
       name: 关于
       url: /about/
@@ -211,6 +236,10 @@ languages:
           name: 作品集
           url: portfolio/
           weight: 30
+        - identifier: search
+          name: 搜索
+          url: search/
+          weight: 35
         - identifier: about
           name: 关于
           url: about/
@@ -262,6 +291,10 @@ languages:
           name: Portfolio
           url: portfolio/
           weight: 30
+        - identifier: search
+          name: Search
+          url: search/
+          weight: 35
         - identifier: about
           name: About
           url: about/
