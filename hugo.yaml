@@ -59,11 +59,11 @@ params:
   assets:
     # disableHLJS: true  # 禁用 highlight.js 代码高亮
     # disableFingerprinting: true  # 禁用文件指纹
-    favicon: "<link / abs url>"  # 网站图标
-    favicon16x16: "<link / abs url>"  # 16x16 网站图标
-    favicon32x32: "<link / abs url>"  # 32x32 网站图标
-    apple_touch_icon: "<link / abs url>"  # Apple 设备触摸图标
-    safari_pinned_tab: "<link / abs url>"  # Safari 固定标签图标
+    favicon: "/images/avatar.png"  # 网站图标
+    # favicon16x16: "/favicon-16x16.png"  # 16x16 网站图标
+    # favicon32x32: "/favicon-32x32.png"  # 32x32 网站图标
+    # apple_touch_icon: "/apple-touch-icon.png"  # Apple 设备触摸图标
+    # safari_pinned_tab: "/safari-pinned-tab.svg"  # Safari 固定标签图标
 
   # ===== 导航栏标签配置 =====
   label:
