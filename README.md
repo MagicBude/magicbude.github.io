@@ -7,15 +7,47 @@
 ### 本地开发
 
 ```bash
-# 启动本地服务器
+# 启动本地服务器（包括草稿文章）
 hugo server -D
 
 # 访问 http://localhost:1313
 ```
 
+### Hugo 常用命令
+
+```bash
+# 启动本地服务器
+hugo server                    # 启动服务器（默认端口 1313）
+hugo server -D                 # 启动服务器，包括草稿文章
+hugo server --disableFastRender # 禁用快速渲染模式（完整重建）
+
+# 构建网站
+hugo                           # 构建网站到 public/ 目录
+hugo -D                        # 构建网站，包括草稿文章
+hugo --minify                  # 构建并压缩输出文件
+
+# 创建新文章
+hugo new blog/article-name.md  # 在 content/blog/ 下创建新文章
+
+# 停止服务器
+# 在 PowerShell 中按 Ctrl+C
+# 或执行：Get-Process hugo -ErrorAction SilentlyContinue | Stop-Process -Force
+```
+
 ### 部署
 
 网站自动部署到 GitHub Pages，通过 GitHub Actions 工作流。
+
+手动部署：
+```bash
+# 构建网站
+hugo
+
+# 提交并推送到 GitHub
+git add .
+git commit -m "your commit message"
+git push origin main
+```
 
 ## 技术栈
 
