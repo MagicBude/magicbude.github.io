@@ -19,5 +19,6 @@ Hello! I'm MagicBude.
 - [![Gmail](/icons/gmail.svg) Email](mailto:magicbude1998@gmail.com)
 - [![GitHub](/icons/github.svg) GitHub](https://github.com/MagicBude)
 - [![Gitee](/icons/gitee.svg) Gitee](https://gitee.com/MagicBude)
+- [![B站](/icons/blbl.svg) Bilibili](https://space.bilibili.com/23060942)
 
 Looking forward to connecting with you!

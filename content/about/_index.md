@@ -17,5 +17,6 @@ description: "了解更多关于我"
 - [![Gmail](/icons/gmail.svg) 邮箱](mailto:magicbude1998@gmail.com)
 - [![GitHub](/icons/github.svg) GitHub](https://github.com/MagicBude)
 - [![Gitee](/icons/gitee.svg) Gitee](https://gitee.com/MagicBude)
+- [![B站](/icons/blbl.svg) B站](https://space.bilibili.com/23060942)
 
 期待与你交流！

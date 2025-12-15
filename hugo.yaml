@@ -101,8 +101,8 @@ params:
       url: "https://github.com/MagicBude"
     - name: email  # 邮箱
       url: "mailto:magicbude1998@gmail.com"
-    - name: gitee  # Gitee
-      url: "https://gitee.com/MagicBude"
+    - name: bilibili  # B站
+      url: "https://space.bilibili.com/23060942"
 
   # ===== 分析和验证配置 =====
   analytics:
