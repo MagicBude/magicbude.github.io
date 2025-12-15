@@ -29,7 +29,6 @@ outputs:
     - JSON  # 为首页生成 JSON 索引（用于搜索）
   section:
     - HTML
-    - JSON
 
 # ===== 网站参数配置 =====
 params:
