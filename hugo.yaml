@@ -46,7 +46,7 @@ params:
   ShowReadingTime: false  # 显示阅读时间
   ShowShareButtons: true  # 显示分享按钮
   ShowPostNavLinks: true  # 显示文章导航链接
-  ShowBreadCrumbs: true  # 显示面包屑导航
+  ShowBreadCrumbs: false  # 显示面包屑导航
   ShowCodeCopyButtons: false  # 显示代码复制按钮
   ShowWordCount: true  # 显示字数统计
   ShowRssButtonInSectionTermList: true  # 在分类/标签列表中显示 RSS 按钮
@@ -140,6 +140,10 @@ params:
 # ===== 菜单配置 =====
 menu:
   main:
+    - identifier: home  # 首页
+      name: 首页
+      url: /
+      weight: 1
     - identifier: toolbox  # 工具库
       name: 工具库
       url: /toolbox/
@@ -167,7 +171,7 @@ menu:
     - identifier: search  # 搜索
       name: 搜索
       url: /search/
-      weight: 35
+      weight: 32
     - identifier: about  # 关于
       name: 关于
       url: /about/
@@ -212,6 +216,10 @@ languages:
         Content: "这是我的个人网站，分享开发工具、技术见解和优质项目"
     menu:
       main:
+        - identifier: home
+          name: 首页
+          url: /
+          weight: 1
         - identifier: toolbox
           name: 工具库
           url: toolbox/
@@ -239,7 +247,7 @@ languages:
         - identifier: search
           name: 搜索
           url: search/
-          weight: 35
+          weight: 32
         - identifier: about
           name: 关于
           url: about/
@@ -267,6 +275,10 @@ languages:
         Content: "This is my personal website, sharing development tools, technical insights and quality projects"
     menu:
       main:
+        - identifier: home
+          name: Home
+          url: /
+          weight: 1
         - identifier: toolbox
           name: Toolbox
           url: toolbox/
@@ -294,7 +306,7 @@ languages:
         - identifier: search
           name: Search
           url: search/
-          weight: 35
+          weight: 32
         - identifier: about
           name: About
           url: about/
