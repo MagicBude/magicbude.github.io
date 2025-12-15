@@ -203,6 +203,22 @@ const tools = [
         downloadUrl: 'https://www.internetdownloadmanager.com/'
     },
     {
+        id: 23,
+        name: { zh: 'NDM', en: 'NDM' },
+        category: 'other',
+        icon: '/icons/NeatDM.svg',
+        description: { zh: '免费的多线程下载工具，IDM 的最佳替代品', en: 'Free multi-threaded download tool, best alternative to IDM' },
+        downloadUrl: 'https://www.neatdownloadmanager.com/'
+    },
+    {
+        id: 24,
+        name: { zh: 'XDM', en: 'XDM' },
+        category: 'other',
+        icon: '/icons/xdm-logo.svg',
+        description: { zh: '开源免费下载管理器，跨平台支持', en: 'Open source free download manager with cross-platform support' },
+        downloadUrl: 'https://xtremedownloadmanager.com/'
+    },
+    {
         id: 17,
         name: { zh: 'Telegram', en: 'Telegram' },
         category: 'other',

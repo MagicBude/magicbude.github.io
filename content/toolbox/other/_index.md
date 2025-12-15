@@ -16,6 +16,22 @@ layout: "toolbox"
 
 ---
 
+## NDM
+
+免费的多线程下载工具。完全开源，跨平台支持，是 IDM 的最佳免费替代品。
+
+[官网](https://www.neatdownloadmanager.com/)
+
+---
+
+## XDM
+
+开源免费的下载管理器。跨平台支持（Windows/macOS/Linux），轻量级且功能强大。
+
+[官网](https://xtremedownloadmanager.com/)
+
+---
+
 ## Telegram
 
 安全的即时通讯应用。端到端加密，注重隐私保护。
