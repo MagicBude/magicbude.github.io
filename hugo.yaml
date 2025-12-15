@@ -31,8 +31,8 @@ outputs:
 params:
   env: production  # 环境设置（production 用于启用分析和 SEO 功能）
   title: MagicBude  # 网站标题
-  description: "用 Hugo 构建的个人网站 - 包含工具库、博客和作品集"  # 网站描述
-  keywords: [开发工具, 博客, 作品集]  # 网站关键词
+  description: "MagicBude 的个人网站 - 分享开发工具、技术见解和优质项目"  # 网站描述
+  keywords: [开发工具, 技术博客, 编程, 效率工具]  # 网站关键词
   author: MagicBude  # 作者名称
   DateFormat: "2006-01-02"  # 日期格式（ISO 格式）
   defaultTheme: auto  # 默认主题（auto/dark/light）
@@ -85,6 +85,8 @@ params:
         url: toolbox
       - name: 博客
         url: blog
+      - name: 关于
+        url: about
 
   # ===== 首页信息模式（首页显示欢迎信息）=====
   homeInfoParams:

@@ -1,9 +1,9 @@
 ---
 title: "关于"
-description: "了解更多关于我"
+description: "我是 MagicBude，欢迎来到我的个人网站。"
 ---
 
-你好！我是 MagicBude。
+这是一个分享开发工具、技术见解和优质项目的个人网站。我致力于探索高效的开发工具，分享实用的技术知识，帮助开发者提升工作效率。
 
 ## 我的兴趣
 
@@ -12,7 +12,9 @@ description: "了解更多关于我"
 - 📚 技术学习和分享
 - 🚀 开源项目
 
-## 联系我
+## 联系方式
+
+欢迎通过以下方式与我交流：
 
 - [![Gmail](/icons/gmail.svg) 邮箱](mailto:magicbude1998@gmail.com)
 - [![GitHub](/icons/github.svg) GitHub](https://github.com/MagicBude)
