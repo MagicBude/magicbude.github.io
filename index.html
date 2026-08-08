@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh" data-style="instrument" data-scheme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>magicbude</title>
+  <meta name="description" content="magicbude 的个人网站：代码、游戏、动漫、电影、羽毛球的数字花园。">
+
+  <!--
+    防闪白内联脚本：必须在 CSS 加载之前执行。
+    原因：皮肤（data-style）和语言（lang）存在 localStorage 里。
+    如果等外部 JS 加载完才设置，页面会先以默认皮肤闪一下再跳变，很难看。
+    这里直接读 localStorage 设到 <html> 上，CSS 一应用就是正确皮肤，无闪烁。
+    键名 "site-style" / "site-lang" 必须和 js/main.js、js/i18n.js 里一致。
+  -->
+  <script>
+    (function () {
+      try {
+        var s = localStorage.getItem("site-style") || "instrument";
+        var l = localStorage.getItem("site-lang") || "zh";
+        // 明暗由皮肤决定：instrument / terminal 暗，minimal / magazine 亮。
+        var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
+        var d = document.documentElement;
+        d.setAttribute("data-style", s);
+        d.setAttribute("data-scheme", scheme);
+        d.setAttribute("lang", l);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/main.css">
+  <!-- 内联 SVG favicon：一个带圆角的小方块，零外链。 -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+</head>
+<body>
+  <!-- 开屏页：极简封面。名字 + slogan + 进入按钮，右上角放皮肤/语言切换。 -->
+  <div class="splash">
+    <!-- 右上角控件容器：内容由 js/main.js 注入（皮肤选择器 + 语言切换） -->
+    <div class="splash__controls" id="splash-controls"></div>
+
+    <div class="splash__inner">
+      <!-- 站点名由 JS 从 site.config.js 填入；这里写个兜底，JS 没跑也不会空白 -->
+      <h1 class="splash__name" id="splash-name">magicbude</h1>
+      <span class="splash__slogan" data-i18n="splash.subtitle">个人网站 · 数字花园</span>
+      <div>
+        <!-- 「进入」跳到真正的首页 home.html（index.html 被本开屏页占用） -->
+        <a class="btn btn--primary splash__enter" href="home.html" data-i18n="splash.enter">进入</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 脚本顺序不能乱：先配置，再图标，再多语，最后主逻辑 -->
+  <script src="js/site.config.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh" data-style="instrument" data-scheme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>404 · 页面走丢了 · magicbude</title>
+  <meta name="description" content="找不到你要的页面。">
+
+  <!-- 防闪白内联脚本：与全站一致，CSS 加载前设好皮肤/语言 -->
+  <script>
+    (function () {
+      try {
+        var s = localStorage.getItem("site-style") || "instrument";
+        var l = localStorage.getItem("site-lang") || "zh";
+        var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
+        var d = document.documentElement;
+        d.setAttribute("data-style", s);
+        d.setAttribute("data-scheme", scheme);
+        d.setAttribute("lang", l);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="common.skip">跳到主内容</a>
+
+  <header id="site-header" class="site-header"></header>
+
+  <main class="site-main" id="main">
+    <!--
+      notfound 布局：垂直居中、文字居中。
+      404 大字号 + 一句说明 + 回到首页按钮 + 快捷导航（避免用户卡死）。
+    -->
+    <section class="notfound container">
+      <p class="notfound__code" data-i18n="notfound.title">404</p>
+      <p class="notfound__text" data-i18n="notfound.text">你想找的页面走丢了。</p>
+
+      <a class="btn btn--primary" href="home.html">
+        <span data-i18n="notfound.home">回到首页</span>
+      </a>
+
+      <p class="page-eyebrow" data-i18n="notfound.quick">或者去</p>
+      <!-- 快捷导航由 render404 根据 nav 生成（排除 搜索） -->
+      <div class="notfound__links" id="notfound-links"></div>
+    </section>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <script src="js/site.config.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/main.js"></script>
+
+  <!--
+    404 页的「数据 → DOM」：把导航渲染成快捷入口胶囊，
+    让用户一键跳到还能用的页面。挂 window.render404 供语言切换时刷新。
+  -->
+  <script>
+  (function () {
+    "use strict";
+
+    var CONFIG = window.SITE_CONFIG || {};
+    var ICON  = window.icon  || function () { return ""; };
+    var I18N  = window.i18n  || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
+
+    var NAV_ICON = {
+      home: "home", blog: "book", projects: "code",
+      now: "sparkles", uses: "tool", links: "link",
+      search: "search", about: "user"
+    };
+
+    function render404() {
+      var host = document.getElementById("notfound-links");
+      if (!host || !CONFIG.nav) return;
+      host.innerHTML = CONFIG.nav
+        .filter(function (it) { return it.key !== "search"; })
+        .map(function (it) {
+          var ic = NAV_ICON[it.key] || "layout";
+          return (
+            '<a class="btn btn--ghost" href="' + it.href + '">' +
+              ICON(ic) + "<span>" + I18N.t(it.i18n) + "</span>" +
+            "</a>"
+          );
+        })
+        .join("");
+    }
+
+    window.render404 = render404;
+    render404();
+  })();
+  </script>
+</body>
+</html>

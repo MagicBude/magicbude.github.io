@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh" data-style="instrument" data-scheme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>近况 · magicbude</title>
+  <meta name="description" content="magicbude 最近在玩、在看、在搞的事。">
+
+  <script>
+    (function () {
+      try {
+        var s = localStorage.getItem("site-style") || "instrument";
+        var l = localStorage.getItem("site-lang") || "zh";
+        var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
+        var d = document.documentElement;
+        d.setAttribute("data-style", s);
+        d.setAttribute("data-scheme", scheme);
+        d.setAttribute("lang", l);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="common.skip">跳到主内容</a>
+
+  <header id="site-header" class="site-header"></header>
+
+  <main class="site-main" id="main">
+    <section class="hero container container--narrow">
+      <p class="page-eyebrow" data-i18n="now.eyebrow">近况</p>
+      <h1 class="hero__name" data-i18n="now.title">最近在搞啥</h1>
+      <p class="lead" data-i18n="now.lead">不是简历，是此刻正在进行的事——会随兴趣更新。</p>
+    </section>
+
+    <!-- 分类由 renderNow 按 window.NOW 生成 -->
+    <div class="container" id="now-root"></div>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <script src="js/site.config.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/main.js"></script>
+
+  <!--
+    近况页结构与装备页几乎一致：window.NOW 是分类数组，
+    区别是每个 item 不跳外链（纯记录），用不同的图标区分「玩/看/搞」。
+  -->
+  <script>
+  (function () {
+    "use strict";
+
+    var ICON = window.icon || function () { return ""; };
+    var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
+
+    window.NOW = [
+      {
+        title: { zh: "在玩", en: "Playing" }, icon: "gamepad",
+        items: [
+          { name: "羽毛球", note: { zh: "每周两场，胜负不重要，出汗最重要。", en: "Twice a week. Winning barely matters — sweating does." } },
+          { name: "《塞尔达：王国之泪》", note: { zh: "通勤路上看别人玩，自己偶尔上手。", en: "Watch others play on commute, occasionally pick up the pad." } },
+        ],
+      },
+      {
+        title: { zh: "在看", en: "Watching" }, icon: "film",
+        items: [
+          { name: "《葬送的芙莉莲》", note: { zh: "慢节奏但后劲很大，配乐封神。", en: "Slow pace but lingers; the soundtrack is divine." } },
+          { name: "《奥本海默》", note: { zh: "二刷，IMAX 才是正解。", en: "Second watch — IMAX is the only right way." } },
+        ],
+      },
+      {
+        title: { zh: "在搞", en: "Building" }, icon: "sparkles",
+        items: [
+          { name: "这个个人站", note: { zh: "你正在看的，纯手写、零构建。", en: "This very site — hand-written, zero-build." } },
+          { name: "SensorLink 工具", note: { zh: "传感器串口可视化，做到一半。", en: "Sensor serial visualizer, halfway done." } },
+        ],
+      },
+    ];
+
+    function renderNow() {
+      var lang = I18N.getLang();
+      var root = document.getElementById("now-root");
+      if (!root) return;
+
+      root.innerHTML = (window.NOW || []).map(function (cat) {
+        var title = (cat.title && cat.title[lang]) ? cat.title[lang] : (cat.title && cat.title.zh) || cat.icon;
+        var head =
+          '<h2 class="subsection__title">' + ICON(cat.icon || "sparkles") +
+          "<span>" + title + "</span></h2>";
+
+        var cards = (cat.items || []).map(function (it) {
+          var note = (it.note && it.note[lang]) ? it.note[lang] : (it.note && it.note.zh) || "";
+          return (
+            '<div class="card">' +
+              '<span class="card__title"><span>' + it.name + "</span></span>" +
+              '<span class="card__desc">' + note + "</span>" +
+            "</div>"
+          );
+        }).join("");
+
+        return (
+          '<section class="subsection">' +
+            head +
+            '<div class="card-grid">' + cards + "</div>" +
+          "</section>"
+        );
+      }).join("");
+    }
+
+    window.renderNow = renderNow;
+    renderNow();
+  })();
+  </script>
+</body>
+</html>

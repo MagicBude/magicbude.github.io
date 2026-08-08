@@ -1,0 +1,1782 @@
+/* =============================================================================
+   main.css — 全站样式表
+   =============================================================================
+   组织顺序（从底层到上层，这个顺序本身就有意义）：
+
+     1. 设计令牌（CSS 变量）  — 颜色、字体、间距的唯一真相来源
+     2. 基础重置             — 抹平浏览器默认样式差异
+     3. 排版                 — 文字的默认表现
+     4. 布局容器             — 宽度约束、栅格
+     5. 组件                 — 导航、卡片、按钮、开屏页等具体模块
+     6. 页面级样式           — 只在某类页面出现的东西
+     7. 工具类               — 少量高频复用的小类
+     8. 响应式与打印         — 断点覆盖
+
+   为什么按这个顺序？因为 CSS 是"后面的覆盖前面的"。
+   越通用的规则放越前面，越具体的放后面，就能少写很多 !important。
+
+   ---------------------------------------------------------------------------
+   皮肤（skin）机制说明 —— 这是本文件的核心设计：
+   整个站的配色全部抽成 CSS 变量（--color-* / --font-heading）。
+   在 <html> 上设 data-style="instrument|minimal|terminal|magazine" 就会套用
+   对应的那一套变量值。组件里只引用变量、不写死颜色，所以换皮肤 = 换一组变量，
+   组件零改动。
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. 设计令牌（Design Tokens）
+   =============================================================================
+   把所有"魔法数字"和颜色值集中定义成 CSS 变量。
+
+   好处：想把主色从蓝色换成绿色，只改这里一行，全站跟着变。
+   如果颜色值散落在几百行样式里，改一次就是一场灾难。
+
+   :root 是文档根元素（也就是 <html>）的选择器。
+   在这里定义的变量，全站任何地方都能用 var(--变量名) 取到。
+   ============================================================================= */
+
+:root {
+  /* --- 字体族 -------------------------------------------------------------
+     系统字体栈（system font stack）：不加载任何外部字体文件，
+     直接用用户操作系统自带的界面字体。
+
+     好处：零加载时间、零布局抖动、每个平台都是最"原生"的观感。
+     代价：不同设备上长得不完全一样 —— 但对于文字为主的站点，这不是问题。
+
+     栈的顺序就是"优先级"，浏览器从左往右找第一个能用的：
+       -apple-system / BlinkMacSystemFont  → macOS / iOS 的 San Francisco
+       Segoe UI                            → Windows
+       PingFang SC / Microsoft YaHei       → 中文字体（苹方 / 微软雅黑）
+       sans-serif                          → 最后的兜底
+     中文字体一定要放在英文字体后面，否则英文也会用中文字体渲染，很难看。
+  */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+
+  /* 等宽字体，用于代码。ui-monospace 会选用系统默认的编程字体 */
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* 衬线字体栈，仅"杂志编辑风"用，营造阅读/文艺感 */
+  --font-serif:
+    Georgia, Cambria, "Times New Roman", "Songti SC", "SimSun", serif;
+
+  /* 标题字体默认先指向等宽（对应默认皮肤 instrument），
+     下面每个 [data-style] 块会按需覆盖成 等宽 / 无衬线 / 衬线。 */
+  --font-heading: var(--font-mono);
+
+  /* --- 字号 ---------------------------------------------------------------
+     用 clamp() 实现流式字号（fluid typography），这是现代 CSS 的一个大杀器。
+
+     clamp(最小值, 理想值, 最大值) 的含义：
+       取中间那个"理想值"，但不能小于第一个参数，也不能大于第三个。
+
+     理想值里的 vw 单位 = 视口宽度的百分之一。
+     所以 1.75rem + 1.5vw 表示"基础 28px，再加上屏幕宽度的 1.5%"。
+     屏幕越宽字越大，但被 clamp 限制在合理区间内。
+
+     这样做的好处：不需要写一堆 @media 断点来调字号，
+     从手机到 4K 显示器都是平滑过渡的。
+  */
+  --text-xs:   0.8125rem;                          /* 13px  辅助信息 */
+  --text-sm:   0.875rem;                           /* 14px  次要文字 */
+  --text-base: 1rem;                               /* 16px  正文基准 */
+  --text-lg:   1.125rem;                           /* 18px  引导文字 */
+  --text-xl:   clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);    /* h3 */
+  --text-2xl:  clamp(1.5rem, 1.3rem + 1vw, 2rem);          /* h2 */
+  --text-3xl:  clamp(1.875rem, 1.5rem + 1.9vw, 2.75rem);   /* h1 / 首页大标题 */
+
+  /* --- 行高 ---------------------------------------------------------------
+     行高用无单位数字（1.7 而不是 1.7em），这很关键。
+     无单位值会让子元素按自己的字号计算行高；
+     带单位的话子元素会继承计算后的绝对值，字号变了行高不跟着变，就会挤在一起。
+  */
+  --leading-tight: 1.25;   /* 标题 —— 紧凑，让多行标题看起来是一个整体 */
+  --leading-normal: 1.6;   /* 界面文字 */
+  --leading-relaxed: 1.75; /* 正文 —— 中文比英文需要更大行距才舒服 */
+
+  /* --- 间距 ---------------------------------------------------------------
+     采用 4px 为基础单位的间距阶梯。
+     所有间距都从这套值里取，页面的节奏感才会统一。
+     随手写 13px、17px 这种数字是页面显得"业余"的常见原因。
+  */
+  --space-1: 0.25rem;   /*  4px */
+  --space-2: 0.5rem;    /*  8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.5rem;    /* 24px */
+  --space-6: 2rem;      /* 32px */
+  --space-7: 3rem;      /* 48px */
+  --space-8: 4rem;      /* 64px */
+  --space-9: 6rem;      /* 96px */
+
+  /* --- 圆角 --------------------------------------------------------------- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 999px;  /* 足够大的值，用于做胶囊形和圆形 */
+
+  /* --- 布局尺寸 ----------------------------------------------------------- */
+  --width-content: 720px;   /* 正文宽度。约 40-45 个中文字/行，是阅读舒适区 */
+  --width-wide: 1100px;     /* 宽容器，用于卡片网格等 */
+  --header-height: 64px;
+
+  /* --- 动画 ---------------------------------------------------------------
+     统一过渡时长和缓动曲线。
+     150-250ms 是界面反馈的黄金区间：低于 100ms 感觉不到，高于 400ms 觉得卡。
+     cubic-bezier(0.4, 0, 0.2, 1) 是"先快后慢"，符合物理直觉，比 linear 自然得多。
+  */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration: 200ms;
+
+  /* --- 默认皮肤配色（工程仪器风）-----------------------------------------
+     这里给一套"兜底"默认值，保证即使 JS 没跑、data-style 没设上，
+     页面也有完整配色，不会变成黑底黑字。真正的皮肤在下面的 [data-style] 里覆盖。 */
+  --color-bg:          #0d1117;
+  --color-bg-subtle:   #161b22;
+  --color-bg-muted:    #21262d;
+  --color-text:        #e6edf3;
+  --color-text-muted:  #9198a1;
+  --color-text-subtle: #6e7681;
+  --color-border:      #30363d;
+  --color-border-strong: #444c56;
+  --color-accent:      #4aa8ff;
+  --color-accent-hover:#79c0ff;
+  --color-accent-soft: rgba(74, 168, 255, 0.12);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+
+/* --- 皮肤 A：工程仪器风（默认，暗）---------------------------------------
+   深灰底 + 蓝色强调 + 等宽标题。技术感强，适合当教材对照。
+   data-scheme 供代码高亮器判断明暗（见第 6 节）。 */
+[data-style="instrument"] {
+  --color-bg:          #0d1117;
+  --color-bg-subtle:   #161b22;
+  --color-bg-muted:    #21262d;
+  --color-text:        #e6edf3;
+  --color-text-muted:  #9198a1;
+  --color-text-subtle: #6e7681;
+  --color-border:      #30363d;
+  --color-border-strong: #444c56;
+  --color-accent:      #4aa8ff;
+  --color-accent-hover:#79c0ff;
+  --color-accent-soft: rgba(74, 168, 255, 0.12);
+  --font-heading:      var(--font-mono);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* --- 皮肤 B：浅色极简风（亮）---------------------------------------------
+   白底 + 蓝色强调 + 无衬线标题。干净、主流技术站观感。 */
+[data-style="minimal"] {
+  --color-bg:          #ffffff;
+  --color-bg-subtle:   #f6f8fa;
+  --color-bg-muted:    #eaeef2;
+  --color-text:        #1a1d23;
+  --color-text-muted:  #5b6270;
+  --color-text-subtle: #868d9a;
+  --color-border:      #e3e6ea;
+  --color-border-strong: #cbd0d8;
+  --color-accent:      #0969da;
+  --color-accent-hover:#0550ae;
+  --color-accent-soft: #ddf0ff;
+  --font-heading:      var(--font-sans);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+}
+
+/* --- 皮肤 C：终端黑客风（暗）---------------------------------------------
+   近黑底 + 磷光绿强调 + 全等宽。像终端/代码编辑器，个性强。 */
+[data-style="terminal"] {
+  --color-bg:          #0a0e0a;
+  --color-bg-subtle:   #0f150f;
+  --color-bg-muted:    #162016;
+  --color-text:        #c8f0c8;
+  --color-text-muted:  #6f9f6f;
+  --color-text-subtle: #4f7f4f;
+  --color-border:      #1e2e1e;
+  --color-border-strong: #2e4a2e;
+  --color-accent:      #3fb950;
+  --color-accent-hover:#56d364;
+  --color-accent-soft: rgba(63, 185, 80, 0.12);
+  --font-heading:      var(--font-mono);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* --- 皮肤 D：杂志编辑风（亮，暖）-----------------------------------------
+   暖白底 + 琥珀强调 + 衬线标题。偏内容阅读，文艺感强。 */
+[data-style="magazine"] {
+  --color-bg:          #faf8f5;
+  --color-bg-subtle:   #f3efe9;
+  --color-bg-muted:    #ece6dd;
+  --color-text:        #2b2620;
+  --color-text-muted:  #6b6258;
+  --color-text-subtle: #9a9085;
+  --color-border:      #e3dcd2;
+  --color-border-strong: #cfc6b8;
+  --color-accent:      #b45309;
+  --color-accent-hover:#8a3e06;
+  --color-accent-soft: #f6e7d4;
+  --font-heading:      var(--font-serif);
+  --shadow-sm: 0 1px 2px rgba(60, 40, 20, 0.05);
+  --shadow-md: 0 4px 12px rgba(60, 40, 20, 0.08);
+}
+
+
+/* =============================================================================
+   2. 基础重置
+   =============================================================================
+   不用 normalize.css 之类的库，只写真正需要的几条。
+   现代浏览器的默认样式已经比较一致了，全量重置反而是负担。
+   ============================================================================= */
+
+/* box-sizing: border-box 让 width 包含 padding 和 border。
+   这几乎是所有人想要的行为 —— 你说"这个盒子 200px 宽"，
+   就该是 200px，而不是 200px 加上内边距再加上边框。
+   *, ::before, ::after 覆盖所有元素和伪元素。 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 清掉默认外边距。浏览器给 h1~h6、p、ul 等预设的 margin 数值杂乱，
+   统一归零后由我们自己定义，间距节奏才可控。 */
+* {
+  margin: 0;
+}
+
+html {
+  /* 锚点跳转时平滑滚动，而不是瞬间闪现 */
+  scroll-behavior: smooth;
+  /* 锚点定位时在顶部留出空间，否则目标标题会被固定导航栏挡住 */
+  scroll-padding-top: calc(var(--header-height) + var(--space-4));
+  /* 防止 iOS 横竖屏切换时字号被自动放大 */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+
+  /* 字体抗锯齿。在 macOS 上让文字看起来更细腻，
+     不加的话深色背景上的浅色文字会显得过粗 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* 皮肤切换时颜色平滑过渡，避免突兀的闪变 */
+  transition: background-color var(--duration) var(--ease),
+              color var(--duration) var(--ease);
+
+  /* flex 布局让页脚在内容不足时也能贴在视口底部（sticky footer） */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* dvh 是动态视口高度，解决移动端浏览器地址栏伸缩导致的 100vh 跳动问题。
+     写在 100vh 后面做渐进增强 —— 不支持的浏览器会忽略这行 */
+  min-height: 100dvh;
+}
+
+/* 媒体元素默认是 inline，底部会莫名多出几像素空白（那是行内元素的基线间隙）。
+   改成 block 就消失了。max-width 防止图片撑破容器。 */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 表单元素默认不继承字体，必须手动指定，否则输入框里会是浏览器默认的宋体/Arial */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* 长单词/长 URL 强制换行，防止撑破布局 */
+p,
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+
+/* --- 焦点样式 ---------------------------------------------------------------
+   :focus-visible 只在"键盘操作"时显示焦点环，鼠标点击时不显示。
+
+   这解决了一个长期矛盾：设计师嫌焦点框难看想删掉（outline: none），
+   但删了键盘用户就完全不知道自己选中了哪个元素，等于废掉无障碍访问。
+   :focus-visible 让两边都满意。
+*/
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+
+/* --- 尊重"减少动效"偏好 -----------------------------------------------------
+   有些人（前庭功能障碍、晕动症）会在系统设置里开启"减少动态效果"。
+   这个媒体查询能读到该设置，我们应当尊重它，把所有动画降到几乎瞬时。
+
+   注意不是设成 0s —— 某些依赖 transitionend 事件的 JS 逻辑会因此失效，
+   设成 0.01ms 既保证视觉上没有动画，又能让事件正常触发。
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+/* =============================================================================
+   3. 排版
+   ============================================================================= */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);  /* 标题用皮肤定义的字体：等宽/无衬线/衬线 */
+  line-height: var(--leading-tight);
+  font-weight: 650;
+  letter-spacing: -0.015em;  /* 大字号时收紧字距，视觉上更紧凑高级 */
+  color: var(--color-text);
+  /* text-wrap: balance 让多行标题的每行长度尽量均衡，
+     避免出现"第二行只有两个字"的孤字现象。较新的属性，不支持的浏览器直接忽略 */
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--text-3xl); }
+h2 { font-size: var(--text-2xl); }
+h3 { font-size: var(--text-xl); }
+h4 { font-size: var(--text-lg); }
+
+a {
+  color: var(--color-accent);
+  /* 去掉默认下划线，由具体场景决定是否加回来 */
+  text-decoration: none;
+  transition: color var(--duration) var(--ease);
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+/* 代码相关元素 */
+code,
+pre,
+kbd {
+  font-family: var(--font-mono);
+  /* 等宽字体的字形通常比同字号的比例字体显得大，缩到 0.9 倍才协调 */
+  font-size: 0.9em;
+}
+
+/* 行内代码：加个浅背景块，和正文区分开 */
+code {
+  background-color: var(--color-bg-muted);
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+}
+
+/* 代码块内部的 code 要清掉上面的样式，否则会出现"块中块"的双层背景 */
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-7) 0;
+}
+
+
+/* =============================================================================
+   4. 布局
+   ============================================================================= */
+
+/* 通用容器：限制最大宽度并居中，两侧留出内边距。
+   inline 方向的 padding（左右）用于防止小屏幕上内容贴边。 */
+.container {
+  width: 100%;
+  max-width: var(--width-wide);
+  margin-inline: auto;              /* 逻辑属性，等价于 margin-left/right: auto */
+  padding-inline: var(--space-5);
+}
+
+/* 窄容器：用于文章正文。
+   一行文字太长眼睛会难以找到下一行的开头，控制在 720px 左右最舒服 */
+.container--narrow {
+  max-width: var(--width-content);
+}
+
+/* 主内容区。flex: 1 让它占满剩余空间，把页脚推到底部 */
+.site-main {
+  flex: 1;
+  padding-block: var(--space-7);    /* 上下内边距 */
+}
+
+
+/* --- 跳过导航链接 --------------------------------------------------------- */
+.skip-link {
+  position: absolute;
+  /* 默认移到视口上方藏起来，但仍在无障碍树里，Tab 能聚焦到 */
+  top: -100px;
+  left: var(--space-4);
+  z-index: 100;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-accent);
+  color: #fff;
+  border-radius: var(--radius-md);
+  transition: top var(--duration) var(--ease);
+}
+
+/* 一旦被键盘聚焦就滑下来 */
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+
+/* =============================================================================
+   5. 组件
+   ============================================================================= */
+
+/* --- 顶部导航栏 ----------------------------------------------------------- */
+
+.site-header {
+  /* sticky 让导航栏滚动到顶部时固定住。
+     比 position: fixed 好的地方在于它仍占据文档流空间，
+     不会出现内容被遮住需要手动加 padding-top 的问题 */
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  background-color: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  border-bottom: 1px solid var(--color-border);
+
+  /* 毛玻璃效果：背景半透明 + 模糊。
+     需要配合半透明背景色才有效果，纯色背景下 blur 是看不出来的 */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);   /* Safari 需要前缀 */
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  height: var(--header-height);
+}
+
+/* Logo */
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-weight: 650;
+  font-size: var(--text-lg);
+  letter-spacing: -0.02em;
+  /* margin-right: auto 把后面的元素全部推到右边，
+     这是 flex 布局里做"左右分栏"最简洁的写法，比加 justify-content 更灵活 */
+  margin-right: auto;
+}
+
+.site-logo:hover {
+  color: var(--color-accent);
+}
+
+/* Logo 前面的小方块。纯 CSS 图形，不用图片 */
+.site-logo__mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background-color: var(--color-accent);
+  flex-shrink: 0;   /* 防止空间不足时被压扁 */
+}
+
+/* 导航链接列表 */
+.site-nav__list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  list-style: none;   /* 去掉 <ul> 的小圆点 */
+  padding: 0;
+  margin: 0;
+}
+
+.site-nav__link {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: color var(--duration) var(--ease),
+              background-color var(--duration) var(--ease);
+}
+
+.site-nav__link:hover {
+  color: var(--color-text);
+  background-color: var(--color-bg-muted);
+}
+
+/* 当前页面对应的导航项 */
+.site-nav__link.is-active {
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+/* 皮肤选择器：一个被美化过的 <select>。
+   原生 select 很难看且不受 CSS 完全控制，这里至少统一配色、圆角、边框。 */
+.skin-select {
+  height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  /* 让下拉箭头用当前强调色，而不是浏览器默认的黑箭头 */
+  transition: color var(--duration) var(--ease),
+              border-color var(--duration) var(--ease);
+}
+
+.skin-select:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+/* 语言切换按钮：显示当前语言（中 / EN），点击在 zh 和 en 间切换 */
+.lang-toggle {
+  display: grid;
+  place-items: center;      /* grid 布局下这一行就能实现水平垂直双向居中 */
+  min-width: 38px;
+  height: 38px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  transition: color var(--duration) var(--ease),
+              border-color var(--duration) var(--ease),
+              background-color var(--duration) var(--ease);
+}
+
+.lang-toggle:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+  background-color: var(--color-bg-muted);
+}
+
+/* 汉堡菜单按钮：桌面端隐藏，移动端才出现（见响应式部分） */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 38px;
+  height: 38px;
+  padding: 0 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-toggle__bar {
+  display: block;
+  height: 2px;
+  width: 100%;
+  border-radius: 2px;
+  background-color: var(--color-text);
+  transition: transform var(--duration) var(--ease),
+              opacity var(--duration) var(--ease);
+}
+
+/* 菜单展开时把三条杠变成一个 X。
+   [aria-expanded="true"] 直接用无障碍属性当选择器 ——
+   这样"状态"只需要在 JS 里维护一处，样式自动跟随，不用再加个 .is-open 类。 */
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(2) {
+  opacity: 0;   /* 中间那条淡出 */
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+
+/* --- 按钮 ----------------------------------------------------------------- */
+
+/* 通用按钮基类。用 .btn 套基础样式，再用修饰类区分主次。 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--text-base);
+  cursor: pointer;
+  text-decoration: none;            /* 当 .btn 用在 <a> 上时去掉下划线 */
+  transition: background-color var(--duration) var(--ease),
+              border-color var(--duration) var(--ease),
+              color var(--duration) var(--ease),
+              transform var(--duration) var(--ease);
+}
+
+/* 主按钮：实心强调色 */
+.btn--primary {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+.btn--primary:hover {
+  background-color: var(--color-accent-hover);
+  color: #fff;
+}
+
+/* 次按钮：描边 */
+.btn--ghost {
+  border-color: var(--color-border-strong);
+  background-color: transparent;
+  color: var(--color-text);
+}
+.btn--ghost:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+
+/* --- 页脚 ----------------------------------------------------------------- */
+
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding-block: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.site-footer__meta {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.site-footer__sep {
+  margin-inline: var(--space-2);
+  color: var(--color-text-subtle);
+}
+
+.social-links {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.social-links__item {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  transition: color var(--duration) var(--ease),
+              background-color var(--duration) var(--ease);
+}
+
+.social-links__item:hover {
+  color: var(--color-accent);
+  background-color: var(--color-bg-muted);
+}
+
+.social-links__item .icon {
+  width: 19px;
+  height: 19px;
+}
+
+
+/* --- 图标基础尺寸 --------------------------------------------------------- */
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+
+/* --- 开屏页（splash）-----------------------------------------------------
+   极简封面：名字 + slogan + 进入按钮，外加右上角皮肤/语言切换。
+   整页占满一屏，内容垂直水平居中。 */
+.splash {
+  /* 不带顶部导航栏，自己占满整个视口 */
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-6);
+  position: relative;
+}
+
+/* 右上角的小控件：皮肤选择器 + 语言切换 */
+.splash__controls {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.splash__inner {
+  max-width: 640px;
+}
+
+/* 名字：用主色，是整页视觉焦点。字号比正文大很多。 */
+.splash__name {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--color-accent);
+  line-height: 1.05;
+}
+
+.splash__slogan {
+  display: inline-block;
+  margin-top: var(--space-4);
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+/* 进入按钮，明显比普通链接大，引导点击 */
+.splash__enter {
+  margin-top: var(--space-7);
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--text-lg);
+}
+
+
+/* --- 首页 Hero 区 --------------------------------------------------------- */
+
+.hero {
+  padding-block: var(--space-7) var(--space-8);
+}
+
+.hero__greeting {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-3);
+}
+
+/* 名字用主色高亮，让视线第一时间落在这里 */
+.hero__name {
+  color: var(--color-accent);
+}
+
+.hero__tagline {
+  display: inline-block;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-4);
+}
+
+.hero__intro {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+  max-width: 60ch;    /* ch 单位 = 字符"0"的宽度，用来控制文本行长非常直观 */
+}
+
+
+/* --- 区块标题 ------------------------------------------------------------- */
+
+.section {
+  margin-block: var(--space-8);
+}
+
+.section__header {
+  display: flex;
+  align-items: baseline;      /* 按文字基线对齐，比 center 更整齐 */
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section__title {
+  font-size: var(--text-xl);
+}
+
+.section__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;        /* 防止"查看全部 →"被换行拆开 */
+}
+
+.section__more .icon {
+  width: 15px;
+  height: 15px;
+  transition: transform var(--duration) var(--ease);
+}
+
+/* 悬停时箭头右移一点，是个成本极低但很有质感的微交互 */
+.section__more:hover .icon {
+  transform: translateX(3px);
+}
+
+
+/* --- 文章列表项 ----------------------------------------------------------- */
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  /* gap 在 flex 布局里替代了传统的 margin-bottom + :last-child 清除。
+     再也不用写 "最后一个不要下边距" 这种补丁了 */
+  gap: var(--space-2);
+}
+
+.post-item {
+  display: block;
+  padding: var(--space-4);
+  margin-inline: calc(var(--space-4) * -1);   /* 负外边距，让悬停背景比文字更宽，视觉上更舒展 */
+  border-radius: var(--radius-lg);
+  color: inherit;
+  transition: background-color var(--duration) var(--ease);
+}
+
+.post-item:hover {
+  background-color: var(--color-bg-subtle);
+  color: inherit;
+}
+
+.post-item__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  transition: color var(--duration) var(--ease);
+}
+
+.post-item:hover .post-item__title {
+  color: var(--color-accent);
+}
+
+.post-item__excerpt {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: var(--leading-normal);
+  margin-bottom: var(--space-2);
+
+  /* 多行文本截断（超过 2 行显示省略号）。
+     这套写法虽然带 -webkit- 前缀，但所有现代浏览器都支持，是事实标准 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 文章元信息（日期、阅读时长、标签） */
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+.post-meta__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.post-meta__item .icon {
+  width: 14px;
+  height: 14px;
+}
+
+
+/* --- 标签 ----------------------------------------------------------------- */
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  padding: 0;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg-muted);
+  border-radius: var(--radius-full);
+  transition: color var(--duration) var(--ease),
+              background-color var(--duration) var(--ease);
+}
+
+.tag:hover {
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+/* 带计数的标签（标签云用） */
+.tag__count {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+
+/* --- 卡片（项目列表用）---------------------------------------------------- */
+
+.card-grid {
+  display: grid;
+  /*
+    这一行是响应式网格的核心，值得仔细理解：
+
+    repeat(auto-fill, minmax(280px, 1fr))
+
+    auto-fill  → 有多少空间就放多少列，不用手动指定列数
+    minmax(280px, 1fr) → 每列最小 280px，最大平分剩余空间
+
+    效果：屏幕宽就自动排 3 列、4 列，屏幕窄就自动变 2 列、1 列，
+    整个过程不需要写任何 @media 查询。这是 CSS Grid 最实用的能力之一。
+
+    auto-fill 和 auto-fit 的区别：
+    列数不足以填满一行时，auto-fill 会保留空列（卡片保持原宽度），
+    auto-fit 会让现有列拉伸填满整行。看需求选，这里希望卡片别被拉太宽，用 auto-fill。
+  */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg);
+  color: inherit;
+  transition: border-color var(--duration) var(--ease),
+              box-shadow var(--duration) var(--ease),
+              transform var(--duration) var(--ease);
+}
+
+.card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+  /* 轻微上浮。位移量要小（2-4px），大了会显得廉价 */
+  transform: translateY(-2px);
+  color: inherit;
+}
+
+.card__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.card__title .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--color-text-subtle);
+}
+
+.card__desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: var(--leading-normal);
+  /* flex: 1 让描述占满剩余高度，把下方的标签推到卡片底部对齐。
+     同一行的卡片高度不同时，这招能让底部元素保持在同一水平线 */
+  flex: 1;
+}
+
+.card__link {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.card__link .icon {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--duration) var(--ease);
+}
+
+.card__link:hover .icon {
+  transform: translateX(3px);
+}
+
+
+/* --- 文章正文 ------------------------------------------------------------- */
+
+.post-header {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.post-header__title {
+  margin-bottom: var(--space-4);
+}
+
+/*
+  .prose 是文章正文的排版容器。
+  由于 Markdown 生成的 HTML 我们无法给每个标签加 class，
+  只能用后代选择器统一设置样式。这是少数适合用标签选择器的场景。
+*/
+.prose {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);
+}
+
+/* 段落间距。中文排版行距大、段距也要相应放大才分得清段落 */
+.prose > * + * {
+  /*
+    这个选择器叫"猫头鹰选择器"（lobotomized owl），读作 "> * + *"：
+    选中所有"前面有兄弟元素"的直接子元素。
+
+    效果等于"除了第一个元素，其余都加上边距"。
+    好处是不用为每种标签单独写 margin，也不会在容器开头留下多余空白。
+  */
+  margin-top: var(--space-5);
+}
+
+/* 标题上方需要更大的间距，形成清晰的章节分隔 */
+.prose h2 {
+  margin-top: var(--space-8);
+  padding-top: var(--space-2);
+}
+
+.prose h3 {
+  margin-top: var(--space-6);
+}
+
+/* 正文里的链接加下划线。
+   导航栏的链接靠位置就能看出是链接，但正文里混在文字中，
+   只靠颜色区分对色觉障碍者不友好，下划线是必要的第二重提示。 */
+.prose a {
+  text-decoration: underline;
+  /* 下划线离文字远一点，别贴着字母底部，也别切断中文的下半部分 */
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  transition: text-decoration-color var(--duration) var(--ease);
+}
+
+.prose a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: var(--space-5);
+}
+
+.prose li + li {
+  margin-top: var(--space-2);
+}
+
+/* 引用块 */
+.prose blockquote {
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-text-muted);
+  font-style: normal;   /* 中文没有斜体字形，强行倾斜是把字"压扁"，很难看，所以关掉 */
+}
+
+/* 代码块 */
+.prose pre {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  /* 代码不换行，超出部分横向滚动。
+     强制换行会破坏代码的缩进结构，读起来更痛苦 */
+  overflow-x: auto;
+  line-height: 1.6;
+  /* 让触屏设备的横向滚动更顺滑 */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 图片 */
+.prose img {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  margin-inline: auto;
+}
+
+/* 表格 */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;   /* 合并相邻单元格边框，避免出现双线 */
+  font-size: var(--text-sm);
+  display: block;
+  overflow-x: auto;            /* 窄屏时可横向滚动，不撑破布局 */
+}
+
+.prose th,
+.prose td {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.prose th {
+  background-color: var(--color-bg-subtle);
+  font-weight: 600;
+}
+
+
+/* --- 文章目录（TOC）------------------------------------------------------- */
+
+.toc {
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-6);
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+}
+
+.toc__title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;      /* 全大写文字需要加字距，否则字母会挤成一团 */
+  color: var(--color-text-subtle);
+  margin-bottom: var(--space-3);
+}
+
+.toc ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+/* 嵌套层级用左内边距体现缩进 */
+.toc ul ul {
+  padding-left: var(--space-4);
+  margin-top: var(--space-1);
+}
+
+.toc li {
+  margin-bottom: var(--space-1);
+}
+
+.toc a {
+  color: var(--color-text-muted);
+}
+
+.toc a:hover {
+  color: var(--color-accent);
+}
+
+
+/* --- 上一篇 / 下一篇 ------------------------------------------------------ */
+
+.post-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.post-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: inherit;
+  transition: border-color var(--duration) var(--ease),
+              background-color var(--duration) var(--ease);
+}
+
+.post-nav__link:hover {
+  border-color: var(--color-border-strong);
+  background-color: var(--color-bg-subtle);
+  color: inherit;
+}
+
+/* "下一篇"靠右对齐，形成对称的视觉平衡 */
+.post-nav__link--next {
+  text-align: right;
+  /* grid-column: 2 强制它待在第二列。
+     否则当只有"下一篇"没有"上一篇"时，它会跑到第一列去 */
+  grid-column: 2;
+}
+
+.post-nav__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+.post-nav__link--next .post-nav__label {
+  justify-content: flex-end;
+}
+
+.post-nav__title {
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+
+/* --- 分页 ----------------------------------------------------------------- */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-7);
+}
+
+.pagination__link {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  height: 38px;
+  padding-inline: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  transition: all var(--duration) var(--ease);
+}
+
+.pagination__link:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.pagination__link.is-active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+
+/* --- 空状态 --------------------------------------------------------------- */
+
+.empty-state {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+
+/* =============================================================================
+   5b. 关于页 / 404 页 专用样式
+   ========================================================================== */
+
+/* 页面小标签（eyebrow）：比标题低一级，放在大标题上方点明栏目。
+   用 muted 色 + 字距，制造"次要但点睛"的层次感。 */
+.page-eyebrow {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+/* 关于页「联系我」的描述文字 */
+.about-contact-desc {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+/* 社交链接胶囊的横向排列。flex-wrap 保证窄屏自动换行，不会溢出。 */
+.contact-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+/* .btn 本身已是 inline-flex（图标+文字横向排列），这里无需额外样式。 */
+
+
+/* --- 404 居中布局 --------------------------------------------------------- */
+.notfound {
+  /* min-height 让内容在视口里垂直居中，即使内容很短也不会贴顶 */
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding-block: var(--space-8);
+}
+
+/* 404 大字号：用 clamp 让它在手机到桌面间平滑放大，且始终用标题字体（随皮肤变） */
+.notfound__code {
+  font-family: var(--font-heading);
+  font-size: clamp(4rem, 12vw, 8rem);
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.notfound__text {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  max-width: 48ch;
+}
+
+/* 快捷导航胶囊，居中排列 */
+.notfound__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: var(--space-2);
+}
+
+
+/* =============================================================================
+   6. 代码高亮配色
+   =============================================================================
+   代码高亮器（如 highlight.js / Chroma）输出的是带 class 的 <span>，
+   我们在这里定义每个类的颜色。类名含义（常用的几个）：
+     .k  关键字(keyword)    .s  字符串(string)     .c  注释(comment)
+     .n  名称(name)         .m  数字(number)       .o  运算符(operator)
+     .nf 函数名             .nc 类名               .kt 类型
+
+   注意：这里按明暗分两套，由 <html data-scheme="dark|light"> 控制。
+   data-scheme 由首屏内联脚本根据所选皮肤设置（instrument/terminal = dark，
+   minimal/magazine = light）。这样代码配色和皮肤明暗始终一致。
+   ============================================================================= */
+
+/* 代码块容器 */
+.highlight {
+  margin-block: var(--space-5);
+}
+
+.highlight pre {
+  margin: 0;
+}
+
+/* 亮色方案下的代码配色 */
+[data-scheme="light"] .chroma .k,
+[data-scheme="light"] .chroma .kd,
+[data-scheme="light"] .chroma .kn,
+[data-scheme="light"] .chroma .kr { color: #a626a4; }   /* 关键字：紫 */
+[data-scheme="light"] .chroma .s,
+[data-scheme="light"] .chroma .s1,
+[data-scheme="light"] .chroma .s2,
+[data-scheme="light"] .chroma .sb { color: #50a14f; }   /* 字符串：绿 */
+[data-scheme="light"] .chroma .c,
+[data-scheme="light"] .chroma .c1,
+[data-scheme="light"] .chroma .cm { color: #9ca3af; font-style: italic; }  /* 注释：灰 */
+[data-scheme="light"] .chroma .nf,
+[data-scheme="light"] .chroma .nx { color: #4078f2; }   /* 函数：蓝 */
+[data-scheme="light"] .chroma .m,
+[data-scheme="light"] .chroma .mi,
+[data-scheme="light"] .chroma .mf { color: #c18401; }   /* 数字：橙 */
+[data-scheme="light"] .chroma .nt { color: #e45649; }   /* 标签：红 */
+[data-scheme="light"] .chroma .na { color: #c18401; }   /* 属性 */
+
+/* 暗色方案下的代码配色：整体提亮，保证在深色背景上的对比度 */
+[data-scheme="dark"] .chroma .k,
+[data-scheme="dark"] .chroma .kd,
+[data-scheme="dark"] .chroma .kn,
+[data-scheme="dark"] .chroma .kr { color: #c678dd; }
+[data-scheme="dark"] .chroma .s,
+[data-scheme="dark"] .chroma .s1,
+[data-scheme="dark"] .chroma .s2,
+[data-scheme="dark"] .chroma .sb { color: #98c379; }
+[data-scheme="dark"] .chroma .c,
+[data-scheme="dark"] .chroma .c1,
+[data-scheme="dark"] .chroma .cm { color: #6b7280; font-style: italic; }
+[data-scheme="dark"] .chroma .nf,
+[data-scheme="dark"] .chroma .nx { color: #61afef; }
+[data-scheme="dark"] .chroma .m,
+[data-scheme="dark"] .chroma .mi,
+[data-scheme="dark"] .chroma .mf { color: #d19a66; }
+[data-scheme="dark"] .chroma .nt { color: #e06c75; }
+[data-scheme="dark"] .chroma .na { color: #d19a66; }
+
+
+/* =============================================================================
+   7. 工具类
+   ============================================================================= */
+
+/*
+  视觉上隐藏但屏幕阅读器仍可读取。
+  用于给纯图标按钮补充文字说明，或标注区域标题。
+
+  为什么不用 display:none 或 visibility:hidden？
+  因为那两个会把元素从无障碍树里移除，屏幕阅读器也读不到了，就失去意义了。
+  这套写法是把元素压缩成 1×1 像素并裁剪掉，视觉上等于消失，但仍在文档流中。
+*/
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* =============================================================================
+/* =============================================================================
+   7.5 内容页专属组件（项目 / 装备 / 近况 / 导航 / 搜索）
+   这些页面都是「数据 → DOM」渲染：HTML 里只留空容器，
+   由每页底部的内联脚本把数组循环拼成卡片。所以这里大多是「卡片内排版」的样式。
+   ============================================================================= */
+
+/* 页面引言下的一句引导语（muted 灰色小字）。
+   hero 给大标题，.lead 给一句话补充说明，分工清晰。 */
+.lead {
+  margin: 0 0 var(--space-6);
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  line-height: 1.6;
+  max-width: 60ch;
+}
+
+/* 卡片底部的「元数据行」：一行小标签 + 状态徽章。
+   flex + wrap 让内容多时自动换行，不会溢出卡片。 */
+.card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto;            /* 关键：把元推行顶到卡片底部，多卡高度不齐也能对齐 */
+  padding-top: var(--space-3);
+}
+
+/* 通用工具类：margin-left: auto 把元素推到 flex 行的末尾。
+   卡片里用它在「徽章+标签」和「查看 →」之间拉开间距，右对齐动作按钮。 */
+.ml-auto { margin-left: auto; }
+
+/* 状态徽章（项目页用）：通用 .badge + 语义修饰类。
+   用「边框 + 文字色」而非整块填充，视觉更轻，不会抢卡片标题的风头。 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;       /* 999px = 胶囊形，做圆角按钮/标签的惯用写法 */
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.8;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+.badge--ok  { color: var(--color-pos);   border-color: color-mix(in srgb, var(--color-pos) 40%, transparent); }
+.badge--wip { color: var(--color-warn);  border-color: color-mix(in srgb, var(--color-warn) 40%, transparent); }
+.badge--arch{ color: var(--color-text-muted); }
+
+/* 分类分组（装备页 / 近况页用）：一个分类标题 + 下面一套卡片网格。
+   margin-top 让不同分类之间留白，避免挤在一起。 */
+.subsection { margin-top: var(--space-8); }
+.subsection:first-of-type { margin-top: 0; }
+.subsection__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xl);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-4);
+  color: var(--color-text);
+}
+.subsection__title .icon { color: var(--color-accent); }
+
+/* 链接卡片（导航页用）：在 .card 基础上强调「外链」属性。
+   复用 .card 的圆角/边框，只补一条外链箭头提示这是跳出本站。 */
+.card--link .card__link { color: var(--color-accent); }
+
+/* ---- 搜索页 ------------------------------------------------------------- */
+.search-form {
+  position: relative;
+  max-width: 640px;
+  margin-bottom: var(--space-5);
+}
+/* 输入框左侧塞一个放大镜图标：用绝对定位把图标浮在 input 上，
+   input 自己加左内边距给图标腾位置。 */
+.search-form .icon {
+  position: absolute;
+  left: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;        /* 图标不拦截点击，点哪都能聚焦输入框 */
+}
+.search-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-9);
+  font-size: var(--text-lg);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--duration) var(--ease),
+              box-shadow var(--duration) var(--ease);
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  /* 聚焦时加一圈淡色光晕，比单纯变色更明显，是表单可用性的常见手段 */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+.search-stats {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-4);
+}
+.result-list { display: grid; gap: var(--space-3); }
+/* 单条搜索结果：标题链接 + 类型徽章 + 摘要。
+   用 grid 两列（徽章固定宽、其余自适应）让多行对齐整齐。 */
+.result {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--duration) var(--ease),
+              transform var(--duration) var(--ease);
+}
+.result:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);  /* 轻微上浮，给一点「可点」的反馈 */
+}
+.result__title { font-weight: 600; color: var(--color-text); }
+.result__title:hover { color: var(--color-accent); }
+.result__kind {
+  justify-self: start;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-accent);
+  background-color: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.result__excerpt {
+  grid-column: 1 / -1;          /* 摘要横跨整行，不被徽章挤 */
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  margin-top: 2px;
+}
+/* 搜索无结果 / 空态：居中、淡色，给一句友好的提示而不是空白。 */
+.empty-state {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+/* =============================================================================
+   8. 响应式
+   =============================================================================
+   断点选择说明：
+   不按具体设备型号定断点（那样永远追不完），而是"当布局开始难看时"就加一个。
+   768px 是平板竖屏的常见宽度，也是大多数设计从"多列"退化到"单列"的临界点。
+   ============================================================================= */
+
+@media (max-width: 768px) {
+
+  /* 移动端显示汉堡按钮 */
+  .nav-toggle {
+    display: flex;
+    order: 3;          /* flex 的 order 属性可以改变视觉顺序而不动 HTML 结构 */
+  }
+
+  /* 语言切换在移动端排第 2（紧挨汉堡） */
+  .lang-toggle {
+    order: 2;
+  }
+
+  /* 皮肤选择器在移动端排在语言切换左边 */
+  .skin-select {
+    order: 1;
+  }
+
+  /*
+    移动端导航：默认收起，点汉堡展开。
+    这里用绝对定位做成从导航栏下方展开的面板。
+  */
+  .site-nav {
+    /* order: 4 让它排在最后，配合 width: 100% 会被挤到第二行 */
+    order: 4;
+    width: 100%;
+    display: none;
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* JS 会给 <nav> 加上 is-open 类来展开 */
+  .site-nav.is-open {
+    display: block;
+  }
+
+  .site-nav__list {
+    flex-direction: column;
+    align-items: stretch;   /* 让每个链接占满宽度，点击区域更大 */
+    gap: var(--space-1);
+  }
+
+  .site-nav__link {
+    /*
+      移动端点击目标至少 44×44px —— 这是苹果人机界面指南给出的数字，
+      对应成年人指尖的平均接触面积。小于这个尺寸误触率会明显上升。
+    */
+    padding: var(--space-3) var(--space-3);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-size: var(--text-base);
+  }
+
+  /* 导航栏高度改为自适应，因为展开后要容纳下面的菜单 */
+  .site-header__inner {
+    height: auto;
+    min-height: var(--header-height);
+    flex-wrap: wrap;
+    padding-block: var(--space-2);
+    gap: var(--space-3);
+  }
+
+  /* 上一篇/下一篇改为上下堆叠 */
+  .post-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .post-nav__link--next {
+    grid-column: 1;       /* 单列布局下取消强制第二列 */
+    text-align: left;
+  }
+
+  .post-nav__link--next .post-nav__label {
+    justify-content: flex-start;
+  }
+
+  /* 区块标题在窄屏改为上下排列，避免"标题"和"查看全部"挤在一起 */
+  .section__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  /* 文章列表项取消负外边距，小屏幕上寸土寸金 */
+  .post-item {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .post-item:hover {
+    background-color: transparent;   /* 触屏没有 hover 概念，去掉避免点击后残留高亮 */
+  }
+}
+
+
+/* =============================================================================
+   9. 打印样式
+   =============================================================================
+   有人会把技术文章打印出来或存成 PDF。
+   几行 CSS 就能让打印效果从"惨不忍睹"变成"像模像样"，性价比很高。
+   ============================================================================= */
+
+@media print {
+  /* 导航、页脚、目录在纸上毫无意义，直接去掉 */
+  .site-header,
+  .site-footer,
+  .toc,
+  .post-nav,
+  .pagination,
+  .skip-link,
+  .splash__controls {
+    display: none !important;
+  }
+
+  /* 强制白底黑字，省墨也更清晰 */
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;      /* 印刷用 pt 而不是 px */
+  }
+
+  /* 把链接地址打印在链接文字后面，否则纸上的链接完全无从查证 */
+  .prose a::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #555;
+  }
+
+  /* 避免标题孤零零地留在页面底部 */
+  h1, h2, h3 {
+    break-after: avoid;
+  }
+
+  /* 代码块和图片不要被分页切断 */
+  pre, img, blockquote {
+    break-inside: avoid;
+  }
+}

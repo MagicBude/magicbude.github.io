@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh" data-style="instrument" data-scheme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>项目 · magicbude</title>
+  <meta name="description" content="magicbude 做过的网站、小工具、开源项目与正在折腾的东西。">
+
+  <!-- 防闪白内联脚本：CSS 加载前先按 localStorage 设皮肤/语言，键名与 main.js / i18n.js 一致 -->
+  <script>
+    (function () {
+      try {
+        var s = localStorage.getItem("site-style") || "instrument";
+        var l = localStorage.getItem("site-lang") || "zh";
+        var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
+        var d = document.documentElement;
+        d.setAttribute("data-style", s);
+        d.setAttribute("data-scheme", scheme);
+        d.setAttribute("lang", l);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="common.skip">跳到主内容</a>
+
+  <!-- 头部容器：js/main.js 根据 site.config.js 注入导航（数据驱动，不写死） -->
+  <header id="site-header" class="site-header"></header>
+
+  <main class="site-main" id="main">
+    <!-- ============ 页面引言 ============ -->
+    <section class="hero container container--narrow">
+      <p class="page-eyebrow" data-i18n="projects.eyebrow">作品</p>
+      <h1 class="hero__name" data-i18n="projects.title">项目</h1>
+      <p class="lead" data-i18n="projects.lead">我做过的网站、小工具、开源项目，以及正在折腾的东西。</p>
+    </section>
+
+    <!-- ============ 项目卡片网格 ============ -->
+    <section class="section container">
+      <!-- 卡片由 renderProjects 根据 window.PROJECTS 生成 -->
+      <div class="card-grid" id="projects-grid"></div>
+      <!-- 空态：没有任何项目时显示（可由 i18n 翻译） -->
+      <p class="empty-state" id="projects-empty" hidden data-i18n="projects.empty">还没有公开的项目，先去 GitHub 看看？</p>
+    </section>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+  <!-- 脚本顺序：配置 → 图标 → 多语 → 主逻辑 -->
+  <script src="js/site.config.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/main.js"></script>
+
+  <!--
+    项目页「数据 → DOM」渲染脚本。
+    - window.PROJECTS 是本页的「内容数据源」：每加一个项目，只往数组里加一项即可，
+      不用碰 HTML。这就是你学前端最该吃透的套路：数据 + 循环 = 页面。
+    - 挂到 window.renderProjects：main.js 切语言时会调用，让卡片文案/状态跟着变。
+  -->
+  <script>
+  (function () {
+    "use strict";
+
+    var ICON = window.icon || function () { return ""; };
+    var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
+
+    // 本页内容数据：改这里就能改页面，HTML 不用动。
+    // 字段：title 名称 / desc 双语简介 / url 链接 / icon 图标名 / status 状态 / tags 标签数组
+    // status 取值：active(运行中) / wip(开发中) / arch(已归档)，对应不同颜色徽章。
+    window.PROJECTS = [
+      {
+        title: "数字花园（本站）",
+        desc: { zh: "你正在看的这个纯静态个人站，零构建、手写 HTML/CSS/JS。",
+                en: "The static personal site you're on — zero-build, hand-written HTML/CSS/JS." },
+        url: "home.html", icon: "layout", status: "active",
+        tags: ["Web", "Static"],
+      },
+      {
+        title: "SensorLink",
+        desc: { zh: "传感器数据采集与可视化的小工具，串口直连、实时绘图。",
+                en: "A small tool for sensor data capture & visualization over serial, with live charts." },
+        url: "https://github.com/magicbude", icon: "code", status: "wip",
+        tags: ["Tool", "Embedded"],
+      },
+      {
+        title: "Markdown 速记板",
+        desc: { zh: "浏览器里即开即写的 Markdown 笔记，数据存本地、可导出。",
+                en: "An in-browser Markdown notepad: local-first, exportable." },
+        url: "https://github.com/magicbude", icon: "pen", status: "active",
+        tags: ["Web", "PWA"],
+      },
+      {
+        title: "像素天气",
+        desc: { zh: "早期练手项目，把天气数据画成像素风小动画。",
+                en: "An early practice project rendering weather as pixel-art animations." },
+        url: "https://github.com/magicbude", icon: "sparkles", status: "arch",
+        tags: ["Fun"],
+      },
+    ];
+
+    // 状态 → 徽章样式类 + i18n key 的映射表。集中放一处，改语义只动这里。
+    var STATUS = {
+      active: { cls: "badge--ok",  key: "projects.status.active" },
+      wip:    { cls: "badge--wip", key: "projects.status.wip" },
+      arch:   { cls: "badge--arch", key: "projects.status.arch" },
+    };
+
+    function renderProjects() {
+      var lang = I18N.getLang();
+      var grid = document.getElementById("projects-grid");
+      var empty = document.getElementById("projects-empty");
+      if (!grid) return;
+
+      var list = window.PROJECTS || [];
+      if (list.length === 0) {
+        grid.innerHTML = "";
+        if (empty) empty.hidden = false;
+        return;
+      }
+      if (empty) empty.hidden = true;
+
+      grid.innerHTML = list.map(function (p) {
+        // 取状态徽章信息；未知状态不显示徽章。
+        var st = STATUS[p.status] || null;
+        var badge = st
+          ? '<span class="badge ' + st.cls + '">' + I18N.t(st.key) + "</span>"
+          : "";
+        // 标签：用 .tag 小胶囊，循环拼出来。
+        var tags = (p.tags || []).map(function (tg) {
+          return '<span class="tag">' + tg + "</span>";
+        }).join("");
+        var desc = (p.desc && p.desc[lang]) ? p.desc[lang] : (p.desc && p.desc.zh) || "";
+
+        // external 图标提示这是跳出/外链；viewAll 是「查看」按钮文案。
+        return (
+          '<a class="card" href="' + p.url + '"' +
+            (p.url.indexOf("http") === 0 ? ' target="_blank" rel="noopener"' : "") + ">" +
+            '<span class="card__title">' + ICON(p.icon || "code") + "<span>" + p.title + "</span></span>" +
+            '<span class="card__desc">' + desc + "</span>" +
+            '<span class="card__meta">' +
+              badge +
+              tags +
+              '<span class="card__link ml-auto">' + I18N.t("projects.view") + ICON("external") + "</span>" +
+            "</span>" +
+          "</a>"
+        );
+      }).join("");
+    }
+
+    // 暴露给 main.js 的语言切换钩子，并立即渲染一次。
+    window.renderProjects = renderProjects;
+    renderProjects();
+  })();
+  </script>
+</body>
+</html>
