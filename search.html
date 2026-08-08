@@ -1,5 +1,11 @@
 <!DOCTYPE html>
+<!--
+  search.html - 站内搜索页
+  协同：js/main.js（头部 / 页脚）、js/i18n.js、js/site.config.js（nav）。
+  数据驱动：输入框触发 window.renderSearch，把「页面 / 博客 / 项目 / 友链」归一为 INDEX 后过滤渲染。
+-->
 <html lang="zh" data-style="instrument" data-scheme="dark">
+<!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,7 +27,9 @@
   </script>
 
   <link rel="stylesheet" href="css/main.css">
+<!-- #endregion -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+<!-- #region 页面骨架（导航 / 页脚容器 + 内容区块） -->
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="common.skip">跳到主内容</a>
@@ -59,6 +67,8 @@
 
   <footer id="site-footer" class="site-footer"></footer>
 
+<!-- #endregion -->
+<!-- #region 脚本（依赖加载 + 本页数据 -> DOM 渲染） -->
   <script src="js/site.config.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/i18n.js"></script>
@@ -221,5 +231,6 @@
     renderSearch();
   })();
   </script>
+<!-- #endregion -->
 </body>
 </html>

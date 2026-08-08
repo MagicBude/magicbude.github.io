@@ -21,6 +21,7 @@
 (function () {
   "use strict";
 
+  // #region 常量与状态
   // 取全局配置与工具。给个兜底，防止某个脚本没加载导致整页脚本报错。
   var CONFIG = window.SITE_CONFIG || {};
   var ICON = window.icon || function () { return ""; };
@@ -39,6 +40,8 @@
     return style === "instrument" || style === "terminal" ? "dark" : "light";
   }
 
+  // #endregion 常量与状态
+  // #region 皮肤应用与控件 HTML
   // 应用一个皮肤：改 <html> 上的 data-* 属性 + 记忆到 localStorage。
   function applyStyle(style) {
     document.documentElement.setAttribute("data-style", style);
@@ -81,6 +84,8 @@
     );
   }
 
+  // #endregion 皮肤应用与控件 HTML
+  // #region 头部 / 开屏 / 页脚渲染
   // ---- 渲染完整头部（内容页用）------------------------------------------
   function renderHeader() {
     var host = document.getElementById("site-header");
@@ -162,6 +167,8 @@
     I18N.apply(host);
   }
 
+  // #endregion 头部 / 开屏 / 页脚渲染
+  // #region 事件绑定
   // ---- 事件绑定 ----------------------------------------------------------
   function bindSkin(scope) {
     var sel = scope.querySelector("#skin-select");
@@ -228,6 +235,8 @@
     });
   }
 
+  // #endregion 事件绑定
+  // #region 启动
   // ---- 启动 --------------------------------------------------------------
   function init() {
     renderHeader();
@@ -248,4 +257,5 @@
   } else {
     init();
   }
+  // #endregion 启动
 })();

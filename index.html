@@ -1,5 +1,13 @@
 <!DOCTYPE html>
+<!--
+  index.html - 开屏页（封面）
+  作用：站点入口封面，站名 + slogan + 「进入」按钮；右上角放皮肤 / 语言切换。
+  协同：js/site.config.js（站名注入 #splash-name）、js/main.js（注入右上角控件）、js/i18n.js（slogan / 按钮多语）。
+  数据驱动：正文文案由 SITE_CONFIG / i18n 运行时填充，本文件只留结构骨架。
+  皮肤 / 语言在 CSS 加载前由 head 内防闪白内联脚本设好。
+-->
 <html lang="zh" data-style="instrument" data-scheme="dark">
+<!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,7 +39,9 @@
   <link rel="stylesheet" href="css/main.css">
   <!-- 内联 SVG favicon：一个带圆角的小方块，零外链。 -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+<!-- #endregion -->
 </head>
+<!-- #region 开屏页主体（名字 / slogan / 进入 + 控件容器） -->
 <body>
   <!-- 开屏页：极简封面。名字 + slogan + 进入按钮，右上角放皮肤/语言切换。 -->
   <div class="splash">
@@ -50,9 +60,12 @@
   </div>
 
   <!-- 脚本顺序不能乱：先配置，再图标，再多语，最后主逻辑 -->
+<!-- #endregion -->
+<!-- #region 脚本（依赖加载） -->
   <script src="js/site.config.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
+<!-- #endregion -->
 </body>
 </html>

@@ -1,5 +1,12 @@
 <!DOCTYPE html>
+<!--
+  home.html - 首页枢纽（真正首页）
+  作用：Hero（站名 / 定位 / 简介）+ 「去哪儿」卡片网格 + 最新动态。
+  协同：js/site.config.js（身份 / 导航数据源）、js/main.js（注入头部 / 页脚）、js/i18n.js（多语）。
+  数据驱动：Hero 与卡片由底部内联脚本 window.renderHome 从 SITE_CONFIG / i18n 渲染；最新动态由构建生成的 window.POSTS 填充。
+-->
 <html lang="zh" data-style="instrument" data-scheme="dark">
+<!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,7 +38,9 @@
   <!-- 内联 SVG favicon：带圆角的小方块，零外链 -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
 </head>
+<!-- #endregion -->
 <body>
+<!-- #region 页面骨架（导航 / 页脚容器 + 内容区块） -->
   <!-- 跳到主内容：键盘用户按 Tab 第一个就能聚焦，对屏幕阅读器友好 -->
   <a class="skip-link" href="#main" data-i18n="common.skip">跳到主内容</a>
 
@@ -81,6 +90,8 @@
   <!-- 页脚容器：内容由 js/main.js 注入（版权 + 社交链接） -->
   <footer id="site-footer" class="site-footer"></footer>
 
+<!-- #endregion -->
+<!-- #region 脚本（依赖加载 + 本页数据 -> DOM 渲染） -->
   <!-- 脚本顺序不能乱：先配置，再图标，再多语，最后主逻辑 -->
   <script src="js/site.config.js"></script>
   <script src="js/icons.js"></script>
@@ -189,5 +200,6 @@
     renderHome();
   })();
   </script>
+<!-- #endregion -->
 </body>
 </html>

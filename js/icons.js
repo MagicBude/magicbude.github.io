@@ -24,6 +24,7 @@
 window.icon = (function () {
   "use strict";
 
+  // #region 图标外壳（stroke / fill 辅助）
   // 描边类图标外壳：统一 viewBox / stroke / 圆角端点，只换内部路径。
   // stroke-linecap/linejoin=round 让线条末端和拐角变圆，更精致、不刺眼。
   function stroke(inner) {
@@ -44,6 +45,8 @@ window.icon = (function () {
     );
   }
 
+  // #endregion 图标外壳
+  // #region 图标集（ICONS）
   var ICONS = {
     // ---- 品牌标（fill）----
     // GitHub 猫标
@@ -84,8 +87,11 @@ window.icon = (function () {
     user: stroke('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
   };
 
+  // #endregion 图标集
+  // #region 取用函数（icon）
   // 返回取图标函数：icon('name')。找不到返回空字符串，调用处不会报错。
   return function (name) {
     return ICONS[name] || "";
   };
+  // #endregion 取用函数
 })();

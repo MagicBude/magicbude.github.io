@@ -23,11 +23,11 @@
  *   toggle()         在支持的语言间循环切换，返回新语言
  * ============================================================================
  */
-
 window.i18n = (function () {
   "use strict";
 
   // 字典：第一层是语言代码，第二层是「文案 key → 译文」。
+  // #region 字典（zh / en 语言包）
   var dict = {
     zh: {
       "nav.home": "首页",
@@ -185,6 +185,8 @@ window.i18n = (function () {
   };
 
   // 语言切换按钮循环支持的语言顺序。要加日语就在这里加 "ja"。
+  // #endregion 字典
+  // #region 语言状态与存储
   var LANG_ORDER = ["zh", "en"];
 
   // localStorage 里存语言的键名。必须和 HTML 防闪白脚本里的一致。
@@ -208,6 +210,8 @@ window.i18n = (function () {
   }
 
   // 把某个根元素内所有带 data-i18n 的元素填上当前语言的文字。
+  // #endregion 语言状态与存储
+  // #region 翻译与渲染
   // 不传 root 就处理整个 document。幂等，可反复调用。
   function apply(root) {
     root = root || document;
@@ -227,6 +231,8 @@ window.i18n = (function () {
     apply(document);
   }
 
+  // #endregion 翻译与渲染
+  // #region 语言切换
   // 在支持的语言间循环切换（zh → en → zh …），返回新的语言代码。
   function toggle() {
     var cur = getLang();
@@ -237,6 +243,8 @@ window.i18n = (function () {
   }
 
   // 暴露公开 API 挂在 window.i18n 上。
+  // #endregion 语言切换
+  // #region 公开 API 导出
   return {
     dict: dict,
     getLang: getLang,
@@ -245,4 +253,5 @@ window.i18n = (function () {
     setLang: setLang,
     toggle: toggle,
   };
+  // #endregion 公开 API 导出
 })();

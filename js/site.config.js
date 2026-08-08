@@ -24,6 +24,7 @@
 // 直接赋值给 window，确保任何脚本（main.js / i18n.js）都能访问到。
 window.SITE_CONFIG = {
 
+  // #region 身份与基础信息（name / tagline / bio）
   // 站点名 / 你的网络 ID。开屏页大标题、导航 Logo 都用它。
   name: "magicbude",
 
@@ -48,6 +49,8 @@ window.SITE_CONFIG = {
         "partly for anyone else who likes to tinker.",
   },
 
+  // #endregion 身份与基础信息
+  // #region 社交链接与导航
   // 社交 / 外部链接。type 必须对应 js/icons.js 里定义的图标名，
   // 例如 "github" / "gitee" / "x" / "mail" / "rss"。
   social: [
@@ -70,6 +73,8 @@ window.SITE_CONFIG = {
     { key: "search",   href: "search.html",   i18n: "nav.search" },
     { key: "about",    href: "about.html",    i18n: "nav.about" },
   ],
+  // #endregion 社交链接与导航
+  // #region 皮肤定义与默认值
 
   // 可切换的视觉皮肤。value 对应 css/main.css 里的 [data-style="xxx"]。
   // label 也做多语，下拉框里会按当前语言显示。
@@ -88,4 +93,5 @@ window.SITE_CONFIG = {
     style: "instrument",
     lang: "zh",
   },
+  // #endregion 皮肤定义与默认值
 };
