@@ -64,6 +64,7 @@ magicbude.github.io/
 ├─ feed.xml                           # RSS 订阅文件，由博客构建器更新
 ├─ sitemap.xml                        # 搜索引擎使用的公开网址清单，手工维护
 ├─ robots.txt                         # 告诉搜索引擎允许抓取的范围和站点地图位置
+├─ .nojekyll                          # 关闭 Jekyll，让 Pages 原样发布所有静态文件
 ├─ README.md                          # 面向访客和协作者的仓库快速说明
 └─ AGENTS.md                          # 智能体与协作者必须遵守的仓库工作规范
 ```
@@ -90,6 +91,10 @@ content/posts/<slug>.md
 ```
 
 这三个产物都提交到仓库，所以 GitHub Pages 只负责发布静态文件，不需要在线安装依赖或执行构建。
+
+## 部署方式
+
+站点使用 GitHub Pages 的 `Deploy from a branch` 直接发布仓库根目录，不使用 Actions 构建工作流。根目录的 `.nojekyll` 会关闭 Jekyll 处理，确保现有 HTML、资源目录和生成产物按原路径提供。
 
 ## 路径解析规则
 
