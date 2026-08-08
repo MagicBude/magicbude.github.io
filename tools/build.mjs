@@ -8,13 +8,14 @@
  *   2. 用内置的 Markdown→HTML 转换器，生成 blog/<slug>/index.html（完整静态详情页）
  *   3. 重新生成 assets/js/data/posts.js（window.POSTS，供 blog/ / home/ 列表渲染）
  *      和 feed.xml（RSS 订阅源）
+ *   4. 生成 sitemap.xml（静态栏目 + 博客详情页）
  *
  * 设计原则（和整个站一致）：零外部依赖、零运行时库。
  *   - 不引任何 npm 包，只用 Node 内置模块（fs / path）。
  *   - Markdown 转换器是手写的、可读的，目的之一就是让你看懂「MD 怎么变 HTML」，
  *     它本身也是一份教材。
  *
- * 产物都提交进仓库（blog/<slug>/index.html、assets/js/data/posts.js、feed.xml），
+ * 产物都提交进仓库（blog/<slug>/index.html、assets/js/data/posts.js、feed.xml、sitemap.xml），
  * 保证 GitHub Pages 直接可用，不用在 CI 里跑构建。
  *
  * 依赖顺序：本文件用 ESM（.mjs），通过 import.meta.url 定位仓库根目录。
@@ -31,6 +32,7 @@ const POSTS_DIR = path.join(ROOT, "content", "posts");
 const BLOG_DIR = path.join(ROOT, "blog");
 const JS_POSTS = path.join(ROOT, "assets", "js", "data", "posts.js");
 const FEED = path.join(ROOT, "feed.xml");
+const SITEMAP = path.join(ROOT, "sitemap.xml");
 
 // 站点基础信息（用于 RSS 的绝对链接）。换域名时只改这里。
 // 注意：详情页在 blog/ 子目录，页面内资源用相对路径 "../"，而 RSS 用的是绝对链接。
@@ -282,6 +284,8 @@ function parseList(lines, start, indent) {
 // #region frontmatter 解析
 // 解析文件开头的 --- 包裹的 YAML 风格字段。支持普通键值与 [a, b] 数组（tags）。
 function parseFrontmatter(raw) {
+  // Windows 常用 CRLF；先统一换行，避免逐行 frontmatter 正则残留 \r 而解析失败。
+  raw = raw.replace(/\r\n/g, "\n");
   const m = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
   if (!m) return { data: {}, body: raw };
 
@@ -528,6 +532,37 @@ function renderFeed(posts) {
     "</rss>\n"
   );
 }
+
+// sitemap 与新版语义化目录保持一致；文章日期作为稳定的 lastmod，避免无意义变更。
+function renderSitemap(posts) {
+  const staticPages = [
+    "",
+    "home/",
+    "blog/",
+    "projects/",
+    "now/",
+    "uses/",
+    "links/",
+    "about/",
+    "search/",
+  ];
+  let urls = staticPages
+    .map((page) => "  <url>\n    <loc>" + escapeXml(SITE_BASE + page) + "</loc>\n  </url>")
+    .join("\n");
+
+  posts.forEach(function (post) {
+    const loc = SITE_BASE + "blog/" + post.slug + "/";
+    const lastmod = post.date ? "\n    <lastmod>" + escapeXml(post.date) + "</lastmod>" : "";
+    urls += "\n  <url>\n    <loc>" + escapeXml(loc) + "</loc>" + lastmod + "\n  </url>";
+  });
+
+  return (
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    urls +
+    "\n</urlset>\n"
+  );
+}
 // #endregion
 
 // #region 主流程
@@ -602,6 +637,10 @@ function main() {
   // 5) 生成 RSS
   writeFileSync(FEED, renderFeed(posts), "utf8");
   console.log("  ✓ feed.xml");
+
+  // 6) 生成与当前目录路由一致的站点地图。
+  writeFileSync(SITEMAP, renderSitemap(posts), "utf8");
+  console.log("  ✓ sitemap.xml");
 
   console.log("\n完成。改文章后重新运行 `node tools/build.mjs` 即可。");
 }

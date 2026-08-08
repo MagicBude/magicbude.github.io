@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  sitemap.xml 直接手工维护，不由整站构建器生成。
-  新增或删除公开 HTML 页面时同步修改本文件，URL 必须与仓库真实文件对应。
--->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://magicbude.github.io/</loc></url>
-  <url><loc>https://magicbude.github.io/home/</loc></url>
-  <url><loc>https://magicbude.github.io/blog/</loc></url>
-  <url><loc>https://magicbude.github.io/blog/2026-svg-charts/</loc></url>
-  <url><loc>https://magicbude.github.io/projects/</loc></url>
-  <url><loc>https://magicbude.github.io/now/</loc></url>
-  <url><loc>https://magicbude.github.io/uses/</loc></url>
-  <url><loc>https://magicbude.github.io/links/</loc></url>
-  <url><loc>https://magicbude.github.io/about/</loc></url>
-  <url><loc>https://magicbude.github.io/search/</loc></url>
+  <url>
+    <loc>https://magicbude.github.io/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/home/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/blog/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/projects/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/now/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/uses/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/links/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/about/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/search/</loc>
+  </url>
+  <url>
+    <loc>https://magicbude.github.io/blog/2026-svg-charts/</loc>
+    <lastmod>2026-08-08</lastmod>
+  </url>
 </urlset>
