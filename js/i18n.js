@@ -104,6 +104,20 @@ window.i18n = (function () {
       "search.kind.page": "页面",
       "search.kind.project": "项目",
       "search.kind.link": "链接",
+
+      "blog.eyebrow": "博客",
+      "blog.title": "博客",
+      "blog.lead": "写代码、做小工具的记录，以及一些碎碎念。",
+      "blog.filterLang": "语言",
+      "blog.filterTag": "标签",
+      "blog.langZh": "中文",
+      "blog.langEn": "English",
+      "blog.back": "返回博客",
+      "blog.toc": "目录",
+      "blog.published": "发布于",
+      "blog.prev": "上一篇",
+      "blog.next": "下一篇",
+      "blog.empty": "没有匹配的文章。",
     },
 
     en: {
@@ -181,6 +195,20 @@ window.i18n = (function () {
       "search.kind.page": "Page",
       "search.kind.project": "Project",
       "search.kind.link": "Link",
+
+      "blog.eyebrow": "Blog",
+      "blog.title": "Blog",
+      "blog.lead": "Notes from coding, building small tools, and the occasional ramble.",
+      "blog.filterLang": "Language",
+      "blog.filterTag": "Tags",
+      "blog.langZh": "中文",
+      "blog.langEn": "English",
+      "blog.back": "Back to blog",
+      "blog.toc": "Contents",
+      "blog.published": "Published",
+      "blog.prev": "Previous",
+      "blog.next": "Next",
+      "blog.empty": "No matching posts.",
     },
   };
 

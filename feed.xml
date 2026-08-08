@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>magicbude</title>
+    <link>https://magicbude.github.io/</link>
+    <description>magicbude 的个人网站：代码、游戏、动漫、电影、羽毛球的数字花园。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Sat, 08 Aug 2026 06:08:37 GMT</lastBuildDate>
+    <generator>magicbude static blog builder</generator>
+    <item>
+      <title>徒手画 SVG 图表：不靠任何图表库</title>
+      <link>https://magicbude.github.io/blog/2026-svg-charts.html</link>
+      <guid isPermaLink="true">https://magicbude.github.io/blog/2026-svg-charts.html</guid>
+      <pubDate>Sat, 08 Aug 2026 00:00:00 GMT</pubDate>
+      <description>不用 ECharts、不引 CDN，纯手写内联 SVG 把数据画成柱状图、折线图和饼图。本文拆解坐标换算、比例尺和标签处理，并给出可直接复用的函数。</description>
+    </item>
+  </channel>
+</rss>

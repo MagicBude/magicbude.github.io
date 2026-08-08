@@ -1811,3 +1811,48 @@ hr {
   }
 /* #endregion 打印样式 */
 }
+
+/* #region 博客列表筛选（blog.html 专属） */
+.blog-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.blog-filters__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.blog-filters__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+  margin-right: var(--space-1);
+}
+
+/* .tag 已定义胶囊外观；这里只补「可点击」与「选中态」。
+   .tag-btn 用 <button>，需要清掉浏览器默认的边框/字体，再交给 .tag 上色。 */
+.tag-btn {
+  cursor: pointer;
+  border: 1px solid transparent;
+  font: inherit;
+  transition: color var(--duration) var(--ease),
+              background-color var(--duration) var(--ease),
+              border-color var(--duration) var(--ease);
+}
+
+.tag-btn:hover {
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+/* 选中态：强调色 + 浅底 + 淡边框，和「当前筛选维度」的语义对应 */
+.tag-btn.is-active {
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+/* #endregion 博客列表筛选 */

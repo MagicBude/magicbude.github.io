@@ -10,5 +10,8 @@
 Thumbs.db
 *.log
 
+# 编辑器工作区目录（VS Code / Visual Studio 本地缓存，非项目代码）
+.vs/
+
 # 依赖与构建产物（本项目为零构建纯静态站，以下为预留）
 node_modules/
