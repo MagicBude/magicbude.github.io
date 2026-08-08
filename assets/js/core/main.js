@@ -150,6 +150,117 @@
     I18N.apply(host);
   }
 
+  // ---- 开屏页背景星尘（canvas 渐进增强）--------------------------------
+  // 在背景画缓慢上浮的粒子，增加"炫"但不抢内容。设计要点：
+  //   · 颜色实时读 CSS 变量 --color-accent，切换皮肤时粒子自动变色；
+  //   · 用 MutationObserver 监听 <html data-style> 变化来刷新颜色，不侵入换肤逻辑；
+  //   · prefers-reduced-motion 时直接不启动，尊重无障碍；
+  //   · 纯原生 canvas，零依赖；JS 没跑也有 CSS 光晕兜底，不会空白。
+  function initSplashCanvas() {
+    var canvas = document.getElementById("splash-canvas");
+    if (!canvas) return; // 不是开屏页（没有画布）就直接返回
+
+    // 用户要求减少动效：不画粒子，保留 CSS 静态光晕即可。
+    var reduce = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
+    var ctx = canvas.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2); // 限制到 2 倍，避免超大屏太吃性能
+    var w = 0, h = 0;
+    var particles = [];
+    var accent = "#4aa8ff"; // 兜底色，读不到变量时用
+    var raf = 0;
+    var last = 0;
+
+    // 读当前皮肤的强调色。getPropertyValue 返回值可能带前后空格，trim 一下。
+    function readAccent() {
+      try {
+        var v = getComputedStyle(document.documentElement)
+          .getPropertyValue("--color-accent").trim();
+        if (v) accent = v;
+      } catch (e) {}
+    }
+
+    // 把 "#rrggbb" 转成 "r,g,b"，方便给粒子叠加透明度。
+    function toRGB(c) {
+      var m = c.match(/^#([0-9a-f]{6})$/i);
+      if (!m) return "74,168,255";
+      var n = parseInt(m[1], 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(",");
+    }
+
+    function resize() {
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // 按 dpr 缩放，保证高清不糊
+    }
+
+    function makeParticle() {
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 1.8 + 0.6,     // 半径
+        vy: Math.random() * 0.35 + 0.12,  // 上浮速度
+        vx: (Math.random() - 0.5) * 0.18, // 轻微横向漂移
+        a: Math.random() * 0.5 + 0.2,     // 基础透明度
+        tw: Math.random() * Math.PI * 2,  // 闪烁相位
+      };
+    }
+
+    function seed() {
+      // 粒子数随屏幕面积缩放，夹在 30~80，避免手机太卡 / 大屏太稀。
+      var count = Math.max(30, Math.min(80, Math.round((w * h) / 22000)));
+      particles = [];
+      for (var i = 0; i < count; i++) particles.push(makeParticle());
+    }
+
+    function frame(t) {
+      // 限制到约 30fps：粒子慢，降帧足够且省电。
+      if (t - last < 33) { raf = requestAnimationFrame(frame); return; }
+      last = t;
+      ctx.clearRect(0, 0, w, h);
+      var rgb = toRGB(accent);
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        p.y -= p.vy;
+        p.x += p.vx;
+        p.tw += 0.02;
+        if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w; } // 飘出顶就回到底
+        if (p.x < -5) p.x = w + 5; else if (p.x > w + 5) p.x = -5;
+        var alpha = p.a * (0.6 + 0.4 * Math.sin(p.tw)); // 呼吸式闪烁
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(" + rgb + "," + alpha.toFixed(3) + ")";
+        ctx.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    function start() {
+      readAccent();
+      resize();
+      seed();
+      if (raf) cancelAnimationFrame(raf);
+      last = 0;
+      raf = requestAnimationFrame(frame);
+    }
+
+    // 换肤时（<html data-style> 变化）刷新粒子颜色；用观察者解耦，不碰 bindSkin。
+    if (window.MutationObserver) {
+      new MutationObserver(function () { readAccent(); })
+        .observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["data-style"],
+        });
+    }
+
+    window.addEventListener("resize", function () { resize(); seed(); });
+    start();
+  }
+
   // ---- 渲染页脚 ----------------------------------------------------------
   function renderFooter() {
     var host = document.getElementById("site-footer");
@@ -263,6 +374,7 @@
   function init() {
     renderHeader();
     renderSplashControls();
+    initSplashCanvas(); // 开屏背景星尘（无开屏页的页面会自己 return）
     renderFooter();
 
     // 把页面正文里（<main> 等）的 data-i18n 也填上当前语言。

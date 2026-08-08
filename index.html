@@ -46,6 +46,8 @@
   <!-- 开屏页：极简封面。名字 + slogan + 进入按钮，右上角放皮肤/语言切换。 -->
   <!-- 开屏内容是本页唯一主要内容，因此使用 main，而不是无语义 div。 -->
   <main class="splash">
+    <!-- 背景星尘粒子（canvas）：纯装饰、不挡点击；JS 没跑也有下面的静态光晕兜底。 -->
+    <canvas class="splash__canvas" id="splash-canvas" aria-hidden="true"></canvas>
     <!-- 右上角控件容器：内容由 js/main.js 注入（皮肤选择器 + 语言切换） -->
     <div class="splash__controls" id="splash-controls"></div>
 

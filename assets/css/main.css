@@ -764,6 +764,51 @@ hr {
   text-align: center;
   padding: var(--space-6);
   position: relative;
+  /* 光晕/粒子溢出时裁掉，避免出现滚动条 */
+  overflow: hidden;
+  /* 建立独立层叠上下文，让 ::before 伪元素只在 .splash 内部做背景层 */
+  isolation: isolate;
+
+  /* 极淡网格点阵：每隔 30px 一个 1px 圆点，取边框色，几乎看不见，只增加质感。
+     颜色用 CSS 变量，所以 4 套皮肤下自动适配（暗皮肤点更隐、亮皮肤点更柔）。 */
+  background-image:
+    radial-gradient(circle at center, var(--color-border) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-position: center;
+}
+
+/* 光晕层：两团模糊径向渐变，缓慢平移 + 缩放，营造"氛围光"。
+   全部用 accent 的半透明（--color-accent-soft），暗皮肤晕成冷光、亮皮肤晕成淡蓝。
+   放在内容之下、背景之上：isolate 后 z-index:-1 安全。 */
+.splash::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 40% at 25% 30%, var(--color-accent-soft), transparent 70%),
+    radial-gradient(45% 45% at 78% 70%, var(--color-accent-soft), transparent 70%);
+  filter: blur(20px);
+  opacity: 0.9;
+  animation: splashGlow 18s ease-in-out infinite alternate;
+}
+
+/* 右上角控件、正文内容都在光晕/粒子之上 */
+.splash__controls,
+.splash__inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* 背景星尘画布：铺满、最底层、不挡点击 */
+.splash__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* 右上角的小控件：皮肤选择器 + 语言切换 */
@@ -780,14 +825,32 @@ hr {
   max-width: 640px;
 }
 
-/* 名字：用主色，是整页视觉焦点。字号比正文大很多。 */
+/* 名字：整页视觉焦点。先给一个单色兜底（不支持渐变裁切的浏览器也能看）。 */
 .splash__name {
   font-family: var(--font-heading);
   font-size: clamp(2.5rem, 8vw, 4.5rem);
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: var(--color-accent);
   line-height: 1.05;
+  color: var(--color-accent);
+}
+
+/* 支持的浏览器：流动渐变文字，而不是单色平涂——"炫"但克制。 */
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .splash__name {
+    background: linear-gradient(
+      100deg,
+      var(--color-accent),
+      var(--color-accent-hover),
+      var(--color-accent)
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: splashNameShimmer 6s linear infinite;
+  }
 }
 
 .splash__slogan {
@@ -797,11 +860,52 @@ hr {
   color: var(--color-text-muted);
 }
 
-/* 进入按钮，明显比普通链接大，引导点击 */
+/* 进入按钮，明显比普通链接大，引导点击；hover 时加一圈柔光。 */
 .splash__enter {
   margin-top: var(--space-7);
   padding: var(--space-4) var(--space-8);
   font-size: var(--text-lg);
+  box-shadow: 0 0 0 0 var(--color-accent-soft);
+  transition:
+    box-shadow var(--duration) var(--ease),
+    transform var(--duration) var(--ease);
+}
+.splash__enter:hover {
+  box-shadow: 0 0 28px 2px var(--color-accent-soft);
+  transform: translateY(-1px);
+}
+
+/* 入场动画：名字 / slogan / 进入按钮依次淡入上移，像"开机"。 */
+.splash__name,
+.splash__slogan,
+.splash__enter {
+  animation: splashRise 0.8s var(--ease) both;
+}
+.splash__slogan { animation-delay: 0.15s; }
+.splash__enter  { animation-delay: 0.30s; }
+
+/* 尊重无障碍：用户要求减少动效时，关掉所有开屏动画（保留静态光晕）。 */
+@media (prefers-reduced-motion: reduce) {
+  .splash::before,
+  .splash__name,
+  .splash__slogan,
+  .splash__enter {
+    animation: none;
+  }
+}
+
+/* --- 开屏页关键帧 ----------------------------------------------------- */
+@keyframes splashGlow {
+  0%   { transform: translate3d(-4%, -3%, 0) scale(1); }
+  100% { transform: translate3d( 4%,  3%, 0) scale(1.15); }
+}
+@keyframes splashNameShimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes splashRise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 
