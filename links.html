@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
   links.html - 导航 / 友链页
-  协同：js/main.js（头部 / 页脚）、js/i18n.js。
-  数据驱动：两类链接由 window.LINKS（本页内联对象）经 window.renderLinks 渲染（friends / resources）。
+  协同：js/main.js（头部 / 页脚）、js/i18n.js、js/links.js（共享链接数据）。
+  数据驱动：两类链接由 window.LINKS 经 window.renderLinks 渲染（friends / resources）。
 -->
 <html lang="zh" data-style="instrument" data-scheme="dark">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -54,6 +54,8 @@
   <script src="js/site.config.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/i18n.js"></script>
+  <!-- 链接数据独立加载，使导航页和搜索页可以共享同一份 window.LINKS。 -->
+  <script src="js/links.js"></script>
   <script src="js/main.js"></script>
 
   <!--
@@ -67,19 +69,6 @@
 
     var ICON = window.icon || function () { return ""; };
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
-
-    // 友链数据：想加一条，往对应数组里加一项即可。
-    window.LINKS = {
-      friends: [
-        { name: "好友 A 的博客", url: "https://example.com", note: { zh: "前端与生活的碎碎念。", en: "Front-end and life, in bits." } },
-        { name: "好友 B 的工具箱", url: "https://example.com", note: { zh: "一堆实用小工具。", en: "A bunch of handy little tools." } },
-      ],
-      resources: [
-        { name: "MDN Web Docs", url: "https://developer.mozilla.org", note: { zh: "前端查文档第一站。", en: "First stop for web docs." } },
-        { name: "Can I use", url: "https://caniuse.com", note: { zh: "查浏览器兼容性。", en: "Browser compatibility at a glance." } },
-        { name: "Hugo", url: "https://gohugo.io", note: { zh: "本站早期用的静态生成器（已弃）。", en: "The SSG this site started with (retired)." } },
-      ],
-    };
 
     // 把一组链接渲染成「标题 + 卡片网格」。friends/resources 复用它。
     function renderGroup(titleText, items) {

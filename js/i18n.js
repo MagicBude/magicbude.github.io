@@ -43,8 +43,8 @@ window.i18n = (function () {
       "splash.enter": "进入",
 
       "home.greeting": "你好，我是",
-      "home.badge": "在代码与兴趣之间",
-      "home.intro": "这里记录我写代码、做小工具，以及打球、看番、刷电影的日常。",
+      "home.badge": "在代码与兴趣之间，留下自己的数字轨迹",
+      "home.intro": "这里整理作品、文章、近况、常用工具与收藏，也是其他网站和项目的长期入口。",
       "home.section.entries": "去哪儿",
       "home.section.recent": "最新动态",
       "home.noPosts": "还没有文章，去博客写第一篇吧。",
@@ -63,6 +63,8 @@ window.i18n = (function () {
       "common.theme": "主题",
       "common.language": "语言",
       "common.skip": "跳到主内容",
+      "common.mainNav": "主导航",
+      "common.menu": "菜单",
 
       "footer.builtWith": "用原生 HTML / CSS / JS 手写",
       "footer.rss": "订阅 RSS",
@@ -73,16 +75,17 @@ window.i18n = (function () {
 
       "projects.eyebrow": "作品",
       "projects.title": "项目",
-      "projects.lead": "我做过的网站、小工具、开源项目，以及正在折腾的东西。",
+      "projects.lead": "已经完成、正在制作和计划中的网站、工具与项目。",
       "projects.empty": "还没有公开的项目，先去 GitHub 看看？",
       "projects.view": "查看",
       "projects.status.active": "运行中",
       "projects.status.wip": "开发中",
+      "projects.status.idea": "规划中",
       "projects.status.arch": "已归档",
 
       "uses.eyebrow": "装备",
       "uses.title": "我在用什么",
-      "uses.lead": "日常在用的硬件与软件。有些带推广链接，点一下也算支持我。",
+      "uses.lead": "日常使用的硬件、软件与服务，以及选择它们的原因。",
 
       "now.eyebrow": "近况",
       "now.title": "最近在搞啥",
@@ -99,7 +102,7 @@ window.i18n = (function () {
       "search.title": "搜一搜",
       "search.results": "找到 {n} 条结果",
       "search.empty": "没有匹配的内容，换个关键词试试。",
-      "search.hint": "支持搜索博客文章与站内页面。",
+      "search.hint": "支持搜索页面、文章、项目、友链与资源。",
       "search.kind.blog": "文章",
       "search.kind.page": "页面",
       "search.kind.project": "项目",
@@ -134,8 +137,8 @@ window.i18n = (function () {
       "splash.enter": "Enter",
 
       "home.greeting": "Hi, I'm",
-      "home.badge": "Between code and curiosity",
-      "home.intro": "Notes on coding, side tools, and the everyday — badminton, anime, films.",
+      "home.badge": "A personal trail between code and curiosity",
+      "home.intro": "A home for projects, writing, current notes, tools, collections, and links to other work.",
       "home.section.entries": "Where to go",
       "home.section.recent": "Recent",
       "home.noPosts": "No posts yet — go write the first one.",
@@ -154,6 +157,8 @@ window.i18n = (function () {
       "common.theme": "Theme",
       "common.language": "Language",
       "common.skip": "Skip to content",
+      "common.mainNav": "Primary navigation",
+      "common.menu": "Menu",
 
       "footer.builtWith": "Hand-written with plain HTML / CSS / JS",
       "footer.rss": "RSS",
@@ -164,16 +169,17 @@ window.i18n = (function () {
 
       "projects.eyebrow": "Works",
       "projects.title": "Projects",
-      "projects.lead": "Sites, small tools, open-source and things I'm tinkering with.",
+      "projects.lead": "Completed, active, and planned websites, tools, and projects.",
       "projects.empty": "No public projects yet — check GitHub?",
       "projects.view": "View",
       "projects.status.active": "Active",
       "projects.status.wip": "In progress",
+      "projects.status.idea": "Planned",
       "projects.status.arch": "Archived",
 
       "uses.eyebrow": "Uses",
       "uses.title": "What I use",
-      "uses.lead": "Hardware & software I use daily. Some are affiliate links — clicking helps me out.",
+      "uses.lead": "Hardware, software, and services I use, with the reasons behind those choices.",
 
       "now.eyebrow": "Now",
       "now.title": "What I'm up to",
@@ -190,7 +196,7 @@ window.i18n = (function () {
       "search.title": "Search",
       "search.results": "{n} results found",
       "search.empty": "Nothing matched. Try another keyword.",
-      "search.hint": "Searches blog posts and site pages.",
+      "search.hint": "Searches pages, posts, projects, friends, and resources.",
       "search.kind.blog": "Post",
       "search.kind.page": "Page",
       "search.kind.project": "Project",
@@ -238,6 +244,8 @@ window.i18n = (function () {
   }
 
   // 把某个根元素内所有带 data-i18n 的元素填上当前语言的文字。
+  // 默认写 textContent；若元素声明 data-i18n-attr，则改写逗号分隔的属性列表。
+  // 属性翻译必须显式声明，避免脚本仅凭标签名猜测 placeholder 或 aria-label。
   // #endregion 语言状态与存储
   // #region 翻译与渲染
   // 不传 root 就处理整个 document。幂等，可反复调用。
@@ -246,7 +254,14 @@ window.i18n = (function () {
     var nodes = root.querySelectorAll("[data-i18n]");
     for (var i = 0; i < nodes.length; i++) {
       var key = nodes[i].getAttribute("data-i18n");
-      nodes[i].textContent = t(key);
+      var attrs = nodes[i].getAttribute("data-i18n-attr");
+      if (attrs) {
+        attrs.split(",").forEach(function (attr) {
+          nodes[i].setAttribute(attr.trim(), t(key));
+        });
+      } else {
+        nodes[i].textContent = t(key);
+      }
     }
   }
 

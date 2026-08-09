@@ -157,11 +157,11 @@ window.SITE_CONFIG = {
 | 文章详情 | `blog/<slug>.html` | 构建脚本生成 |
 | 项目 | `projects.html` | GitHub / Gitee 项目、自建子站链接 |
 | 近况 | `now.html` | 当前在玩 / 看 / 搞啥（nownownow 概念） |
-| 装备 | `uses.html` | 我在用的硬件 / 软件 / 服务（可挂推广） |
+| 装备 | `uses.html` | 我在用的硬件 / 软件 / 服务（可选附产品或官网链接） |
 | 导航 / 友链 | `links.html` | 其他站、朋友站、资源收藏 |
 | 关于 | `about.html` | 通用自我介绍（中英双语，内容来自 site.config） |
 | 404 | `404.html` | 找不到页面 |
-| 搜索 | `search.html` | 客户端过滤 `js/posts.js`（功能页） |
+| 搜索 | `search.html` | 客户端统一过滤页面、文章、项目、友链与资源 |
 | RSS | `feed.xml` | 构建脚本生成（功能） |
 | 站点地图 | `sitemap.xml` | 构建或手写（功能） |
 
@@ -172,8 +172,7 @@ window.SITE_CONFIG = {
 
 ## 11. 部署
 
-- GitHub Pages，Actions 工作流直接上传静态文件（`upload-pages-artifact` + `deploy-pages`），
-  不跑 Jekyll，不需要 `.nojekyll`。
-- 工作流：`.github/workflows/deploy.yml`。
+- GitHub Pages 直接托管仓库中的静态文件，不运行整站构建。
+- `.github/workflows/` 当前只有占位文件；若以后采用 Actions，必须先补充并审阅真实工作流。
 - **注意**：`blog/*.html`、`js/posts.js`、`feed.xml` 是构建产物，提交进仓库（保证 Pages 直接可用），
   源 `.md` 也在仓库（`posts/`）。改文章 = 改 md → 跑脚本 → 提交生成的 html。

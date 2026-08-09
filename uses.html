@@ -40,7 +40,7 @@
     <section class="hero container container--narrow">
       <p class="page-eyebrow" data-i18n="uses.eyebrow">装备</p>
       <h1 class="hero__name" data-i18n="uses.title">我在用什么</h1>
-      <p class="lead" data-i18n="uses.lead">日常在用的硬件与软件。有些带推广链接，点一下也算支持我。</p>
+      <p class="lead" data-i18n="uses.lead">日常使用的硬件、软件与服务，以及选择它们的原因。</p>
     </section>
 
     <!-- 分类由 renderUses 按 window.USES 生成 -->
@@ -69,7 +69,7 @@
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
 
     // 本页内容数据：按分类分组。每类：title 双语 / icon 图标 / items 列表。
-    // item：name 名称 / note 双语说明 / url 链接（可空，空则不外链）/ affiliate 是否推广
+    // item：name 名称 / note 双语说明 / url 链接（可空，空则只展示文字）
     window.USES = [
       {
         title: { zh: "开发设备", en: "Dev machine" }, icon: "code",

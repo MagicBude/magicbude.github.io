@@ -106,14 +106,14 @@
           '<span class="site-logo__mark"></span>' +
           "<span>" + (CONFIG.name || "site") + "</span>" +
         "</a>" +
-        '<nav class="site-nav" id="site-nav" aria-label="主导航">' +
+        '<nav class="site-nav" id="site-nav" aria-label="' + I18N.t("common.mainNav") + '">' +
           '<ul class="site-nav__list">' + nav + "</ul>" +
         "</nav>" +
         skinSelectHTML() +
         langToggleHTML() +
         // 汉堡按钮：桌面端被 CSS 隐藏，移动端才出现。三条杠由 CSS 在展开时变 X。
         '<button id="nav-toggle" class="nav-toggle" type="button" ' +
-          'aria-expanded="false" aria-controls="site-nav" aria-label="菜单">' +
+          'aria-expanded="false" aria-controls="site-nav" aria-label="' + I18N.t("common.menu") + '">' +
           '<span class="nav-toggle__bar"></span>' +
           '<span class="nav-toggle__bar"></span>' +
           '<span class="nav-toggle__bar"></span>' +
@@ -193,12 +193,13 @@
       if (typeof window.renderHome === "function") window.renderHome();
       if (typeof window.renderAbout === "function") window.renderAbout();
       if (typeof window.render404 === "function") window.render404();
-      // 以下 5 个内容页（项目/装备/近况/导航/搜索）各自挂了 renderXxx，
+      // 以下内容页各自挂了 renderXxx，
       // 切换语言时一并重渲染，保证卡片文案、状态徽章、搜索标签都跟着变语言。
       if (typeof window.renderProjects === "function") window.renderProjects();
       if (typeof window.renderUses === "function") window.renderUses();
       if (typeof window.renderNow === "function") window.renderNow();
       if (typeof window.renderLinks === "function") window.renderLinks();
+      if (typeof window.renderSearch === "function") window.renderSearch();
       // 博客列表页：切语言时重渲染，让筛选标签/卡片文案跟着变语言。
       if (typeof window.renderBlog === "function") window.renderBlog();
     });

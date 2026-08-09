@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
   search.html - 站内搜索页
-  协同：js/main.js（头部 / 页脚）、js/i18n.js、js/site.config.js（nav）。
-  数据驱动：输入框触发 window.renderSearch，把「页面 / 博客 / 项目 / 友链」归一为 INDEX 后过滤渲染。
+  协同：js/main.js（头部 / 页脚）、js/i18n.js，以及页面、文章、项目、链接四类数据文件。
+  数据驱动：输入框触发 window.renderSearch，把四类内容归一为 INDEX 后过滤渲染。
 -->
 <html lang="zh" data-style="instrument" data-scheme="dark">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -10,7 +10,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>搜索 · magicbude</title>
-  <meta name="description" content="在站内搜索博客文章与页面。">
+  <meta name="description" content="搜索站内页面、博客文章、项目、友链与资源。">
 
   <script>
     (function () {
@@ -52,12 +52,13 @@
           type="search"
           autocomplete="off"
           data-i18n="common.searchPlaceholder"
+          data-i18n-attr="placeholder,aria-label"
           placeholder="搜索文章…"
           aria-label="搜索">
       </div>
 
       <p class="search-stats" id="search-stats" hidden></p>
-      <p class="search-stats" id="search-hint" data-i18n="search.hint">支持搜索博客文章与站内页面。</p>
+      <p class="search-stats" id="search-hint" data-i18n="search.hint">支持搜索页面、文章、项目、友链与资源。</p>
 
       <!-- 结果列表由 renderSearch 填充 -->
       <div class="result-list" id="search-results"></div>
@@ -72,12 +73,17 @@
   <script src="js/site.config.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/i18n.js"></script>
+  <!-- posts.js 必须先于本页搜索脚本加载，否则文章不会进入 window.POSTS。 -->
+  <script src="js/posts.js"></script>
+  <!-- 项目与链接数据同样先加载，搜索页才能读取对应的全局数据。 -->
+  <script src="js/projects.js"></script>
+  <script src="js/links.js"></script>
   <script src="js/main.js"></script>
 
   <!--
     搜索页「数据 → DOM」+ 事件驱动。
     思路：
-      1) 建索引：把「页面 / 博客文章 / 项目 / 链接」统一成一种结构 {title, url, excerpt, kind}，
+      1) 建索引：把「页面 / 博客文章 / 项目 / 友链与资源」统一成一种结构 {title, url, excerpt, kind}，
          存进 INDEX 数组。这样后面过滤逻辑只认这一种结构，不用管数据来自哪。
       2) 过滤：输入时取输入框文字，转小写，去 title/excerpt/kind 里 substring 匹配。
       3) 渲染：把命中项拼成 .result 卡片，带类型徽章。
@@ -97,10 +103,24 @@
     // 把任意字符串安全地转小写（防止 null/undefined 报错）
     function lc(s) { return (s || "").toString().toLowerCase(); }
 
-    // 用当前语言取双语字段
+    // 从 { zh: "...", en: "..." } 形式的字段中读取当前语言；缺译文时回退到中文。
     function bi(field) {
       var lang = I18N.getLang();
       return (field && field[lang]) ? field[lang] : (field && field.zh) || "";
+    }
+
+    /*
+     * 搜索结果最终通过 innerHTML 批量插入，因此标题、摘要和 URL 必须先转义。
+     * 即使当前数据由自己维护，也不能让一篇文章标题中的引号破坏 HTML 属性；
+     * 把安全边界放在渲染出口，比要求每个数据源自行转义更可靠。
+     */
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
     }
 
     // 建索引：从多个数据源归一成一个数组。
@@ -119,7 +139,7 @@
         });
       });
 
-      // 2) 博客文章（构建脚本会生成 window.POSTS；没有就跳过）
+      // 2) 博客文章（仅写文章时由小型构建脚本刷新 window.POSTS；没有就跳过）
       (window.POSTS || []).forEach(function (p) {
         items.push({
           title: p.title || "",
@@ -129,7 +149,7 @@
         });
       });
 
-      // 3) 项目（window.PROJECTS，本页同文件里定义）
+      // 3) 项目（由 js/projects.js 提供，项目页与搜索页共用）
       (window.PROJECTS || []).forEach(function (p) {
         items.push({
           title: p.title || "",
@@ -139,14 +159,14 @@
         });
       });
 
-      // 4) 友链 / 资源（window.LINKS）
+      // 4) 友链与资源（由 js/links.js 提供，导航页与搜索页共用）
       var links = window.LINKS || {};
-      ["friends", "resources"].forEach(function (grp) {
-        (links[grp] || []).forEach(function (l) {
+      ["friends", "resources"].forEach(function (group) {
+        (links[group] || []).forEach(function (link) {
           items.push({
-            title: l.name || "",
-            url: l.url || "",
-            excerpt: bi(l.note),
+            title: link.name || "",
+            url: link.url || "",
+            excerpt: bi(link.note),
             kind: "link",
           });
         });
@@ -157,8 +177,7 @@
 
     // 渲染：根据当前输入框文字过滤并画结果。
     function renderSearch() {
-      buildIndex(); // 每次重渲染都重建索引，保证博客/项目数据最新
-      var lang = I18N.getLang();
+      buildIndex(); // 语言切换后页面标题会变化，因此每次渲染都重新建立轻量索引。
       var q = lc(document.getElementById("search-input").value).trim();
       var results = document.getElementById("search-results");
       var empty = document.getElementById("search-empty");
@@ -196,14 +215,14 @@
 
       // 命中项 → 结果卡片。type 徽章用 i18n 的 search.kind.*
       results.innerHTML = hits.map(function (it) {
-        var kindLabel = I18N.t("search.kind." + it.kind);
+        var kindLabel = escapeHtml(I18N.t("search.kind." + it.kind));
         var excerpt = it.excerpt
-          ? '<p class="result__excerpt">' + it.excerpt + "</p>"
+          ? '<p class="result__excerpt">' + escapeHtml(it.excerpt) + "</p>"
           : "";
         return (
-          '<a class="result" href="' + it.url + '">' +
+          '<a class="result" href="' + escapeHtml(it.url) + '">' +
             '<span class="result__kind">' + kindLabel + "</span>" +
-            '<span class="result__title">' + it.title + "</span>" +
+            '<span class="result__title">' + escapeHtml(it.title) + "</span>" +
             excerpt +
           "</a>"
         );

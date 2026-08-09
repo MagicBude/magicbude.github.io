@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
   projects.html - 项目页
-  协同：js/main.js（头部 / 页脚）、js/i18n.js。
-  数据驱动：卡片由 window.PROJECTS（本页内联数组）经 window.renderProjects 渲染；status 决定徽章颜色（active / wip / arch）。
+  协同：js/main.js（头部 / 页脚）、js/i18n.js、js/projects.js（共享项目数据）。
+  数据驱动：卡片由 window.PROJECTS 经 window.renderProjects 渲染；status 决定徽章颜色。
 -->
 <html lang="zh" data-style="instrument" data-scheme="dark">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -10,7 +10,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>项目 · magicbude</title>
-  <meta name="description" content="magicbude 做过的网站、小工具、开源项目与正在折腾的东西。">
+  <meta name="description" content="magicbude 已经完成、正在制作和计划中的网站、工具与项目。">
 
   <!-- 防闪白内联脚本：CSS 加载前先按 localStorage 设皮肤/语言，键名与 main.js / i18n.js 一致 -->
   <script>
@@ -43,7 +43,7 @@
     <section class="hero container container--narrow">
       <p class="page-eyebrow" data-i18n="projects.eyebrow">作品</p>
       <h1 class="hero__name" data-i18n="projects.title">项目</h1>
-      <p class="lead" data-i18n="projects.lead">我做过的网站、小工具、开源项目，以及正在折腾的东西。</p>
+      <p class="lead" data-i18n="projects.lead">已经完成、正在制作和计划中的网站、工具与项目。</p>
     </section>
 
     <!-- ============ 项目卡片网格 ============ -->
@@ -63,6 +63,8 @@
   <script src="js/site.config.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/i18n.js"></script>
+  <!-- 项目数据独立加载，使项目页和搜索页可以共享同一份 window.PROJECTS。 -->
+  <script src="js/projects.js"></script>
   <script src="js/main.js"></script>
 
   <!--
@@ -78,44 +80,11 @@
     var ICON = window.icon || function () { return ""; };
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
 
-    // 本页内容数据：改这里就能改页面，HTML 不用动。
-    // 字段：title 名称 / desc 双语简介 / url 链接 / icon 图标名 / status 状态 / tags 标签数组
-    // status 取值：active(运行中) / wip(开发中) / arch(已归档)，对应不同颜色徽章。
-    window.PROJECTS = [
-      {
-        title: "数字花园（本站）",
-        desc: { zh: "你正在看的这个纯静态个人站，零构建、手写 HTML/CSS/JS。",
-                en: "The static personal site you're on — zero-build, hand-written HTML/CSS/JS." },
-        url: "home.html", icon: "layout", status: "active",
-        tags: ["Web", "Static"],
-      },
-      {
-        title: "SensorLink",
-        desc: { zh: "传感器数据采集与可视化的小工具，串口直连、实时绘图。",
-                en: "A small tool for sensor data capture & visualization over serial, with live charts." },
-        url: "https://github.com/magicbude", icon: "code", status: "wip",
-        tags: ["Tool", "Embedded"],
-      },
-      {
-        title: "Markdown 速记板",
-        desc: { zh: "浏览器里即开即写的 Markdown 笔记，数据存本地、可导出。",
-                en: "An in-browser Markdown notepad: local-first, exportable." },
-        url: "https://github.com/magicbude", icon: "pen", status: "active",
-        tags: ["Web", "PWA"],
-      },
-      {
-        title: "像素天气",
-        desc: { zh: "早期练手项目，把天气数据画成像素风小动画。",
-                en: "An early practice project rendering weather as pixel-art animations." },
-        url: "https://github.com/magicbude", icon: "sparkles", status: "arch",
-        tags: ["Fun"],
-      },
-    ];
-
     // 状态 → 徽章样式类 + i18n key 的映射表。集中放一处，改语义只动这里。
     var STATUS = {
       active: { cls: "badge--ok",  key: "projects.status.active" },
       wip:    { cls: "badge--wip", key: "projects.status.wip" },
+      idea:   { cls: "badge--wip", key: "projects.status.idea" },
       arch:   { cls: "badge--arch", key: "projects.status.arch" },
     };
 

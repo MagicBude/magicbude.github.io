@@ -1,0 +1,5 @@
+# 允许搜索引擎访问公开静态页面；.internal 已被 Git 忽略，不会部署到线上。
+User-agent: *
+Allow: /
+
+Sitemap: https://magicbude.github.io/sitemap.xml

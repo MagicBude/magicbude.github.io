@@ -31,22 +31,18 @@ window.SITE_CONFIG = {
   // 一句话标语。多语：用 { zh, en } 对象。
   // 首页 Hero 的小徽章、开屏页副标题会用到。
   tagline: {
-    zh: "在代码与兴趣之间",
-    en: "Between code and curiosity",
+    zh: "在代码与兴趣之间，留下自己的数字轨迹",
+    en: "A personal trail between code and curiosity",
   },
 
-  // 自我介绍（首页 / 关于页正文）。多语对象。可长可短，随时改。
-  // 文案基调：真诚、有信息量、不尬。身份不写死，给未来挂子站/工具留空间。
+  // 采用不依赖当前开发阶段的长期表述，避免网站每完成一个阶段就重写自我介绍。
+  // 以后只有身份、兴趣或站点定位真正变化时才需要修改这里。
   bio: {
-    zh: "我是 magicbude，一个喜欢动手的全栈开发者。代码既是工作也是爱好——从底层固件到网页前端都愿意碰一碰。" +
-        "生活里，羽毛球、动漫和电影是我的三大消遣。这个站是我的数字花园：记录折腾的过程与思考，" +
-        "也随时可能挂上我做过的其他网站和小工具——既给自己留个备份，也希望能帮到同样爱折腾的人。",
-    en: "I'm magicbude, a hands-on full-stack developer. Code is both my work and my hobby — " +
-        "I'll happily poke at everything from low-level firmware to web front-ends. " +
-        "Off the keyboard, badminton, anime, and films keep me busy. " +
-        "This site is my digital garden: notes from what I build and tinker with, " +
-        "and a place to host the other sites and small tools I make — partly a backup for myself, " +
-        "partly for anyone else who likes to tinker.",
+    zh: "我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。这里是我的个人主站与数字花园：" +
+        "用于整理作品、文章、近况、常用工具和收藏，也作为我创建的其他网站与项目的长期入口。",
+    en: "I'm magicbude, interested in programming, hands-on creation, and exploring different interests. " +
+        "This is my personal homepage and digital garden for projects, writing, current notes, tools, collections, " +
+        "and the other websites or projects I create.",
   },
 
   // #endregion 身份与基础信息
@@ -57,8 +53,8 @@ window.SITE_CONFIG = {
     { type: "github", url: "https://github.com/magicbude",    label: "GitHub" },
     { type: "gitee",  url: "https://gitee.com/magicbude",     label: "Gitee" },
     { type: "x",      url: "https://x.com/",                  label: "X" },
-    { type: "mail",   url: "mailto:hi@magicbude.example",     label: "Email" },
-    { type: "rss",    url: "feed.xml",                        label: "RSS" },
+    { type: "mail",   url: "mailto:magicbude1998@gmail.com", label: "Email" },
+    { type: "rss",    url: "feed.xml",                       label: "RSS" },
   ],
 
   // 主导航。顺序即展示顺序。i18n 是对应的多语字典 key（见 js/i18n.js）。

@@ -5,8 +5,9 @@
 ## 项目是什么
 
 个人网站（不是纯博客），定位「数字花园 + 多站 portal」。
-**零构建、纯静态**：原生 HTML / CSS / JS，无框架、无打包器、无外部运行时依赖、无 CDN。
+**主站零构建、纯静态**：原生 HTML / CSS / JS，无框架、无打包器、无外部运行时依赖、无 CDN。
 可直接双击打开；本地预览用 `python -m http.server`（在仓库根目录启动）。
+`tools/build.mjs` 是唯一例外，而且只在写 Markdown 文章时按需运行，不参与主站页面开发。
 
 ## 技术栈与约束
 
@@ -20,6 +21,7 @@
 - 图标：内联 SVG，集中在 `js/icons.js`；**禁止用 emoji 当功能图标、禁止外链图标库**。
 - 博客：本地写 `posts/*.md`，跑 `node tools/build.mjs` 生成 `blog/<slug>.html` +
   刷新 `js/posts.js` + 生成 `feed.xml`（产物也提交进仓库，保证 Pages 直接可用）。
+- 构建器禁止扩展到首页、关于、项目、样式、公共脚本或整站模板；这些文件必须直接维护。
 
 ## 目录约定
 
@@ -29,7 +31,7 @@
 - `.internal/`：本地草稿 / 笔记 / 对话记录，**gitignore 不提交**，需要时取出即用。
 - `index.html` = 开屏页；`home.html` = 真正首页
   （GitHub Pages 用户站根目录必须是 `index.html`，所以开屏页占它，点「进入」跳 `home.html`）。
-- `.github/workflows/deploy.yml`：纯静态部署到 GitHub Pages。
+- `.github/workflows/`：当前仅保留占位；部署方式确认后再添加真实工作流。
 
 ## 编码规范（教材级，最重要）
 

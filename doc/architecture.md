@@ -1,125 +1,86 @@
 # 架构与目录结构
 
-> 本文定义站点的**物理结构**与**构建顺序**。新增文件先对照目录树，别随手建目录。
-> 顺序照「实施顺序」走，别跳步。
+本文记录当前真实结构，不描述尚不存在的“目标态”。新增文件前先确认它属于哪一层。
 
----
+## 目录结构
 
-## 目录结构（目标态）
-
-```
+```text
 magicbude.github.io/
-├── AGENTS.md               # 智能体/协作者规则（零构建、编码规范、提交规范）
-├── index.html              # 开屏页（极简封面）：名字 + slogan + 进入按钮 → home.html
-├── home.html               # 首页（总枢纽）：简介 + 板块入口 + 全站最新动态
-├── blog.html               # 博客列表（读 js/posts.js 渲染）
-├── about.html              # 关于（中英双语，内容来自 site.config）
-├── projects.html           # 项目：GitHub/Gitee、自建子站
-├── uses.html               # 装备：我在用啥（可挂推广）
-├── now.html                # 近况：当前在玩/看/搞啥
-├── links.html              # 导航 / 友链 / 资源收藏
-├── search.html             # 站内搜索（客户端过滤）
-├── 404.html                # 404
-├── css/
-│   └── main.css            # 全站样式：4 风格令牌 + 组件（按 data-style 切换）
-├── js/
-│   ├── site.config.js      # 全站身份/导航唯一真源（名字/slogan/社交/导航项）
-│   ├── main.js             # 全局脚本：皮肤选择器、语言切换、移动端菜单
-│   ├── i18n.js             # 多语言字典 { zh, en, ... } + 应用函数
-│   ├── icons.js            # 内联 SVG 图标
-│   └── posts.js            # 博客文章数组（列表数据源，构建脚本生成）
-├── blog/                   # 文章详情页（构建脚本生成，每篇 <slug>.html）
-│   └── example.html
-├── posts/                  # 博客 Markdown 源文件（你写的）
-│   └── 2026-svg-charts.md
-├── tools/
-│   └── build.mjs           # 写作时构建：md → blog/<slug>.html + 刷新 posts.js + feed.xml
-├── feed.xml                # RSS（构建脚本生成）
-├── sitemap.xml             # 站点地图（手写/构建）
-├── doc/                    # 项目文档
-│   ├── README.md
-│   ├── spec.md
-│   └── architecture.md
-├── .internal/              # 本地草稿 / 笔记（gitignore，不提交）
-├── .github/
-│   └── workflows/
-│       └── deploy.yml      # 纯静态部署到 GitHub Pages
-└── .gitignore
+├─ index.html              开屏入口，进入 home.html
+├─ home.html               主站首页
+├─ blog.html               博客列表
+├─ projects.html           项目与规划
+├─ now.html                近况
+├─ uses.html               装备与软件
+├─ links.html              友链与资源
+├─ search.html             页面、文章、项目与链接搜索
+├─ about.html              关于
+├─ 404.html                静态错误页
+├─ css/main.css            四套皮肤、组件与响应式样式
+├─ js/
+│  ├─ site.config.js       身份、导航、社交链接与皮肤注册
+│  ├─ icons.js             本地 SVG 图标
+│  ├─ i18n.js              中英文字典与语言切换
+│  ├─ posts.js             构建器生成的文章列表数据
+│  ├─ projects.js          项目页与搜索页共享的数据
+│  ├─ links.js             导航页与搜索页共享的数据
+│  └─ main.js              公共头部、页脚和全站交互
+├─ posts/                  Markdown 文章源
+├─ blog/                   生成后的静态文章详情
+├─ tools/build.mjs         仅用于 Markdown 博客转换
+├─ feed.xml                博客构建器生成的 RSS
+├─ sitemap.xml             手工维护的公开页面清单
+├─ robots.txt              搜索引擎访问规则
+├─ doc/                    架构和设计硬标准
+└─ docs/                   愿景、需求、可访问性与学习规范
 ```
 
-> `.internal/` 与 `.workbuddy/` 被 `.gitignore` 忽略；不使用 Jekyll，不需要 `.nojekyll`。
-> `index.html` 是开屏页，`home.html` 才是真正首页（GitHub Pages 根目录必须是 index.html）。
+## 两条互不混淆的维护路径
 
----
+### 普通主站开发
 
-## 文件状态表
+直接编辑根目录 HTML、`css/main.css` 或 `js/*.js`，保存并刷新浏览器。不运行构建器。
 
-| 文件 | 状态 |
-|------|------|
-| `doc/README.md` / `doc/spec.md` / `doc/architecture.md` | ✅ 已建（本步更新） |
-| `css/main.css` | ✅ 已重构（4 皮肤令牌 + 皮肤/语言切换/开屏页样式） |
-| `js/site.config.js` | ✅ 已建（身份/导航真源） |
-| `js/main.js` | ✅ 已重构（皮肤选择器 + 语言切换 + 移动端菜单 + 头部/页脚渲染） |
-| `js/i18n.js` | ✅ 已建（zh/en 字典 + 应用/toggle） |
-| `js/icons.js` | ✅ 已建（内联 SVG 图标集） |
-| `js/posts.js` | ⬜ 待生成（构建脚本产出） |
-| `index.html` | ✅ 已建（开屏页：防闪白 + 皮肤/语言切换 + 进入按钮） |
-| `home.html` | ✅ 已建（首页枢纽：Hero + 板块入口卡片 + 最新动态，含 data→DOM 内联脚本） |
-| `about.html` | ✅ 已建（中英双语：Hero 读 config + .prose 自我介绍 + 板块卡片 + 社交胶囊；`window.renderAbout` 钩子） |
-| `404.html` | ✅ 已建（中英双语：notfound 居中布局 + 快捷导航；`window.render404` 钩子） |
-| `projects.html` | ✅ 已建（数据驱动卡片：状态徽章/标签/外链，挂 window.PROJECTS） |
-| `uses.html` | ✅ 已建（按分类渲染卡片：window.USES，含外链） |
-| `now.html` | ✅ 已建（按「在玩/在看/在搞」分类：window.NOW） |
-| `links.html` | ✅ 已建（朋友站点+资源两类：window.LINKS） |
-| `search.html` | ✅ 已建（实时过滤 页面/博客/项目/链接，类型徽章） |
-| `blog.html` | ⬜ 待建（博客列表页，接 js/posts.js） |
-| `posts/2026-svg-charts.md` | ⬜ 待建（示例文章源） |
-| `blog/example.html` | ⬜ 待生成 |
-| `tools/build.mjs` | ⬜ 待建 |
-| `feed.xml` / `sitemap.xml` | ⬜ 待生成 |
-| `.github/workflows/deploy.yml` | ⬜ 待建 |
+### Markdown 文章写作
 
----
-
-## 数据流
-
-```
-posts/<slug>.md  ──tools/build.mjs──►  blog/<slug>.html  +  js/posts.js  +  feed.xml
-                                        │                        │
-                                        │                        ▼
-                                        │                  blog.html（渲染列表）
-                                        │                        │
-                                        ▼                        ▼
-                                  浏览器查看详情 ◄──── 点击卡片 ───┘
-
-js/site.config.js ──► 头部 / 首页 Hero ──► 填名字/slogan/导航（改身份只动这一个文件）
-js/i18n.js       ──► 带 data-i18n 的 UI ──► 按当前语言填字（localStorage 记忆）
+```text
+posts/<slug>.md
+       │
+       └─ node tools/build.mjs
+              ├─ blog/<slug>.html
+              ├─ js/posts.js
+              └─ feed.xml
 ```
 
-要点：
-- **列表数据驱动**（学 数据→DOM），**详情静态手写/生成**（学完整页面结构）。
-- **UI 多语**靠字典 + `data-i18n`，**文章多语**靠 `lang` 字段 + 译文互链。
-- **身份不写死**：名字 / slogan / 导航全在 `site.config.js`，页面运行时读取。
+构建器的写入范围只能是上面三个目标。它不得生成或覆盖首页、项目页、关于页、
+公共 CSS、公共 JavaScript 和文档。
 
----
+## 浏览器脚本顺序
 
-## 实施顺序（不要跳步）
+普通页面按照以下顺序加载：
 
-1. **文档与骨架**（已完成）：`doc/` 三份 + `blog/`、`.github/workflows/`、`.internal/` 占位。
-2. **锁定架构**（已完成）：spec / architecture 写入 4 风格、i18n、MD 博客、开屏页 + 8 页、site.config。
-3. **基础重构**：`css/main.css` 加 4 风格令牌 + 皮肤/语言切换组件；`js/main.js` 重写；
-   新建 `js/site.config.js`、`js/i18n.js`、`js/icons.js`。
-4. **开屏页** `index.html`：极简封面，含防闪白内联脚本、皮肤/语言切换、「进入」按钮跳 `home.html`。
-5. **首页枢纽** `home.html`（已完成）：读 `site.config.js` 填 Hero + 板块入口卡片 + 全站最新动态；
-   语言切换钩子 `window.renderHome` 已接进 `js/main.js` 的 `bindLang`。
-6. **关于 / 404** `about.html`、`404.html`（已完成）：中英双语；about 含 Hero + .prose 自我介绍 + 板块卡片 + 社交胶囊（`window.renderAbout`）；404 含 notfound 居中布局 + 快捷导航（`window.render404`）；两者均已接进 `js/main.js` 的 `bindLang` 语言切换钩子。
-7. **其余静态页** `projects.html`、`uses.html`、`now.html`、`links.html`、`search.html`（已完成）：
-   均为中英双语 + 数据驱动（window.PROJECTS / window.USES / window.NOW / window.LINKS）；
-   search.html 实时过滤页面/博客/项目/链接；5 个页面的 `renderXxx` 均已接进 `js/main.js` 的 `bindLang` 语言切换钩子。
-8. **博客体系**：`tools/build.mjs` + `posts/2026-svg-charts.md` → 跑脚本生成 `blog/example.html`
-   + 刷新 `js/posts.js` + `feed.xml`；`blog.html` 接入。
-9. **部署** `.github/workflows/deploy.yml`（纯静态 Pages）+ `sitemap.xml`。
-10. **本地验证**：`python -m http.server` 预览，检查皮肤切换、语言切换、移动端导航、响应式、
-    博客列表与详情渲染、开屏页跳转。
+```text
+site.config.js → icons.js → i18n.js → 页面数据（若有）→ main.js → 页面内联逻辑
+```
 
-每完成一组相关文件，按 Conventional Commits 提交一次。
+这些脚本使用 `window.*` 明确共享少量数据，以保证 `file://` 双击浏览仍然可用。
+顺序不能随意交换：`main.js` 在启动时会读取前三个文件提供的配置、图标和翻译函数。
+
+## 当前状态
+
+- 根目录全部静态页面已经存在并可直接打开。
+- 四套皮肤、中英文、移动菜单、博客列表和客户端搜索已经实现。
+- `posts/2026-svg-charts.md` 已生成对应文章详情、列表数据与 RSS。
+- `sitemap.xml` 与 `robots.txt` 已建立，新增公开页面时需要同步维护站点地图。
+- `.github/workflows/` 当前只有占位文件；是否改用 Actions 部署应另行确认。
+
+## 内容数据位置
+
+- 身份、简介、导航和社交链接：`js/site.config.js`。
+- 文章列表：`js/posts.js`，不要手改，修改 Markdown 后重新生成。
+- 项目与友链：分别位于 `js/projects.js`、`js/links.js`，供内容页和搜索页共享。
+- 近况与装备：暂时位于各自 HTML 的内联数据数组。
+- UI 翻译：`js/i18n.js`。
+
+只有相同数据确实需要被多个页面共同读取时，才把它提取成独立 JS 文件；
+项目与友链正是这种情况，其他页面仍保持简单的内联数据结构。
