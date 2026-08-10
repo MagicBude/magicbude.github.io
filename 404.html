@@ -43,7 +43,8 @@
       404 大字号 + 一句说明 + 回到首页按钮 + 快捷导航（避免用户卡死）。
     -->
     <section class="notfound container">
-      <p class="notfound__code" data-i18n="notfound.title">404</p>
+      <!-- 404 是本页的唯一主标题；保留视觉类名，同时用 h1 建立正确的页面标题层级。 -->
+      <h1 class="notfound__code" data-i18n="notfound.title">404</h1>
       <p class="notfound__text" data-i18n="notfound.text">你想找的页面走丢了。</p>
 
       <a class="btn btn--primary" href="home.html">
