@@ -4,32 +4,29 @@ magicbude 的个人数字基地与原生前端学习项目，用于汇集项目�
 
 ## 如何打开
 
-直接双击根目录的 `index.html`。点击“进入”后会打开真正首页 `home.html`。
+直接双击根目录的 `index.html`，点击“进入”后会打开 `home/index.html`。也可以在仓库根目录运行 `python -m http.server`，再访问浏览器显示的本地地址。
 
-普通网站开发不需要安装依赖，也不需要构建：修改 HTML、`css/main.css` 或
-`js/*.js` 后保存并刷新浏览器即可。
+主站零构建：修改页面目录中的 `index.html`、`assets/css/main.css` 或 `assets/js/` 后，保存并刷新浏览器即可。
 
-唯一的按需工具是 Markdown 博客转换器。只有新增或修改 `posts/*.md` 时才运行：
+唯一按需运行的工具是 Markdown 博客转换器。只有新增或修改 `content/posts/*.md` 时才运行：
 
 ```powershell
 node tools/build.mjs
 ```
 
-它只更新 `blog/*.html`、`js/posts.js` 和 `feed.xml`，不会生成或改写首页、关于页、
-项目页、CSS、公共 JavaScript 或项目文档。
+它只更新 `blog/<slug>/index.html`、`assets/js/data/posts.js` 和 `feed.xml`，不会改写其他页面、公共样式、公共脚本或项目文档。
 
-## 核心文件
+## 从哪里开始阅读
 
-- `js/site.config.js`：身份、简介、导航、社交链接和皮肤注册表。
-- `js/i18n.js`：中英文 UI 字典，新增语言从这里扩展。
-- `js/main.js`：公共头部、页脚、语言、皮肤和移动菜单。
-- `css/main.css`：四套皮肤、设计令牌、组件和响应式规则。
-- `doc/`：当前架构与设计硬标准。
-- `docs/`：愿景、需求、可访问性、注释规范和学习地图。
+- `docs/README.md`：文档入口。
+- `docs/development/architecture.md`：完整目录树，每个重要文件和文件夹均附有用途说明。
+- `assets/js/core/`：站点配置、图标、国际化和公共交互。
+- `assets/js/data/`：文章、项目、近况与友链的共享数据。
+- `assets/css/main.css`：设计令牌、四套皮肤、组件和响应式规则。
 
 ## 项目原则
 
-- 真实成果与规划构想明确区分；尚未完成的项目使用“规划中”状态。
+- 真实成果与规划构想明确区分，规划中的内容保留清晰状态。
 - 浏览器端只使用原生 HTML、CSS、JavaScript 和本地资源。
-- 页面源码保持教材级中文注释，重点解释为什么与失败边界。
+- 页面源码保持教材级中文注释，重点解释原因、协作关系与失败边界。
 - 支持中英文切换、键盘操作、移动端和减少动效偏好。

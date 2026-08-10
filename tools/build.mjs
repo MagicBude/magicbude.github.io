@@ -4,9 +4,9 @@
  * 博客构建脚本（仅在「写作时」手动运行，例如：`node tools/build.mjs`）。
  *
  * 它做三件事：
- *   1. 读 posts/*.md（你写的 Markdown 源）→ 解析 frontmatter + 正文
- *   2. 用内置的 Markdown→HTML 转换器，生成 blog/<slug>.html（完整静态详情页）
- *   3. 重新生成 js/posts.js（window.POSTS，供 blog.html / home.html 列表渲染）
+ *   1. 读 content/posts/*.md（你写的 Markdown 源）→ 解析 frontmatter + 正文
+ *   2. 用内置的 Markdown→HTML 转换器，生成 blog/<slug>/index.html（完整静态详情页）
+ *   3. 重新生成 assets/js/data/posts.js（window.POSTS，供 blog/ / home/ 列表渲染）
  *      和 feed.xml（RSS 订阅源）
  *
  * 设计原则（和整个站一致）：零外部依赖、零运行时库。
@@ -14,7 +14,7 @@
  *   - Markdown 转换器是手写的、可读的，目的之一就是让你看懂「MD 怎么变 HTML」，
  *     它本身也是一份教材。
  *
- * 产物都提交进仓库（blog/*.html、js/posts.js、feed.xml），
+ * 产物都提交进仓库（blog/<slug>/index.html、assets/js/data/posts.js、feed.xml），
  * 保证 GitHub Pages 直接可用，不用在 CI 里跑构建。
  *
  * 依赖顺序：本文件用 ESM（.mjs），通过 import.meta.url 定位仓库根目录。
@@ -27,9 +27,9 @@ import { fileURLToPath } from "node:url";
 
 // 仓库根目录：本文件在 tools/ 下，上一级就是根。
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const POSTS_DIR = path.join(ROOT, "posts");
+const POSTS_DIR = path.join(ROOT, "content", "posts");
 const BLOG_DIR = path.join(ROOT, "blog");
-const JS_POSTS = path.join(ROOT, "js", "posts.js");
+const JS_POSTS = path.join(ROOT, "assets", "js", "data", "posts.js");
 const FEED = path.join(ROOT, "feed.xml");
 
 // 站点基础信息（用于 RSS 的绝对链接）。换域名时只改这里。
@@ -349,7 +349,7 @@ function navLink(post, dir, labelKey, fallback) {
   if (!post) return "";
   const cls = dir === "next" ? "post-nav__link post-nav__link--next" : "post-nav__link";
   return (
-    '<a class="' + cls + '" href="../blog/' + post.slug + '.html">' +
+    '<a class="' + cls + '" href="../' + post.slug + '/index.html">' +
     '<span class="post-nav__label" data-i18n="' + labelKey + '">' + fallback + "</span>" +
     '<span class="post-nav__title">' + escapeHtml(post.title) + "</span>" +
     "</a>"
@@ -357,7 +357,7 @@ function navLink(post, dir, labelKey, fallback) {
 }
 
 function renderDetail(post, bodyHtml, toc, older, newer) {
-  const REL = "../";
+  const REL = "../../";
   const langLabel = post.lang === "en" ? "English" : "中文";
   const tags = (post.tags || [])
     .map((t) => '<span class="tag">' + escapeHtml(t) + "</span>")
@@ -374,9 +374,9 @@ function renderDetail(post, bodyHtml, toc, older, newer) {
 
   return `<!DOCTYPE html>
 <!--
-  blog/${post.slug}.html - 文章详情页（由 tools/build.mjs 自动生成，请勿手改）
+  blog/${post.slug}/index.html - 文章详情页（由 tools/build.mjs 自动生成，请勿手改）
   作用：展示单篇博客文章（正文 / 目录 / 上一篇下一篇）。
-  协同：js/site.config.js（头部 / 页脚）、js/i18n.js（界面多语）。
+  协同：assets/js/core/ 中的站点配置、公共渲染与多语言脚本。
   数据驱动：文章正文是构建时由 Markdown 转换嵌入的静态 HTML，
             页面 chrome（导航 / 返回 / 目录 / 上下篇）走和站内其他页一致的脚本。
 -->
@@ -403,8 +403,8 @@ function renderDetail(post, bodyHtml, toc, older, newer) {
     })();
   </script>
 
-  <link rel="stylesheet" href="${REL}css/main.css">
-  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="${REL}assets/css/main.css">
+  <link rel="icon" href="${REL}assets/icons/favicon.svg" type="image/svg+xml">
 </head>
 <!-- #endregion -->
 <body>
@@ -417,7 +417,7 @@ function renderDetail(post, bodyHtml, toc, older, newer) {
   <main class="site-main" id="main">
     <article class="container container--narrow">
       <!-- 返回博客列表 -->
-      <a class="post-back" href="${REL}blog.html" data-i18n="blog.back">返回博客</a>
+      <a class="post-back" href="../index.html" data-i18n="blog.back">返回博客</a>
 
       <!-- ============ 文章头部 ============ -->
       <header class="post-header">
@@ -448,10 +448,10 @@ ${bodyHtml}
 <!-- #endregion -->
 <!-- #region 脚本（依赖加载） -->
   <!-- 脚本顺序：配置 → 图标 → 多语 → 主逻辑。详情页是静态内容，无需额外渲染脚本。 -->
-  <script src="${REL}js/site.config.js"></script>
-  <script src="${REL}js/icons.js"></script>
-  <script src="${REL}js/i18n.js"></script>
-  <script src="${REL}js/main.js"></script>
+  <script src="${REL}assets/js/core/site.config.js"></script>
+  <script src="${REL}assets/js/core/icons.js"></script>
+  <script src="${REL}assets/js/core/i18n.js"></script>
+  <script src="${REL}assets/js/core/main.js"></script>
 <!-- #endregion -->
 </body>
 </html>
@@ -460,9 +460,9 @@ ${bodyHtml}
 // #endregion
 
 // #region 列表数据（js/posts.js）与 RSS（feed.xml）生成
-// 生成 js/posts.js：window.POSTS 数组。home.html 与 blog.html 都读它渲染列表。
-// 字段保持兼容：date(YYYY-MM-DD) / url / title / excerpt 是 home.html 已用的；
-// 额外加 slug / lang / tags / summary / translation 供 blog.html 筛选与详情互链。
+// 生成文章索引：window.POSTS 数组。home/ 与 blog/ 都读它渲染列表。
+// 字段保持兼容：date(YYYY-MM-DD) / url / title / excerpt 是首页已用的；
+// 额外加 slug / lang / tags / summary / translation 供博客筛选与详情互链。
 function renderPostsJs(list) {
   const items = list
     .map(function (p) {
@@ -483,10 +483,10 @@ function renderPostsJs(list) {
     .join(",\n");
 
   return (
-    "// js/posts.js\n" +
+    "// assets/js/data/posts.js\n" +
     "// 由 tools/build.mjs 自动生成，请勿手改。\n" +
-    "// 改文章请编辑 posts/*.md 后重跑 `node tools/build.mjs`。\n" +
-    "// 字段供 home.html（最新动态）与 blog.html（列表 / 筛选）渲染使用。\n" +
+    "// 改文章请编辑 content/posts/*.md 后重跑 `node tools/build.mjs`。\n" +
+    "// 字段供 home/（最新动态）与 blog/（列表 / 筛选）渲染使用。\n" +
     "window.POSTS = [\n" +
     items +
     "\n];\n"
@@ -497,7 +497,7 @@ function renderPostsJs(list) {
 function renderFeed(posts) {
   const items = posts
     .map(function (p) {
-      const link = SITE_BASE + "blog/" + p.slug + ".html";
+      const link = SITE_BASE + "blog/" + p.slug + "/";
       const pub = p.date
         ? new Date(p.date + "T00:00:00Z").toUTCString()
         : new Date().toUTCString();
@@ -533,7 +533,7 @@ function renderFeed(posts) {
 // #region 主流程
 function main() {
   if (!existsSync(POSTS_DIR)) {
-    console.error("找不到 posts/ 目录，先去写一篇 Markdown 吧。");
+    console.error("找不到 content/posts/ 目录，先去写一篇 Markdown 吧。");
     process.exit(1);
   }
   if (!existsSync(BLOG_DIR)) mkdirSync(BLOG_DIR, { recursive: true });
@@ -541,7 +541,7 @@ function main() {
   // 1) 读取并解析所有 .md 源文件
   const files = readdirSync(POSTS_DIR).filter((f) => f.endsWith(".md"));
   if (!files.length) {
-    console.error("posts/ 里没有任何 .md 文件。");
+    console.error("content/posts/ 里没有任何 .md 文件。");
     process.exit(1);
   }
 
@@ -577,8 +577,10 @@ function main() {
   // 3) 生成每篇详情页
   posts.forEach(function (p) {
     const html = renderDetail(p, p._html, p._toc, p.older, p.newer);
-    writeFileSync(path.join(BLOG_DIR, p.slug + ".html"), html, "utf8");
-    console.log("  ✓ blog/" + p.slug + ".html");
+    const outputDir = path.join(BLOG_DIR, p.slug);
+    if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
+    writeFileSync(path.join(outputDir, "index.html"), html, "utf8");
+    console.log("  ✓ blog/" + p.slug + "/index.html");
   });
 
   // 4) 生成列表数据源 js/posts.js
@@ -590,12 +592,12 @@ function main() {
       lang: p.lang,
       tags: p.tags,
       summary: p.summary,
-      url: "blog/" + p.slug + ".html",
+      url: "blog/" + p.slug + "/index.html",
       translation: p.translation,
     };
   });
   writeFileSync(JS_POSTS, renderPostsJs(list), "utf8");
-  console.log("  ✓ js/posts.js (" + list.length + " 篇)");
+  console.log("  ✓ assets/js/data/posts.js (" + list.length + " 篇)");
 
   // 5) 生成 RSS
   writeFileSync(FEED, renderFeed(posts), "utf8");

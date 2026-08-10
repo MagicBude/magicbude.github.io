@@ -36,9 +36,9 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="assets/css/main.css">
   <!-- favicon 使用本地 SVG 文件，各页面共享同一图标，修改时只维护一处。 -->
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
 <!-- #endregion -->
 </head>
 <!-- #region 开屏页主体（名字 / slogan / 进入 + 控件容器） -->
@@ -55,7 +55,7 @@
       <span class="splash__slogan" data-i18n="splash.subtitle">个人数字基地</span>
       <div>
         <!-- 「进入」跳到真正的首页 home.html（index.html 被本开屏页占用） -->
-        <a class="btn btn--primary splash__enter" href="home.html" data-i18n="splash.enter">进入</a>
+        <a class="btn btn--primary splash__enter" href="home/index.html" data-i18n="splash.enter">进入</a>
       </div>
     </div>
   </main>
@@ -63,10 +63,10 @@
   <!-- 脚本顺序不能乱：先配置，再图标，再多语，最后主逻辑 -->
 <!-- #endregion -->
 <!-- #region 脚本（依赖加载） -->
-  <script src="js/site.config.js"></script>
-  <script src="js/icons.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/main.js"></script>
+  <script src="assets/js/core/site.config.js"></script>
+  <script src="assets/js/core/icons.js"></script>
+  <script src="assets/js/core/i18n.js"></script>
+  <script src="assets/js/core/main.js"></script>
 <!-- #endregion -->
 </body>
 </html>

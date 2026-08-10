@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   404.html - 404 页
-  协同：js/site.config.js（nav 数据源）、js/main.js（头部 / 页脚）、js/i18n.js。
+  协同：assets/js/core/ 中的站点配置、公共渲染与多语言脚本。
   数据驱动：快捷导航胶囊由 window.render404 从 SITE_CONFIG.nav 渲染（排除搜索）。
 -->
 <html lang="zh" data-style="instrument" data-scheme="dark">
@@ -27,8 +27,8 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
 <!-- #endregion -->
 </head>
 <!-- #region 页面骨架（导航 / 页脚容器 + 内容区块） -->
@@ -47,7 +47,7 @@
       <h1 class="notfound__code" data-i18n="notfound.title">404</h1>
       <p class="notfound__text" data-i18n="notfound.text">你想找的页面走丢了。</p>
 
-      <a class="btn btn--primary" href="home.html">
+      <a class="btn btn--primary" href="home/index.html">
         <span data-i18n="notfound.home">回到首页</span>
       </a>
 
@@ -61,10 +61,10 @@
 
 <!-- #endregion -->
 <!-- #region 脚本（依赖加载 + 本页数据 -> DOM 渲染） -->
-  <script src="js/site.config.js"></script>
-  <script src="js/icons.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/main.js"></script>
+  <script src="assets/js/core/site.config.js"></script>
+  <script src="assets/js/core/icons.js"></script>
+  <script src="assets/js/core/i18n.js"></script>
+  <script src="assets/js/core/main.js"></script>
 
   <!--
     404 页的「数据 → DOM」：把导航渲染成快捷入口胶囊，
@@ -92,7 +92,7 @@
         .map(function (it) {
           var ic = NAV_ICON[it.key] || "layout";
           return (
-            '<a class="btn btn--ghost" href="' + it.href + '">' +
+            '<a class="btn btn--ghost" href="' + window.siteUrl(it.href) + '">' +
               ICON(ic) + "<span>" + I18N.t(it.i18n) + "</span>" +
             "</a>"
           );

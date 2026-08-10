@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!--
+  blog/2026-svg-charts/index.html - 文章详情页（由 tools/build.mjs 自动生成，请勿手改）
+  作用：展示单篇博客文章（正文 / 目录 / 上一篇下一篇）。
+  协同：assets/js/core/ 中的站点配置、公共渲染与多语言脚本。
+  数据驱动：文章正文是构建时由 Markdown 转换嵌入的静态 HTML，
+            页面 chrome（导航 / 返回 / 目录 / 上下篇）走和站内其他页一致的脚本。
+-->
+<html lang="zh" data-style="instrument" data-scheme="dark">
+<!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>徒手画 SVG 图表：不靠任何图表库 · magicbude</title>
+  <meta name="description" content="不用 ECharts、不引 CDN，纯手写内联 SVG 把数据画成柱状图、折线图和饼图。本文拆解坐标换算、比例尺和标签处理，并给出可直接复用的函数。">
+
+  <!-- 防闪白内联脚本：CSS 加载前先按 localStorage 设皮肤/语言（键名与 main.js / i18n.js 一致） -->
+  <script>
+    (function () {
+      try {
+        var s = localStorage.getItem("site-style") || "instrument";
+        var l = localStorage.getItem("site-lang") || "zh";
+        var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
+        var d = document.documentElement;
+        d.setAttribute("data-style", s);
+        d.setAttribute("data-scheme", scheme);
+        d.setAttribute("lang", l);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="icon" href="../../assets/icons/favicon.svg" type="image/svg+xml">
+</head>
+<!-- #endregion -->
+<body>
+<!-- #region 页面骨架（导航 / 页脚容器 + 文章主体） -->
+  <a class="skip-link" href="#main" data-i18n="common.skip">跳到主内容</a>
+
+  <!-- 头部容器：js/main.js 根据 site.config.js 注入导航（数据驱动，不写死） -->
+  <header id="site-header" class="site-header"></header>
+
+  <main class="site-main" id="main">
+    <article class="container container--narrow">
+      <!-- 返回博客列表 -->
+      <a class="post-back" href="../index.html" data-i18n="blog.back">返回博客</a>
+
+      <!-- ============ 文章头部 ============ -->
+      <header class="post-header">
+        <h1 class="post-header__title">徒手画 SVG 图表：不靠任何图表库</h1>
+        <div class="post-meta">
+          <span class="post-meta__item"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h12"/></svg> <span data-i18n="blog.published">发布于</span> 2026-08-08</span>
+          <span class="post-meta__item"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg> 中文</span>
+          <span class="post-meta__item"><span class="tag">前端</span> <span class="tag">SVG</span> <span class="tag">数据可视化</span></span>
+        </div>
+      </header>
+
+      <!-- ============ 目录 ============ -->
+      <nav class="toc" aria-label="文章目录"><p class="toc__title" data-i18n="blog.toc">目录</p><ul><li><a href="#h-1">为什么不用图表库</a></li><li><a href="#h-2">核心思路：把数据映射到坐标</a></li><ul><li><a href="#h-3">留出边距（margin）</a></li></ul><li><a href="#h-4">柱状图</a></li><ul><li><a href="#h-5">完整代码</a></li></ul><li><a href="#h-6">折线图与面积</a></li><li><a href="#h-7">饼图：角度即占比</a></li><li><a href="#h-8">一些踩坑</a></li></ul></nav>
+
+      <!-- ============ 正文（Markdown 转换结果）============ -->
+      <div class="prose">
+<p>做个人站时我常遇到一个矛盾：只想画一张小小的图表，却要为一个图表库引入几十 KB 的脚本。对「零构建、零外链」的站点来说，这尤其别扭。其实<strong>大部分图表，徒手写 SVG 比想象中简单</strong>，而且生成的还是内联矢量，任意缩放都不糊。</p><blockquote><p>本文所有示例都是纯函数：喂数据进去，吐出一段 SVG 字符串。你可以直接粘进自己的页面，也可以当作理解图表库底层逻辑的练习。</p></blockquote><h2 id="h-1">为什么不用图表库</h2><p>图表库解决的其实是「通用性」问题——它要应对无数种图表、无数种配置。但你的页面往往只需要一两种固定图表。这时候库带来的好处有限，代价却很明确：</p><ul><li><strong>体积</strong>：哪怕按需引入，核心也常在上百 KB。</li><li><strong>外链</strong>：很多库默认从 CDN 拉，离线就废，和「零外链」原则冲突。</li><li><strong>可控性</strong>：想改一个像素的间距，往往要翻半天文档找对应的配置项。</li></ul><p>手写 SVG 没有这些负担。它的代价是「要自己算坐标」，而这正是下面要拆解的核心。</p><h2 id="h-2">核心思路：把数据映射到坐标</h2><p>图表本质是<strong>把「数据值」翻译成「屏幕上的像素位置」</strong>。这个翻译靠一个叫<em>比例尺（scale）</em>的东西完成。先用一个线性比例尺函数打底：</p><pre><code>// 线性比例尺：把 [domainMin, domainMax] 区间的值，映射到 [rangeMin, rangeMax] 像素。
+// 比如把销量 0~100 映射到画布高度 0~240 像素。
+function linearScale(value, domainMin, domainMax, rangeMin, rangeMax) {
+  if (domainMax === domainMin) return (rangeMin + rangeMax) / 2;
+  const t = (value - domainMin) / (domainMax - domainMin);
+  return rangeMin + t * (rangeMax - rangeMin);
+}</code></pre><p>注意返回值里 <code>rangeMin</code> 通常在<strong>下方</strong>（像素大），<code>rangeMax</code> 在<strong>上方</strong>（像素小）。SVG 的坐标原点在左上角，y 轴向下为正，所以「值越大、y 越小」这个反转要留心。</p><h3 id="h-3">留出边距（margin）</h3><p>真实图表不会让柱子贴着画布边缘，所以要先把画布切成「绘图区」和「边距区」：</p><pre><code>const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+const width = 320, height = 240;
+const plotW = width - margin.left - margin.right;
+const plotH = height - margin.top - margin.bottom;</code></pre><p>所有比例尺的 <code>range</code> 都该落在 <code>plotW</code> / <code>plotH</code> 上，而不是整个 <code>width</code> / <code>height</code>。</p><h2 id="h-4">柱状图</h2><p>柱状图是把每个分类的值，映射成一个矩形。横坐标用<strong>序数</strong>排布（第 i 根柱子占第 i 个格子），纵坐标用上面的线性比例尺。</p><h3 id="h-5">完整代码</h3><pre><code>function barChart(data, w = 320, h = 240) {
+  const m = { top: 20, right: 20, bottom: 30, left: 40 };
+  const pw = w - m.left - m.right;
+  const ph = h - m.top - m.bottom;
+  const max = Math.max(...data.map(d =&gt; d.value));
+  const y = v =&gt; m.top + linearScale(v, 0, max, ph, 0);
+  const bw = pw / data.length * 0.6;            // 柱子宽度：格子的 60%，留缝隙
+  const bars = data.map((d, i) =&gt; {
+    const x = m.left + (pw / data.length) * i + (pw / data.length - bw) / 2;
+    const top = y(d.value);
+    const barH = m.top + ph - top;
+    return `&lt;rect x=&quot;${x}&quot; y=&quot;${top}&quot; width=&quot;${bw}&quot; height=&quot;${barH}&quot; fill=&quot;#4aa8ff&quot;/&gt;`;
+  }).join(&quot;&quot;);
+  return `&lt;svg viewBox=&quot;0 0 ${w} ${h}&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;${bars}&lt;/svg&gt;`;
+}</code></pre><p>调用 <code>barChart([{value: 30}, {value: 70}, {value: 45}])</code> 就能得到一张能直接塞进页面的图表。<code>viewBox</code> 让它在任何尺寸下都按比例缩放，这正是内联 SVG 比 <code>&lt;canvas&gt;</code> 舒服的地方。</p><h2 id="h-6">折线图与面积</h2><p>折线图的横坐标和柱状图一样按序数排，但点与点之间用 <code>&lt;polyline&gt;</code> 连起来。想再叠一层「面积感」，把折线下方封口填色即可：</p><pre><code>const points = data.map((d, i) =&gt; {
+  const x = m.left + (pw / (data.length - 1)) * i;
+  const yy = y(d.value);
+  return `${x},${yy}`;
+}).join(&quot; &quot;);
+const line = `&lt;polyline points=&quot;${points}&quot; fill=&quot;none&quot; stroke=&quot;#4aa8ff&quot; stroke-width=&quot;2&quot;/&gt;`;</code></pre><h2 id="h-7">饼图：角度即占比</h2><p>饼图不用笛卡尔坐标，而是把「占比」换算成「圆心角」。<code>360° × 占比</code> 就是这一块的角度，再用 SVG 的 <code>path</code> 画圆弧：</p><table><thead><tr><th>环节</th><th>要算什么</th><th>用到的量</th></tr></thead><tbody><tr><td>归一</td><td>每块占总和的几分之几</td><td><code>value / sum</code></td></tr><tr><td>角度</td><td>这块占多少度</td><td><code>360 × 占比</code></td></tr><tr><td>弧长</td><td>弧的终点坐标</td><td><code>sin/cos(角度)</code></td></tr></tbody></table><pre><code>const sum = data.reduce((s, d) =&gt; s + d.value, 0);
+let angle = 0;
+const slices = data.map(d =&gt; {
+  const a0 = angle;
+  const a1 = angle + (d.value / sum) * Math.PI * 2;
+  angle = a1;
+  // 用大弧标志 + 终点坐标画扇形（略去圆心坐标计算，按需要替换 cx/cy）
+  return { a0, a1, color: d.color };
+});</code></pre><h2 id="h-8">一些踩坑</h2><ul><li><strong>y 轴反转</strong>：忘记「值大 y 小」，柱子会倒着长。</li><li><strong>文本标签溢出</strong>：长标签要截断或换行，否则会戳出画布。</li><li><strong>小数像素</strong>：浏览器能渲染亚像素，但多个小数累积会让边框发虚，必要时 <code>Math.round</code>。</li><li><strong>无障碍</strong>：纯装饰图表可以 <code>aria-hidden</code>，但带数据的图表最好配一段 <code>&lt;title&gt;</code> 或表格兜底。</li></ul><p>掌握了比例尺这一个核心，柱状、折线、饼图之间只是「把坐标换成不同图形元素」的差别。下次再想加图表，不妨先问自己：真的需要那个库吗？</p>
+      </div>
+
+      <!-- ============ 上一篇 / 下一篇 ============ -->
+      
+    </article>
+  </main>
+
+  <!-- 页脚容器：js/main.js 注入（版权 + 社交链接） -->
+  <footer id="site-footer" class="site-footer"></footer>
+
+<!-- #endregion -->
+<!-- #region 脚本（依赖加载） -->
+  <!-- 脚本顺序：配置 → 图标 → 多语 → 主逻辑。详情页是静态内容，无需额外渲染脚本。 -->
+  <script src="../../assets/js/core/site.config.js"></script>
+  <script src="../../assets/js/core/icons.js"></script>
+  <script src="../../assets/js/core/i18n.js"></script>
+  <script src="../../assets/js/core/main.js"></script>
+<!-- #endregion -->
+</body>
+</html>

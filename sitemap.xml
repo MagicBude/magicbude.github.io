@@ -5,13 +5,13 @@
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://magicbude.github.io/</loc></url>
-  <url><loc>https://magicbude.github.io/home.html</loc></url>
-  <url><loc>https://magicbude.github.io/blog.html</loc></url>
-  <url><loc>https://magicbude.github.io/blog/2026-svg-charts.html</loc></url>
-  <url><loc>https://magicbude.github.io/projects.html</loc></url>
-  <url><loc>https://magicbude.github.io/now.html</loc></url>
-  <url><loc>https://magicbude.github.io/uses.html</loc></url>
-  <url><loc>https://magicbude.github.io/links.html</loc></url>
-  <url><loc>https://magicbude.github.io/about.html</loc></url>
-  <url><loc>https://magicbude.github.io/search.html</loc></url>
+  <url><loc>https://magicbude.github.io/home/</loc></url>
+  <url><loc>https://magicbude.github.io/blog/</loc></url>
+  <url><loc>https://magicbude.github.io/blog/2026-svg-charts/</loc></url>
+  <url><loc>https://magicbude.github.io/projects/</loc></url>
+  <url><loc>https://magicbude.github.io/now/</loc></url>
+  <url><loc>https://magicbude.github.io/uses/</loc></url>
+  <url><loc>https://magicbude.github.io/links/</loc></url>
+  <url><loc>https://magicbude.github.io/about/</loc></url>
+  <url><loc>https://magicbude.github.io/search/</loc></url>
 </urlset>

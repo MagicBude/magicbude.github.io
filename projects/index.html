@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!--
+  projects/index.html - 项目页
+  协同：assets/js/core/ 公共脚本与 assets/js/data/projects.js 共享项目数据。
+  数据驱动：卡片由 window.PROJECTS 经 window.renderProjects 渲染；status 决定徽章颜色。
+-->
+<html lang="zh" data-style="instrument" data-scheme="dark">
+<!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>项目 · magicbude</title>
+  <meta name="description" content="magicbude 已经完成、正在制作和计划中的网站、工具与项目。">
+
+  <!-- 防闪白内联脚本：CSS 加载前先按 localStorage 设皮肤/语言，键名与 main.js / i18n.js 一致 -->
+  <script>
+    (function () {
+      try {
+        var s = localStorage.getItem("site-style") || "instrument";
+        var l = localStorage.getItem("site-lang") || "zh";
+        var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
+        var d = document.documentElement;
+        d.setAttribute("data-style", s);
+        d.setAttribute("data-scheme", scheme);
+        d.setAttribute("lang", l);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="../assets/css/main.css">
+<!-- #endregion -->
+  <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+<!-- #region 页面骨架（导航 / 页脚容器 + 内容区块） -->
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="common.skip">跳到主内容</a>
+
+  <!-- 头部容器：js/main.js 根据 site.config.js 注入导航（数据驱动，不写死） -->
+  <header id="site-header" class="site-header"></header>
+
+  <main class="site-main" id="main">
+    <!-- ============ 页面引言 ============ -->
+    <section class="hero container container--narrow">
+      <p class="page-eyebrow" data-i18n="projects.eyebrow">作品</p>
+      <h1 class="hero__name" data-i18n="projects.title">项目</h1>
+      <p class="lead" data-i18n="projects.lead">已经完成、正在制作和计划中的网站、工具与项目。</p>
+    </section>
+
+    <!-- ============ 项目卡片网格 ============ -->
+    <section class="section container">
+      <!-- 卡片由 renderProjects 根据 window.PROJECTS 生成 -->
+      <div class="card-grid" id="projects-grid"></div>
+      <!-- 空态：没有任何项目时显示（可由 i18n 翻译） -->
+      <p class="empty-state" id="projects-empty" hidden data-i18n="projects.empty">还没有公开的项目，先去 GitHub 看看？</p>
+    </section>
+  </main>
+
+  <footer id="site-footer" class="site-footer"></footer>
+
+<!-- #endregion -->
+<!-- #region 脚本（依赖加载 + 本页数据 -> DOM 渲染） -->
+  <!-- 脚本顺序：配置 → 图标 → 多语 → 主逻辑 -->
+  <script src="../assets/js/core/site.config.js"></script>
+  <script src="../assets/js/core/icons.js"></script>
+  <script src="../assets/js/core/i18n.js"></script>
+  <!-- 项目数据独立加载，使项目页和搜索页可以共享同一份 window.PROJECTS。 -->
+  <script src="../assets/js/data/projects.js"></script>
+  <script src="../assets/js/core/main.js"></script>
+
+  <!--
+    项目页「数据 → DOM」渲染脚本。
+    - window.PROJECTS 是本页的「内容数据源」：每加一个项目，只往数组里加一项即可，
+      不用碰 HTML。这就是你学前端最该吃透的套路：数据 + 循环 = 页面。
+    - 挂到 window.renderProjects：main.js 切语言时会调用，让卡片文案/状态跟着变。
+  -->
+  <script>
+  (function () {
+    "use strict";
+
+    var ICON = window.icon || function () { return ""; };
+    var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
+
+    // 状态 → 徽章样式类 + i18n key 的映射表。集中放一处，改语义只动这里。
+    var STATUS = {
+      active: { cls: "badge--ok",  key: "projects.status.active" },
+      wip:    { cls: "badge--wip", key: "projects.status.wip" },
+      idea:   { cls: "badge--wip", key: "projects.status.idea" },
+      arch:   { cls: "badge--arch", key: "projects.status.arch" },
+    };
+
+    function renderProjects() {
+      var lang = I18N.getLang();
+      var grid = document.getElementById("projects-grid");
+      var empty = document.getElementById("projects-empty");
+      if (!grid) return;
+
+      var list = window.PROJECTS || [];
+      if (list.length === 0) {
+        grid.innerHTML = "";
+        if (empty) empty.hidden = false;
+        return;
+      }
+      if (empty) empty.hidden = true;
+
+      grid.innerHTML = list.map(function (p) {
+        // 取状态徽章信息；未知状态不显示徽章。
+        var st = STATUS[p.status] || null;
+        var badge = st
+          ? '<span class="badge ' + st.cls + '">' + I18N.t(st.key) + "</span>"
+          : "";
+        // 标签：用 .tag 小胶囊，循环拼出来。
+        var tags = (p.tags || []).map(function (tg) {
+          return '<span class="tag">' + tg + "</span>";
+        }).join("");
+        var desc = (p.desc && p.desc[lang]) ? p.desc[lang] : (p.desc && p.desc.zh) || "";
+
+        // external 图标提示这是跳出/外链；viewAll 是「查看」按钮文案。
+        return (
+          '<a class="card" href="' + (p.url.indexOf("http") === 0 ? p.url : window.siteUrl(p.url)) + '"' +
+            (p.url.indexOf("http") === 0 ? ' target="_blank" rel="noopener"' : "") + ">" +
+            '<span class="card__title">' + ICON(p.icon || "code") + "<span>" +
+              ((p.title && p.title[lang]) ? p.title[lang] : (p.title && p.title.zh) || "") +
+            "</span></span>" +
+            '<span class="card__desc">' + desc + "</span>" +
+            '<span class="card__meta">' +
+              badge +
+              tags +
+              '<span class="card__link ml-auto">' + I18N.t("projects.view") + ICON("external") + "</span>" +
+            "</span>" +
+          "</a>"
+        );
+      }).join("");
+    }
+
+    // 暴露给 main.js 的语言切换钩子，并立即渲染一次。
+    window.renderProjects = renderProjects;
+    renderProjects();
+  })();
+  </script>
+<!-- #endregion -->
+</body>
+</html>
