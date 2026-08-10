@@ -36,7 +36,7 @@ const FEED = path.join(ROOT, "feed.xml");
 // 注意：详情页在 blog/ 子目录，页面内资源用相对路径 "../"，而 RSS 用的是绝对链接。
 const SITE_BASE = "https://magicbude.github.io/";
 const SITE_TITLE = "magicbude";
-const SITE_DESC = "magicbude 的个人网站：代码、游戏、动漫、电影、羽毛球的数字花园。";
+const SITE_DESC = "magicbude 的个人数字基地：汇集项目、文章、近况、工具、收藏与其他网站入口。";
 
 // #region 文本转义（防止用户内容破坏 HTML / XML）
 // 把 & < > " 转成实体。文章正文、标题、摘要都可能含这些字符，不转义会破坏页面或注入脚本。
@@ -404,7 +404,7 @@ function renderDetail(post, bodyHtml, toc, older, newer) {
   </script>
 
   <link rel="stylesheet" href="${REL}css/main.css">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 </head>
 <!-- #endregion -->
 <body>

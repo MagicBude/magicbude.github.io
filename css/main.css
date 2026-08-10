@@ -1075,6 +1075,97 @@ hr {
   transform: translateX(3px);
 }
 
+/* --- 首页总览组件 --------------------------------------------------------- */
+
+/*
+  最新文章与近况属于同一级信息，因此宽屏使用等宽双栏并列展示。
+  Grid 适合表达二维列关系；窄屏时只需把列模板改成单列，无须调整 HTML 顺序。
+*/
+.home-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-8);
+}
+
+/* min-width: 0 允许网格子项收缩，避免长标题把整列撑出容器。 */
+.home-overview__column {
+  min-width: 0;
+}
+
+.home-overview__column .post-item {
+  margin-inline: 0;
+  border: 1px solid transparent;
+}
+
+.home-overview__column .post-item:hover {
+  border-color: var(--color-border);
+}
+
+/* 探索栏目承担次级导航，降低最小列宽可以在宽屏容纳更多入口。 */
+.card-grid--compact {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.card--featured {
+  min-height: 210px;
+}
+
+.home-now-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/*
+  近况摘要使用“图标 + 内容”的两列网格：图标宽度固定，文字列占用剩余空间，
+  多行说明会自然与标题左边缘对齐，比逐项设置外边距更稳定。
+*/
+.home-now-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg);
+}
+
+.home-now-item__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+.home-now-item__icon .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.home-now-item__content {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.home-now-item__label {
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.home-now-item__title {
+  color: var(--color-text);
+  font-size: var(--text-base);
+}
+
+.home-now-item__note {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
 
 /* --- 文章正文 ------------------------------------------------------------- */
 
@@ -1669,6 +1760,12 @@ hr {
    ============================================================================= */
 
 @media (max-width: 960px) {
+
+  /* 双栏总览在窄屏改为单列，保持文章在前、近况在后的阅读顺序。 */
+  .home-overview {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
 
   /*
     桌面端使用紧凑控件以节省横向空间，触屏布局则将点击区域提升到至少 44px，

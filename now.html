@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
   now.html - 近况页
-  协同：js/main.js（头部 / 页脚）、js/i18n.js。
-  数据驱动：分类卡片由 window.NOW（本页内联数组）经 window.renderNow 渲染（与 uses 同结构，纯记录无外链）。
+  协同：js/main.js（头部 / 页脚）、js/i18n.js、js/now.js（共享近况数据）。
+  数据驱动：分类卡片由 window.NOW 经 window.renderNow 渲染（与 uses 同结构，纯记录无外链）。
 -->
 <html lang="zh" data-style="instrument" data-scheme="dark">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -28,7 +28,7 @@
 
   <link rel="stylesheet" href="css/main.css">
 <!-- #endregion -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <!-- #region 页面骨架（导航 / 页脚容器 + 内容区块） -->
 </head>
 <body>
@@ -54,6 +54,8 @@
   <script src="js/site.config.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/i18n.js"></script>
+  <!-- 近况数据独立加载，使近况页和首页摘要可以共享同一份 window.NOW。 -->
+  <script src="js/now.js"></script>
   <script src="js/main.js"></script>
 
   <!--
@@ -66,30 +68,6 @@
 
     var ICON = window.icon || function () { return ""; };
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
-
-    window.NOW = [
-      {
-        title: { zh: "在玩", en: "Playing" }, icon: "gamepad",
-        items: [
-          { name: "羽毛球", note: { zh: "每周两场，胜负不重要，出汗最重要。", en: "Twice a week. Winning barely matters — sweating does." } },
-          { name: "《塞尔达：王国之泪》", note: { zh: "通勤路上看别人玩，自己偶尔上手。", en: "Watch others play on commute, occasionally pick up the pad." } },
-        ],
-      },
-      {
-        title: { zh: "在看", en: "Watching" }, icon: "film",
-        items: [
-          { name: "《葬送的芙莉莲》", note: { zh: "慢节奏但后劲很大，配乐封神。", en: "Slow pace but lingers; the soundtrack is divine." } },
-          { name: "《奥本海默》", note: { zh: "二刷，IMAX 才是正解。", en: "Second watch — IMAX is the only right way." } },
-        ],
-      },
-      {
-        title: { zh: "在搞", en: "Building" }, icon: "sparkles",
-        items: [
-          { name: "这个个人站", note: { zh: "你正在看的，纯手写、零构建。", en: "This very site — hand-written, zero-build." } },
-          { name: "SensorLink 工具", note: { zh: "传感器串口可视化，做到一半。", en: "Sensor serial visualizer, halfway done." } },
-        ],
-      },
-    ];
 
     function renderNow() {
       var lang = I18N.getLang();

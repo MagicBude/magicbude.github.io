@@ -29,7 +29,7 @@
 
   <link rel="stylesheet" href="css/main.css">
 <!-- #endregion -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <!-- #region 页面骨架（导航 / 页脚容器 + 内容区块） -->
 </head>
 <body>
@@ -118,7 +118,9 @@
         return (
           '<a class="card" href="' + p.url + '"' +
             (p.url.indexOf("http") === 0 ? ' target="_blank" rel="noopener"' : "") + ">" +
-            '<span class="card__title">' + ICON(p.icon || "code") + "<span>" + p.title + "</span></span>" +
+            '<span class="card__title">' + ICON(p.icon || "code") + "<span>" +
+              ((p.title && p.title[lang]) ? p.title[lang] : (p.title && p.title.zh) || "") +
+            "</span></span>" +
             '<span class="card__desc">' + desc + "</span>" +
             '<span class="card__meta">' +
               badge +

@@ -39,14 +39,16 @@ window.i18n = (function () {
       "nav.search": "搜索",
       "nav.about": "关于",
 
-      "splash.subtitle": "个人网站 · 数字花园",
+      "splash.subtitle": "个人数字基地",
       "splash.enter": "进入",
 
       "home.greeting": "你好，我是",
       "home.badge": "在代码与兴趣之间，留下自己的数字轨迹",
-      "home.intro": "这里整理作品、文章、近况、常用工具与收藏，也是其他网站和项目的长期入口。",
-      "home.section.entries": "去哪儿",
-      "home.section.recent": "最新动态",
+      "home.intro": "这里汇集作品、文章、近况、常用工具与收藏，也连接我创建的其他网站和项目。",
+      "home.section.featured": "精选项目",
+      "home.section.recent": "最新文章",
+      "home.section.now": "最近在做",
+      "home.section.explore": "探索更多",
       "home.noPosts": "还没有文章，去博客写第一篇吧。",
 
       "about.eyebrow": "关于",
@@ -133,14 +135,16 @@ window.i18n = (function () {
       "nav.search": "Search",
       "nav.about": "About",
 
-      "splash.subtitle": "Personal site · digital garden",
+      "splash.subtitle": "Personal digital base",
       "splash.enter": "Enter",
 
       "home.greeting": "Hi, I'm",
       "home.badge": "A personal trail between code and curiosity",
-      "home.intro": "A home for projects, writing, current notes, tools, collections, and links to other work.",
-      "home.section.entries": "Where to go",
-      "home.section.recent": "Recent",
+      "home.intro": "A home for projects, writing, current notes, tools, collections, and links to everything else I create.",
+      "home.section.featured": "Featured projects",
+      "home.section.recent": "Latest writing",
+      "home.section.now": "What I'm doing",
+      "home.section.explore": "Explore more",
       "home.noPosts": "No posts yet — go write the first one.",
 
       "about.eyebrow": "About",

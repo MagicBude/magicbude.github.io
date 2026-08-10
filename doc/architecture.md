@@ -16,6 +16,7 @@ magicbude.github.io/
 ├─ search.html             页面、文章、项目与链接搜索
 ├─ about.html              关于
 ├─ 404.html                静态错误页
+├─ favicon.svg             全站共享的浏览器标签图标
 ├─ css/main.css            四套皮肤、组件与响应式样式
 ├─ js/
 │  ├─ site.config.js       身份、导航、社交链接与皮肤注册
@@ -23,6 +24,7 @@ magicbude.github.io/
 │  ├─ i18n.js              中英文字典与语言切换
 │  ├─ posts.js             构建器生成的文章列表数据
 │  ├─ projects.js          项目页与搜索页共享的数据
+│  ├─ now.js               近况页与首页共享的数据
 │  ├─ links.js             导航页与搜索页共享的数据
 │  └─ main.js              公共头部、页脚和全站交互
 ├─ posts/                  Markdown 文章源
@@ -78,8 +80,8 @@ site.config.js → icons.js → i18n.js → 页面数据（若有）→ main.js 
 
 - 身份、简介、导航和社交链接：`js/site.config.js`。
 - 文章列表：`js/posts.js`，不要手改，修改 Markdown 后重新生成。
-- 项目与友链：分别位于 `js/projects.js`、`js/links.js`，供内容页和搜索页共享。
-- 近况与装备：暂时位于各自 HTML 的内联数据数组。
+- 项目、近况与友链：分别位于 `js/projects.js`、`js/now.js`、`js/links.js`，供多个页面共享。
+- 装备：暂时位于 `uses.html` 的内联数据数组。
 - UI 翻译：`js/i18n.js`。
 
 只有相同数据确实需要被多个页面共同读取时，才把它提取成独立 JS 文件；

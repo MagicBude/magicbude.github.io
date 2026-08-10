@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <!--
   home.html - 首页枢纽（真正首页）
-  作用：Hero（站名 / 定位 / 简介）+ 「去哪儿」卡片网格 + 最新动态。
-  协同：js/site.config.js（身份 / 导航数据源）、js/main.js（注入头部 / 页脚）、js/i18n.js（多语）。
-  数据驱动：Hero 与卡片由底部内联脚本 window.renderHome 从 SITE_CONFIG / i18n 渲染；最新动态由构建生成的 window.POSTS 填充。
+  作用：用 Hero、精选项目、最新文章、近况摘要和栏目导航组成个人数字基地的总入口。
+  协同：site.config.js（身份 / 导航）、projects.js（项目）、posts.js（文章）、now.js（近况）、main.js（公共框架）、i18n.js（多语）。
+  数据驱动：底部的 window.renderHome 从多个 window.* 数据源读取内容并渲染，各内容页与首页只维护一份数据。
 -->
 <html lang="zh" data-style="instrument" data-scheme="dark">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>magicbude · 个人网站</title>
-  <meta name="description" content="magicbude 的个人网站：代码、游戏、动漫、电影、羽毛球的数字花园，也挂着做过的其他网站和小工具。">
+  <title>magicbude · 个人数字基地</title>
+  <meta name="description" content="magicbude 的个人数字基地：汇集项目、文章、近况、工具、收藏与其他网站入口。">
 
   <!--
     防闪白内联脚本：必须在 CSS 加载之前执行（原理同 index.html 开屏页）。
@@ -35,8 +35,8 @@
   </script>
 
   <link rel="stylesheet" href="css/main.css">
-  <!-- 内联 SVG favicon：带圆角的小方块，零外链 -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Crect x='9' y='9' width='14' height='14' rx='4' fill='%234aa8ff'/%3E%3C/svg%3E">
+  <!-- favicon 使用本地 SVG 文件，各页面共享同一图标，修改时只维护一处。 -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <!-- #endregion -->
 <body>
@@ -57,33 +57,56 @@
       <!-- 小徽章：一句话定位，随语言切换 -->
       <span class="hero__tagline" id="hero-tagline" data-i18n="home.badge">在代码与兴趣之间，留下自己的数字轨迹</span>
       <!-- 自我介绍：从 site.config.js 的 bio 字段取，多语 -->
-      <p class="hero__intro" id="hero-bio">我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。</p>
+      <p class="hero__intro" id="hero-bio">我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。这里是我的个人数字基地。</p>
     </section>
 
-    <!-- ============ 去哪儿（板块入口） ============ -->
+    <!-- ============ 精选项目（共享 projects.js） ============ -->
     <section class="section container">
       <div class="section__header">
-        <h2 class="section__title" data-i18n="home.section.entries">去哪儿</h2>
-      </div>
-      <!-- 卡片由内联脚本根据 site.config.js 的 nav 生成（排除首页与搜索） -->
-      <div class="card-grid" id="entry-cards"></div>
-    </section>
-
-    <!-- ============ 最新动态 ============ -->
-    <section class="section container">
-      <div class="section__header">
-        <h2 class="section__title" data-i18n="home.section.recent">最新动态</h2>
-        <a class="section__more" href="blog.html">
+        <h2 class="section__title" data-i18n="home.section.featured">精选项目</h2>
+        <a class="section__more" href="projects.html">
           <span data-i18n="section.viewAll">查看全部</span>
-          <!-- 右箭头图标（与 js/icons.js 的 arrowRight 一致） -->
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>
-          </svg>
+          <span id="featured-arrow" aria-hidden="true"></span>
         </a>
       </div>
-      <!-- 文章列表：构建脚本生成 js/posts.js（window.POSTS）后自动填充；没有时显示空状态 -->
-      <div class="post-list" id="recent-posts"></div>
+      <!-- 取共享项目数据中的前三项；项目状态与完整项目页使用相同语义。 -->
+      <div class="card-grid" id="featured-projects"></div>
+    </section>
+
+    <!-- ============ 最新文章 + 最近在做（桌面双栏，窄屏自动单列） ============ -->
+    <section class="section container home-overview">
+      <div class="home-overview__column">
+        <div class="section__header">
+          <h2 class="section__title" data-i18n="home.section.recent">最新文章</h2>
+          <a class="section__more" href="blog.html">
+            <span data-i18n="section.viewAll">查看全部</span>
+            <span id="recent-arrow" aria-hidden="true"></span>
+          </a>
+        </div>
+        <!-- 文章列表由构建生成的 window.POSTS 提供；首页只展示最新两篇。 -->
+        <div class="post-list" id="recent-posts"></div>
+      </div>
+
+      <div class="home-overview__column">
+        <div class="section__header">
+          <h2 class="section__title" data-i18n="home.section.now">最近在做</h2>
+          <a class="section__more" href="now.html">
+            <span data-i18n="section.viewAll">查看全部</span>
+            <span id="now-arrow" aria-hidden="true"></span>
+          </a>
+        </div>
+        <!-- 每个近况分类取第一项，形成不重复维护的首页摘要。 -->
+        <div class="home-now-list" id="home-now"></div>
+      </div>
+    </section>
+
+    <!-- ============ 探索栏目（稳定的全站导航） ============ -->
+    <section class="section container">
+      <div class="section__header">
+        <h2 class="section__title" data-i18n="home.section.explore">探索更多</h2>
+      </div>
+      <!-- 根据 site.config.js 的导航生成卡片，排除首页与搜索两个功能入口。 -->
+      <div class="card-grid card-grid--compact" id="entry-cards"></div>
     </section>
   </main>
 
@@ -97,15 +120,18 @@
   <script src="js/icons.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/posts.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/now.js"></script>
   <script src="js/main.js"></script>
 
   <!--
-    首页特有的「数据 → DOM」渲染脚本。
+    首页特有的「多数据源 → DOM」渲染脚本。
     放在 body 末尾、主脚本之后，DOM 已就绪，且 main.js 已经把头部/页脚注好。
-    这里做的三件事，都是前端最基础也最常用的模式：
+    这里做的事情都是前端最基础也最常用的数据驱动模式：
       1) 把配置里的文本填进 Hero（名字 / 定位 / 简介）
-      2) 把导航项渲染成"去哪儿"卡片网格
-      3) 如果构建脚本已生成文章数据（window.POSTS），渲染最新几条
+      2) 从共享项目数据生成精选项目
+      3) 从文章与近况数据生成双栏摘要
+      4) 把导航项渲染成探索栏目卡片
     把它挂到 window.renderHome，main.js 在切换语言时会再调一次，保证文案同步刷新。
   -->
   <script>
@@ -127,12 +153,25 @@
     // 板块卡片的一句话说明（多语）。纯页面文案，放这里最直观。
     var ENTRY_DESC = {
       blog:     { zh: "写代码、做小工具的记录与踩坑",   en: "Notes & lessons from coding and tinkering" },
-      projects: { zh: "我做过的网站、工具与开源项目",   en: "Sites, tools and open-source I've built" },
+      projects: { zh: "已经完成、正在制作和计划中的项目", en: "Completed, active, and planned projects" },
       now:      { zh: "最近在玩、在看、在搞啥",         en: "What I'm playing, watching and building now" },
       uses:     { zh: "日常在用的硬件与软件",           en: "Hardware & software I use daily" },
       links:    { zh: "朋友们和觉得有用的站",           en: "Friends and useful sites" },
       about:    { zh: "关于我，以及这个站",             en: "About me and this site" }
     };
+
+    // 项目状态映射与项目页保持一致：首页只复用语义，不复制项目内容。
+    var PROJECT_STATUS = {
+      active: { cls: "badge--ok",  key: "projects.status.active" },
+      wip:    { cls: "badge--wip", key: "projects.status.wip" },
+      idea:   { cls: "badge--wip", key: "projects.status.idea" },
+      arch:   { cls: "badge--arch", key: "projects.status.arch" }
+    };
+
+    // 读取双语字段；当前语言缺少内容时回退到中文，避免卡片出现空白。
+    function bi(field, lang) {
+      return (field && field[lang]) ? field[lang] : (field && field.zh) || "";
+    }
 
     // 渲染整个首页（Hero + 卡片 + 最新动态）。幂等，可反复调用。
     function renderHome() {
@@ -148,7 +187,69 @@
       var bioEl   = document.getElementById("hero-bio");
       if (bioEl && CONFIG.bio) bioEl.textContent = CONFIG.bio[lang] || CONFIG.bio.zh;
 
-      // ---- 2) 去哪儿：把导航渲染成卡片，排除"首页"和"搜索"两项 ----
+      // ---- 2) 精选项目：共享项目数组的前三项 ----
+      var featured = document.getElementById("featured-projects");
+      if (featured) {
+        featured.innerHTML = (window.PROJECTS || []).slice(0, 3).map(function (project) {
+          var state = PROJECT_STATUS[project.status];
+          var badge = state
+            ? '<span class="badge ' + state.cls + '">' + I18N.t(state.key) + "</span>"
+            : "";
+          var external = project.url && project.url.indexOf("http") === 0;
+          return (
+            '<a class="card card--featured" href="' + (project.url || "projects.html") + '"' +
+              (external ? ' target="_blank" rel="noopener"' : "") + ">" +
+              '<span class="card__title">' + ICON(project.icon || "code") + "<span>" + bi(project.title, lang) + "</span></span>" +
+              '<span class="card__desc">' + bi(project.desc, lang) + "</span>" +
+              '<span class="card__meta">' + badge +
+                '<span class="card__link ml-auto">' + I18N.t("projects.view") + ICON(external ? "external" : "arrowRight") + "</span>" +
+              "</span>" +
+            "</a>"
+          );
+        }).join("");
+      }
+
+      // ---- 3) 最新文章：构建脚本生成 js/posts.js 后，window.POSTS 才有值 ----
+      var recent = document.getElementById("recent-posts");
+      if (recent) {
+        if (window.POSTS && window.POSTS.length) {
+          // 双栏布局中展示最新两篇，控制列表高度并为近况栏留出相近的视觉重量。
+          recent.innerHTML = window.POSTS.slice(0, 2).map(function (post) {
+            var date = post.date ? String(post.date).slice(0, 10) : "";
+            return (
+              '<a class="post-item" href="' + (post.url || "#") + '">' +
+                '<div class="post-item__title">' + (post.title || "") + "</div>" +
+                (post.excerpt ? '<p class="post-item__excerpt">' + post.excerpt + "</p>" : "") +
+                '<div class="post-meta"><span class="post-meta__item">' + ICON("book") + date + "</span></div>" +
+              "</a>"
+            );
+          }).join("");
+        } else {
+          recent.innerHTML = '<p class="empty-state" data-i18n="home.noPosts">' +
+            "还没有文章，去博客写第一篇吧。</p>";
+        }
+      }
+
+      // ---- 4) 最近在做：每个分类取第一项作为摘要 ----
+      var nowHost = document.getElementById("home-now");
+      if (nowHost) {
+        nowHost.innerHTML = (window.NOW || []).map(function (category) {
+          var item = category.items && category.items[0];
+          if (!item) return "";
+          return (
+            '<div class="home-now-item">' +
+              '<span class="home-now-item__icon">' + ICON(category.icon || "sparkles") + "</span>" +
+              '<span class="home-now-item__content">' +
+                '<span class="home-now-item__label">' + bi(category.title, lang) + "</span>" +
+                '<strong class="home-now-item__title">' + item.name + "</strong>" +
+                '<span class="home-now-item__note">' + bi(item.note, lang) + "</span>" +
+              "</span>" +
+            "</div>"
+          );
+        }).join("");
+      }
+
+      // ---- 5) 探索栏目：把导航渲染成卡片，排除首页和搜索两项 ----
       var grid = document.getElementById("entry-cards");
       if (grid && CONFIG.nav) {
         var cards = CONFIG.nav
@@ -169,29 +270,11 @@
         grid.innerHTML = cards;
       }
 
-      // ---- 3) 最新动态：构建脚本生成 js/posts.js 后，window.POSTS 才有值 ----
-      var recent = document.getElementById("recent-posts");
-      if (recent) {
-        if (window.POSTS && window.POSTS.length) {
-          // 取最新 4 篇（假设 POSTS 已按日期倒序）。
-          recent.innerHTML = window.POSTS.slice(0, 4).map(function (p) {
-            var d = p.date ? String(p.date).slice(0, 10) : "";
-            return (
-              '<a class="post-item" href="' + (p.url || "#") + '">' +
-                '<div class="post-item__title">' + (p.title || "") + "</div>" +
-                (p.excerpt ? '<p class="post-item__excerpt">' + p.excerpt + "</p>" : "") +
-                '<div class="post-meta">' +
-                  '<span class="post-meta__item">' + ICON("book") + d + "</span>" +
-                "</div>" +
-              "</a>"
-            );
-          }).join("");
-        } else {
-          // 还没有文章数据时的占位（构建博客后自动消失）。
-          recent.innerHTML = '<p class="empty-state" data-i18n="home.noPosts">' +
-            "还没有文章，去博客写第一篇吧。" + "</p>";
-        }
-      }
+      // 三个“查看全部”链接共用相同箭头图标，集中注入可以保持 HTML 骨架简洁。
+      ["featured-arrow", "recent-arrow", "now-arrow"].forEach(function (id) {
+        var host = document.getElementById(id);
+        if (host) host.innerHTML = ICON("arrowRight");
+      });
     }
 
     // 暴露出去，让 main.js 在切换语言时能重渲染首页文案。

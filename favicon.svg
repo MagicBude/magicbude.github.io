@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>magicbude</title>
+  <!-- 深色底板保证浏览器浅色、深色标签栏中都能看清图标轮廓。 -->
+  <rect width="64" height="64" rx="15" fill="#0d1117"/>
+  <!-- 中心方块沿用站点 Logo 的蓝色标记，缩小后仍保持简单、可辨认。 -->
+  <rect x="18" y="18" width="28" height="28" rx="8" fill="#4aa8ff"/>
+</svg>

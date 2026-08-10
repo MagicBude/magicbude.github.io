@@ -17,7 +17,7 @@
 
 /*
  * 字段说明：
- *   title  项目名称；
+ *   title  按语言代码保存的项目名称；
  *   desc   按语言代码保存的简介，当前支持 zh / en；
  *   url    项目详情页或外部仓库地址；
  *   icon   js/icons.js 中的图标名称；
@@ -27,7 +27,7 @@
  */
 window.PROJECTS = [
   {
-    title: "数字花园（本站）",
+    title: { zh: "个人数字基地（本站）", en: "Personal digital base (this site)" },
     desc: {
       zh: "你正在看的这个纯静态个人站，零构建、手写 HTML/CSS/JS。",
       en: "The static personal site you're on — zero-build, hand-written HTML/CSS/JS.",
@@ -38,7 +38,7 @@ window.PROJECTS = [
     tags: ["Web", "Static"],
   },
   {
-    title: "SensorLink",
+    title: { zh: "SensorLink", en: "SensorLink" },
     desc: {
       zh: "计划制作的传感器数据采集与可视化工具，目标是支持串口直连和实时绘图。",
       en: "A planned sensor data tool intended to support serial input and live charts.",
@@ -49,7 +49,7 @@ window.PROJECTS = [
     tags: ["Tool", "Embedded"],
   },
   {
-    title: "Markdown 速记板",
+    title: { zh: "Markdown 速记板", en: "Markdown Quick Notes" },
     desc: {
       zh: "计划制作的浏览器 Markdown 笔记工具，目标是本地保存并支持导出。",
       en: "A planned in-browser Markdown notepad intended to be local-first and exportable.",
@@ -60,7 +60,7 @@ window.PROJECTS = [
     tags: ["Web", "PWA"],
   },
   {
-    title: "像素天气",
+    title: { zh: "像素天气", en: "Pixel Weather" },
     desc: {
       zh: "计划中的像素天气练习：尝试把天气数据表现为像素风动画。",
       en: "A planned exercise exploring weather data as pixel-art animation.",

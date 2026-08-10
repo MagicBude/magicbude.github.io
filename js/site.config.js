@@ -38,11 +38,11 @@ window.SITE_CONFIG = {
   // 采用不依赖当前开发阶段的长期表述，避免网站每完成一个阶段就重写自我介绍。
   // 以后只有身份、兴趣或站点定位真正变化时才需要修改这里。
   bio: {
-    zh: "我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。这里是我的个人主站与数字花园：" +
-        "用于整理作品、文章、近况、常用工具和收藏，也作为我创建的其他网站与项目的长期入口。",
+    zh: "我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。这里是我的个人数字基地：" +
+        "汇集作品、文章、近况、常用工具和收藏，也连接我创建的其他网站与项目。数字花园则是其中持续整理知识与想法的部分。",
     en: "I'm magicbude, interested in programming, hands-on creation, and exploring different interests. " +
-        "This is my personal homepage and digital garden for projects, writing, current notes, tools, collections, " +
-        "and the other websites or projects I create.",
+        "This is my personal digital base for projects, writing, current notes, tools, collections, and the other things I create. " +
+        "Its digital garden is where knowledge and ideas continue to grow.",
   },
 
   // #endregion 身份与基础信息

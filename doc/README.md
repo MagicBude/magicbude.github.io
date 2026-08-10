@@ -38,7 +38,7 @@
 | 视觉风格 | **4 种可切换皮肤**（instrument / minimal / terminal / magazine） | 随时换风格，不用纠结；详见 spec.md |
 | 国际化 | UI 字典切换（zh/en），预留扩展 | 加语言只加一个字典 |
 | 注释标准 | 教材级（解释 **why**，不写废话） | 你对照学习 |
-| 部署 | GitHub Pages（纯静态 Actions 工作流） | 仓库即站点 |
+| 部署 | GitHub Pages 直接发布静态文件 | 仓库即站点，不依赖整站构建 |
 
 ## 文档导航
 
