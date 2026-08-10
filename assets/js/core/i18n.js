@@ -88,6 +88,12 @@ window.i18n = (function () {
       "uses.eyebrow": "装备",
       "uses.title": "我在用什么",
       "uses.lead": "日常使用的硬件、软件与服务，以及选择它们的原因。",
+      "uses.gearTitle": "我的装备",
+      "uses.gearLead": "我实际使用的设备、软件与服务；这部分会随着使用习惯继续更新。",
+      "uses.toolboxTitle": "工具箱",
+      "uses.toolboxLead": "值得收藏的软件与开发工具目录；收录不等于当前正在使用。",
+      "uses.filterAll": "全部",
+      "uses.officialSite": "访问官网",
 
       "now.eyebrow": "近况",
       "now.title": "最近在搞啥",
@@ -109,6 +115,7 @@ window.i18n = (function () {
       "search.kind.page": "页面",
       "search.kind.project": "项目",
       "search.kind.link": "链接",
+      "search.kind.tool": "工具",
 
       "blog.eyebrow": "博客",
       "blog.title": "博客",
@@ -184,6 +191,12 @@ window.i18n = (function () {
       "uses.eyebrow": "Uses",
       "uses.title": "What I use",
       "uses.lead": "Hardware, software, and services I use, with the reasons behind those choices.",
+      "uses.gearTitle": "My setup",
+      "uses.gearLead": "Devices, software, and services I actually use; this list evolves with my workflow.",
+      "uses.toolboxTitle": "Toolbox",
+      "uses.toolboxLead": "A curated directory of useful software and development tools; inclusion does not imply daily use.",
+      "uses.filterAll": "All",
+      "uses.officialSite": "Official site",
 
       "now.eyebrow": "Now",
       "now.title": "What I'm up to",
@@ -205,6 +218,7 @@ window.i18n = (function () {
       "search.kind.page": "Page",
       "search.kind.project": "Project",
       "search.kind.link": "Link",
+      "search.kind.tool": "Tool",
 
       "blog.eyebrow": "Blog",
       "blog.title": "Blog",

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   search/index.html - 站内搜索页
-  协同：assets/js/core/ 公共脚本，以及文章、项目、链接三类共享数据文件。
+  协同：assets/js/core/ 公共脚本，以及文章、项目、链接、工具四类共享数据文件。
   数据驱动：输入框触发 window.renderSearch，把四类内容归一为 INDEX 后过滤渲染。
 -->
 <html lang="zh" data-style="instrument" data-scheme="dark">
@@ -78,6 +78,7 @@
   <!-- 项目与链接数据同样先加载，搜索页才能读取对应的全局数据。 -->
   <script src="../assets/js/data/projects.js"></script>
   <script src="../assets/js/data/links.js"></script>
+  <script src="../assets/js/data/uses.js"></script>
   <script src="../assets/js/core/main.js"></script>
 
   <!--
@@ -175,6 +176,16 @@
             excerpt: bi(link.note),
             kind: "link",
           });
+        });
+      });
+
+      // 5) 工具箱（由装备页与搜索页共同读取；链接指向各工具的官方网站）
+      (window.TOOLBOX || []).forEach(function (tool) {
+        items.push({
+          title: tool.name || "",
+          url: tool.url || "",
+          excerpt: bi(tool.note),
+          kind: "tool",
         });
       });
 

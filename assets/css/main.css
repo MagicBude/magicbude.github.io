@@ -1926,7 +1926,59 @@ hr {
 /* #endregion 打印样式 */
 }
 
-/* #region 博客列表筛选（blog.html 专属） */
+/* #region 装备与工具箱 */
+
+/* 说明文字限制行宽，避免在宽屏上形成难以阅读的超长行。 */
+.section__intro {
+  max-width: 68ch;
+  margin: calc(var(--space-2) * -1) 0 var(--space-6);
+  color: var(--color-text-muted);
+}
+
+/* 每个装备分类保持清晰的垂直节奏；第一组无需额外顶距。 */
+.uses-category + .uses-category {
+  margin-top: var(--space-8);
+}
+
+.uses-category__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-lg);
+}
+
+.uses-category__title .icon {
+  color: var(--color-accent);
+}
+
+/* 筛选器允许自动换行；新增分类时不会把移动端页面撑宽。 */
+.toolbox-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.toolbox-filters .tag-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.toolbox-filters .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* 分类徽章只占内容宽度，不随卡片的 flex 布局拉伸。 */
+.tool-card__category {
+  align-self: flex-start;
+}
+
+/* #endregion 装备与工具箱 */
+
+/* #region 博客列表筛选（blog/index.html 专属） */
 .blog-filters {
   display: flex;
   flex-direction: column;

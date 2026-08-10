@@ -1,7 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <title>magicbude</title>
-  <!-- 深色底板保证浏览器浅色、深色标签栏中都能看清图标轮廓。 -->
-  <rect width="64" height="64" rx="15" fill="#0d1117"/>
-  <!-- 中心方块沿用站点 Logo 的蓝色标记，缩小后仍保持简单、可辨认。 -->
-  <rect x="18" y="18" width="28" height="28" rx="8" fill="#4aa8ff"/>
+  <defs>
+    <!-- 轻微的蓝紫渐变提供层次，但保持足够深，避免在浅色标签栏中失去轮廓。 -->
+    <linearGradient id="background" x1="8" y1="6" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#172554"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <!-- 主标记由冷蓝过渡到青色，对应站点偏技术感的视觉语言。 -->
+    <linearGradient id="mark" x1="15" y1="19" x2="49" y2="47" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#2dd4bf"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 圆角底板确保图标在浏览器的浅色和深色标签栏中都有清晰边界。 -->
+  <rect x="3" y="3" width="58" height="58" rx="16" fill="url(#background)"/>
+  <rect x="3.75" y="3.75" width="56.5" height="56.5" rx="15.25" fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="1.5"/>
+
+  <!-- 一笔式小写 m 代表 magicbude；圆角线帽让 16×16 像素下仍然清楚柔和。 -->
+  <path d="M15 43V27c0-4 2.7-7 6.5-7s6.5 3 6.5 7v16V29c0-5 3.2-9 7.8-9S44 24 44 29v14"
+        fill="none" stroke="url(#mark)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 右上角叶片表达“数字花园持续生长”，也让字母标记拥有独特识别点。 -->
+  <path d="M42 17c2.1-4.8 6.1-6.6 10.1-6.1.4 4.3-1.6 8.1-6.5 9.7-1.8.6-3.4-1.8-3.6-3.6z"
+        fill="#a3e635"/>
+  <path d="M43.5 19c2.1-2.4 4.5-4.2 7.1-5.4" fill="none" stroke="#365314" stroke-width="1.6" stroke-linecap="round"/>
 </svg>

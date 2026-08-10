@@ -2,7 +2,7 @@
 <!--
   uses/index.html - 装备页
   协同：assets/js/core/ 中的公共头部、页脚与多语言脚本。
-  数据驱动：分类卡片由 window.USES（本页内联数组）经 window.renderUses 渲染（两层循环：分类 -> item）。
+  数据驱动：assets/js/data/uses.js 提供装备、工具与分类，页面脚本只负责筛选和渲染。
 -->
 <html lang="zh" data-style="instrument" data-scheme="dark">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -43,8 +43,35 @@
       <p class="lead" data-i18n="uses.lead">日常使用的硬件、软件与服务，以及选择它们的原因。</p>
     </section>
 
-    <!-- 分类由 renderUses 按 window.USES 生成 -->
-    <div class="container" id="uses-root"></div>
+    <div class="container">
+      <!-- #region 我的装备 -->
+      <section class="subsection" aria-labelledby="gear-title">
+        <h2 class="subsection__title" id="gear-title">
+          <span id="gear-title-icon" aria-hidden="true"></span>
+          <span data-i18n="uses.gearTitle">我的装备</span>
+        </h2>
+        <p class="section__intro" data-i18n="uses.gearLead">我实际使用的设备、软件与服务；这部分会随着使用习惯继续更新。</p>
+        <div id="uses-root"></div>
+      </section>
+      <!-- #endregion 我的装备 -->
+
+      <!-- #region 工具箱 -->
+      <section class="subsection" aria-labelledby="toolbox-title">
+        <h2 class="subsection__title" id="toolbox-title">
+          <span id="toolbox-title-icon" aria-hidden="true"></span>
+          <span data-i18n="uses.toolboxTitle">工具箱</span>
+        </h2>
+        <p class="section__intro" data-i18n="uses.toolboxLead">值得收藏的软件与开发工具目录；收录不等于当前正在使用。</p>
+
+        <!--
+          筛选按钮由数据中的分类动态生成。使用一个容器监听点击事件，
+          即使以后增加分类，也不需要为每个新按钮单独绑定监听器。
+        -->
+        <div class="toolbox-filters" id="toolbox-filters" aria-label="工具分类"></div>
+        <div class="card-grid" id="toolbox-root"></div>
+      </section>
+      <!-- #endregion 工具箱 -->
+    </div>
   </main>
 
   <footer id="site-footer" class="site-footer"></footer>
@@ -55,11 +82,11 @@
   <script src="../assets/js/core/icons.js"></script>
   <script src="../assets/js/core/i18n.js"></script>
   <script src="../assets/js/core/main.js"></script>
+  <script src="../assets/js/data/uses.js"></script>
 
   <!--
-    装备页「数据 → DOM」。数据按「分类」组织：window.USES 是分类数组，
-    每个分类下有若干 item。渲染时先循环分类、再循环 item，套两层循环。
-    外层循环出的每个分类包一个 .subsection（标题 + 卡片网格）。
+    装备页「数据 → DOM」：装备按分类进行两层渲染；工具箱先按当前分类筛选，
+    再将结果映射为卡片。切换语言时 main.js 会再次调用 window.renderUses。
   -->
   <script>
   (function () {
@@ -67,69 +94,110 @@
 
     var ICON = window.icon || function () { return ""; };
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
+    var activeToolCategory = "all";
+    var filtersBound = false;
 
-    // 本页内容数据：按分类分组。每类：title 双语 / icon 图标 / items 列表。
-    // item：name 名称 / note 双语说明 / url 链接（可空，空则只展示文字）
-    window.USES = [
-      {
-        title: { zh: "开发设备", en: "Dev machine" }, icon: "code",
-        items: [
-          { name: "ThinkPad X 系列", note: { zh: "主力笔记本，键盘手感无可替代。", en: "Daily laptop — the keyboard is irreplaceable." }, url: "" },
-          { name: "VS Code", note: { zh: "主力编辑器，配一堆小插件。", en: "Main editor, with a pile of small extensions." }, url: "https://code.visualstudio.com" },
-          { name: "Windows + WSL2", note: { zh: "Linux 工具链在 Windows 上跑得很顺。", en: "Linux toolchain on Windows, surprisingly smooth." }, url: "" },
-        ],
-      },
-      {
-        title: { zh: "硬件玩具", en: "Hardware toys" }, icon: "tool",
-        items: [
-          { name: "逻辑分析仪", note: { zh: "调串口和 SPI/I2C 的救命工具。", en: "Lifesaver for debugging UART / SPI / I2C." }, url: "" },
-          { name: "示波器", note: { zh: "看波形必备，哪怕只是确认有没有信号。", en: "Must-have for waveforms, even just to confirm a signal exists." }, url: "" },
-          { name: "3D 打印机", note: { zh: "外壳和支架说打就打。", en: "Enclosures and brackets, printed on demand." }, url: "" },
-        ],
-      },
-      {
-        title: { zh: "日常软件", en: "Daily software" }, icon: "layout",
-        items: [
-          { name: "Obsidian", note: { zh: "笔记与知识库，本地优先。", en: "Notes & knowledge base, local-first." }, url: "https://obsidian.md" },
-          { name: "f.lux", note: { zh: "晚上护眼，屏幕少点蓝。", en: "Eyesaver at night — less blue light." }, url: "" },
-        ],
-      },
-    ];
+    // 所有外部数据在插入 innerHTML 前统一转义，避免名称中的特殊字符破坏标签结构。
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
 
-    function renderUses() {
-      var lang = I18N.getLang();
+    function localized(value, lang) {
+      return value && (value[lang] || value.zh || value.en) || "";
+    }
+
+    // 有链接的装备用 <a>，纯说明项用 <article>；避免用 href="#" 制造无意义的页面跳动。
+    function renderGearCard(item, lang) {
+      var tag = item.url ? "a" : "article";
+      var attrs = item.url ? ' href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener"' : "";
+      return (
+        "<" + tag + ' class="card"' + attrs + ">" +
+          '<span class="card__title">' + escapeHtml(item.name) + "</span>" +
+          '<span class="card__desc">' + escapeHtml(localized(item.note, lang)) + "</span>" +
+          (item.url ? '<span class="card__link">' + I18N.t("uses.officialSite") + ICON("external") + "</span>" : "") +
+        "</" + tag + ">"
+      );
+    }
+
+    function renderGear(lang) {
       var root = document.getElementById("uses-root");
       if (!root) return;
-
-      root.innerHTML = (window.USES || []).map(function (cat) {
-        var title = (cat.title && cat.title[lang]) ? cat.title[lang] : (cat.title && cat.title.zh) || cat.icon;
-        // 分类图标 + 分类标题
-        var head =
-          '<h2 class="subsection__title">' + ICON(cat.icon || "layout") +
-          "<span>" + title + "</span></h2>";
-
-        // 该分类下的卡片网格：每个 item 一张卡
-        var cards = (cat.items || []).map(function (it) {
-          var note = (it.note && it.note[lang]) ? it.note[lang] : (it.note && it.note.zh) || "";
-          var isExt = it.url && it.url.indexOf("http") === 0;
-          var attrs = isExt ? ' href="' + it.url + '" target="_blank" rel="noopener"' : ' href="#"';
-          return (
-            '<a class="card"' + attrs + ">" +
-              '<span class="card__title"><span>' + it.name + "</span></span>" +
-              '<span class="card__desc">' + note + "</span>" +
-              (isExt ? '<span class="card__link ml-auto">' + I18N.t("projects.view") + ICON("external") + "</span>" : "") +
-            "</a>"
-          );
-        }).join("");
-
-        // 外层：一个 .subsection 包标题 + 网格
+      root.innerHTML = (window.USES || []).map(function (category) {
         return (
-          '<section class="subsection">' +
-            head +
-            '<div class="card-grid">' + cards + "</div>" +
+          '<section class="uses-category">' +
+            '<h3 class="uses-category__title">' + ICON(category.icon || "layout") +
+              "<span>" + escapeHtml(localized(category.title, lang)) + "</span></h3>" +
+            '<div class="card-grid">' + (category.items || []).map(function (item) {
+              return renderGearCard(item, lang);
+            }).join("") + "</div>" +
           "</section>"
         );
       }).join("");
+    }
+
+    function renderToolFilters(lang) {
+      var root = document.getElementById("toolbox-filters");
+      var categories = window.TOOL_CATEGORIES || {};
+      if (!root) return;
+      var buttons = '<button class="tag tag-btn' + (activeToolCategory === "all" ? " is-active" : "") +
+        '" type="button" data-category="all">' + I18N.t("uses.filterAll") + "</button>";
+      buttons += Object.keys(categories).map(function (key) {
+        var category = categories[key];
+        return '<button class="tag tag-btn' + (activeToolCategory === key ? " is-active" : "") +
+          '" type="button" data-category="' + key + '">' +
+          ICON(category.icon) + escapeHtml(localized(category.label, lang)) + "</button>";
+      }).join("");
+      root.innerHTML = buttons;
+    }
+
+    function renderToolbox(lang) {
+      var root = document.getElementById("toolbox-root");
+      var categories = window.TOOL_CATEGORIES || {};
+      var tools = window.TOOLBOX || [];
+      if (!root) return;
+      if (activeToolCategory !== "all") {
+        tools = tools.filter(function (tool) { return tool.category === activeToolCategory; });
+      }
+      root.innerHTML = tools.map(function (tool) {
+        var category = categories[tool.category] || { label: {}, icon: "tool" };
+        return (
+          '<a class="card tool-card" href="' + escapeHtml(tool.url) + '" target="_blank" rel="noopener">' +
+            '<span class="card__title">' + ICON(category.icon) + "<span>" + escapeHtml(tool.name) + "</span></span>" +
+            '<span class="tag tool-card__category">' + escapeHtml(localized(category.label, lang)) + "</span>" +
+            '<span class="card__desc">' + escapeHtml(localized(tool.note, lang)) + "</span>" +
+            '<span class="card__link">' + I18N.t("uses.officialSite") + ICON("external") + "</span>" +
+          "</a>"
+        );
+      }).join("");
+    }
+
+    function bindToolFilters() {
+      var root = document.getElementById("toolbox-filters");
+      if (!root || filtersBound) return;
+      root.addEventListener("click", function (event) {
+        var button = event.target.closest("[data-category]");
+        if (!button) return;
+        activeToolCategory = button.getAttribute("data-category") || "all";
+        renderUses();
+      });
+      filtersBound = true;
+    }
+
+    function renderUses() {
+      var lang = I18N.getLang();
+      var gearIcon = document.getElementById("gear-title-icon");
+      var toolboxIcon = document.getElementById("toolbox-title-icon");
+      if (gearIcon) gearIcon.innerHTML = ICON("layout");
+      if (toolboxIcon) toolboxIcon.innerHTML = ICON("tool");
+      renderGear(lang);
+      renderToolFilters(lang);
+      renderToolbox(lang);
+      bindToolFilters();
     }
 
     window.renderUses = renderUses;
