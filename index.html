@@ -80,7 +80,9 @@
       DOM 顺序与视觉顺序一致，窄屏改为单列后仍保持自然的阅读逻辑。
     -->
     <section class="home-dashboard container container--home" aria-label="基地总览" data-i18n="home.dashboard.aria" data-i18n-attr="aria-label">
-      <aside class="home-panel home-profile" aria-labelledby="home-profile-title">
+      <!-- 左栏把“这是谁”和“此刻环境”放在一起，避免只有档案卡后留下大段空白。 -->
+      <aside class="home-rail home-rail--left">
+      <section class="home-panel home-profile" aria-labelledby="home-profile-title">
         <div class="home-profile__mark" id="profile-mark" aria-hidden="true">M</div>
         <p class="home-panel__kicker" data-i18n="home.profile.kicker">基地维护者</p>
         <h2 class="home-profile__name" id="home-profile-title">magicbude</h2>
@@ -106,56 +108,24 @@
           <span data-i18n="home.profile.more">认识更多</span>
           <span id="profile-arrow" aria-hidden="true"></span>
         </a>
-      </aside>
-
-      <section class="home-panel home-feed" aria-labelledby="home-feed-title">
-        <div class="home-panel__header">
-          <div>
-            <p class="home-panel__kicker" data-i18n="home.feed.kicker">中文独立网站</p>
-            <h2 id="home-feed-title" data-i18n="home.section.recent">最新文章</h2>
-          </div>
-          <a class="section__more" href="blog/index.html">
-            <span data-i18n="section.viewAll">查看全部</span>
-            <span id="recent-arrow" aria-hidden="true"></span>
-          </a>
-        </div>
-        <!-- 文章与标签都读取构建器生成的 posts.js，不在首页复制内容。 -->
-        <div class="post-list home-feed__posts" id="recent-posts"></div>
-        <div class="home-topics">
-          <h3 data-i18n="home.section.tags">正在生长的主题</h3>
-          <div class="tag-list" id="home-tags"></div>
-        </div>
       </section>
 
-      <aside class="home-rail">
-        <section class="home-panel" aria-labelledby="home-now-title">
-          <div class="home-panel__header home-panel__header--compact">
-            <div>
-              <p class="home-panel__kicker" data-i18n="home.now.kicker">此刻切片</p>
-              <h2 id="home-now-title" data-i18n="home.section.now">最近在做</h2>
-            </div>
-            <a class="section__more" href="now/index.html" aria-label="查看全部近况" data-i18n="home.now.more" data-i18n-attr="aria-label">
-              <span id="now-arrow" aria-hidden="true"></span>
-            </a>
-          </div>
-          <div class="home-now-list" id="home-now"></div>
-        </section>
-
-        <section class="home-panel home-clock" aria-labelledby="home-clock-title">
-          <p class="home-panel__kicker" data-i18n="home.clock.kicker">浏览器本地时间</p>
-          <h2 id="home-clock-title" data-i18n="home.section.clock">此刻</h2>
+      <!-- 时间与天气属于同一个“此刻”语境，合并后减少卡片堆叠和重复标题。 -->
+      <section class="home-panel home-moment" aria-labelledby="home-clock-title">
+        <p class="home-panel__kicker" data-i18n="home.moment.kicker">当地信息</p>
+        <h2 id="home-clock-title" data-i18n="home.section.clock">此刻</h2>
+        <div class="home-clock">
           <time class="home-clock__time" id="home-clock-time" datetime="">--:--:--</time>
           <p class="home-clock__date" id="home-clock-date">—</p>
           <p class="home-clock__zone" id="home-clock-zone">—</p>
-        </section>
+        </div>
 
         <!--
           天气属于渐进增强：只有访客主动点击后才申请浏览器定位并请求 Open-Meteo。
           页面不会在首屏自动发送位置，拒绝权限或断网时也不影响其他内容。
         -->
-        <section class="home-panel home-weather" aria-labelledby="home-weather-title">
-          <p class="home-panel__kicker" data-i18n="home.weather.kicker">实时天气</p>
-          <h2 id="home-weather-title" data-i18n="home.weather.title">你所在地区</h2>
+        <div class="home-weather" aria-labelledby="home-weather-title">
+          <h3 class="home-weather__title" id="home-weather-title" data-i18n="home.weather.title">你所在地区</h3>
 
           <div class="home-weather__result" id="home-weather-result" hidden>
             <div class="home-weather__primary">
@@ -189,6 +159,56 @@
             <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>
             · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>
           </p>
+        </div>
+      </section>
+      </aside>
+
+      <!-- 中栏连续承载长期内容：文章较少时由真实项目自然补足纵向信息量。 -->
+      <div class="home-main-column">
+      <section class="home-panel home-feed" aria-labelledby="home-feed-title">
+        <div class="home-panel__header">
+          <div>
+            <p class="home-panel__kicker" data-i18n="home.feed.kicker">中文独立网站</p>
+            <h2 id="home-feed-title" data-i18n="home.section.recent">最新文章</h2>
+          </div>
+          <a class="section__more" href="blog/index.html">
+            <span data-i18n="section.viewAll">查看全部</span>
+            <span id="recent-arrow" aria-hidden="true"></span>
+          </a>
+        </div>
+        <!-- 文章与标签都读取构建器生成的 posts.js，不在首页复制内容。 -->
+        <div class="post-list home-feed__posts" id="recent-posts"></div>
+        <div class="home-topics">
+          <h3 data-i18n="home.section.tags">正在生长的主题</h3>
+          <div class="tag-list" id="home-tags"></div>
+        </div>
+      </section>
+
+      <section class="home-panel home-featured" aria-labelledby="home-featured-title">
+        <div class="home-panel__header home-panel__header--compact">
+          <h2 id="home-featured-title" data-i18n="home.section.featured">精选项目</h2>
+          <a class="section__more" href="projects/index.html">
+            <span data-i18n="section.viewAll">查看全部</span>
+            <span id="featured-arrow" aria-hidden="true"></span>
+          </a>
+        </div>
+        <div class="card-grid home-featured__list" id="featured-projects"></div>
+      </section>
+      </div>
+
+      <!-- 右栏只保留近期动态与发布节奏，职责比原来的四卡堆叠更清晰。 -->
+      <aside class="home-rail home-rail--right">
+        <section class="home-panel" aria-labelledby="home-now-title">
+          <div class="home-panel__header home-panel__header--compact">
+            <div>
+              <p class="home-panel__kicker" data-i18n="home.now.kicker">此刻切片</p>
+              <h2 id="home-now-title" data-i18n="home.section.now">最近在做</h2>
+            </div>
+            <a class="section__more" href="now/index.html" aria-label="查看全部近况" data-i18n="home.now.more" data-i18n-attr="aria-label">
+              <span id="now-arrow" aria-hidden="true"></span>
+            </a>
+          </div>
+          <div class="home-now-list" id="home-now"></div>
         </section>
 
         <section class="home-panel home-calendar" aria-labelledby="home-calendar-title">
@@ -209,18 +229,7 @@
     </section>
     <!-- #endregion -->
 
-    <!-- #region 精选项目与栏目入口 -->
-    <section class="section container container--home">
-      <div class="section__header">
-        <h2 class="section__title" data-i18n="home.section.featured">精选项目</h2>
-        <a class="section__more" href="projects/index.html">
-          <span data-i18n="section.viewAll">查看全部</span>
-          <span id="featured-arrow" aria-hidden="true"></span>
-        </a>
-      </div>
-      <div class="card-grid" id="featured-projects"></div>
-    </section>
-
+    <!-- #region 栏目入口 -->
     <section class="section container container--home">
       <div class="section__header">
         <h2 class="section__title" data-i18n="home.section.explore">探索更多</h2>

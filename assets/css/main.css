@@ -1095,16 +1095,24 @@ hr {
 /* --- 首页基地总览 --------------------------------------------------------- */
 
 /*
-  三列不是为了做“后台仪表盘”，而是把三类问题并排回答：
-  左侧介绍主人，中间承载长期内容，右侧呈现此刻状态。minmax(0, 1fr)
-  允许文章标题真正收缩，不会把整个页面撑出横向滚动。
+  三列不是为了做“后台仪表盘”，而是按内容寿命分工：
+  左侧是身份与当地信息，中间是文章和项目等长期内容，右侧是近况与发布节奏。
+  三列各自独立向下生长，避免某一栏内容增多时把其他栏拉出大片空白。
 */
 .home-dashboard {
   display: grid;
-  grid-template-columns: minmax(220px, 0.78fr) minmax(0, 1.55fr) minmax(260px, 0.92fr);
+  grid-template-columns: minmax(240px, 0.92fr) minmax(0, 1.55fr) minmax(260px, 0.95fr);
   gap: var(--space-5);
   align-items: start;
   margin-top: var(--space-7);
+}
+
+/* 中栏与左右 rail 一样使用独立单列网格。相比让六张卡共用二维网格，
+   这种“列内流式排列”不会被另一列中更高的卡片强制撑开行高。 */
+.home-main-column {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-5);
 }
 
 .home-panel {
@@ -1311,6 +1319,21 @@ hr {
   overflow-wrap: anywhere;
 }
 
+/* 时间和天气共处一张卡，但用分隔线保留两层信息边界。 */
+.home-moment .home-weather {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.home-weather__title {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
 /* --- 首页实时天气 ---------------------------------------------------------
    天气卡片把“主要读数”和“三项补充数据”分层：先扫到温度与天气，再查看体感等细节。
    所有颜色仍来自皮肤令牌，外部 API 只提供数据，不控制任何视觉表现。 */
@@ -1407,6 +1430,16 @@ hr {
   color: var(--color-text-muted);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+/* 精选项目进入中栏后固定单列，形成紧凑的纵向作品流。
+   卡片用页面底色与外层面板区分层级，避免“同色卡套卡”看不出边界。 */
+.home-featured__list {
+  grid-template-columns: 1fr;
+}
+
+.home-featured__list .card {
+  background-color: var(--color-bg);
 }
 
 .home-calendar__grid {
