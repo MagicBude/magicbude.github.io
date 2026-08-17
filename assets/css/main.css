@@ -2302,6 +2302,325 @@ hr {
 .badge--wip { color: var(--color-warn);  border-color: color-mix(in srgb, var(--color-warn) 40%, transparent); }
 .badge--arch{ color: var(--color-text-muted); }
 
+/* ---- 项目页：真实作品档案 -------------------------------------------------
+   项目页刻意把“已经运行”和“仍在规划”拆成两层，视觉权重对应真实完成度。
+   代表作品可以拥有大面积视觉区；构想卡片保持克制，避免把计划包装成成品。 */
+
+.projects-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  align-items: end;
+  gap: clamp(var(--space-7), 7vw, 120px);
+}
+
+.projects-hero__copy {
+  min-width: 0;
+}
+
+.projects-hero__copy .lead {
+  margin-bottom: 0;
+}
+
+/* 三个统计量属于同一组，所以 dl 使用等宽三列；数值较少时横向阅读比竖排更快。 */
+.project-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-block: 1px solid var(--color-border);
+}
+
+.project-stat {
+  min-width: 0;
+  padding: var(--space-4) var(--space-3);
+  border-left: 1px solid var(--color-border);
+}
+
+.project-stat:first-child {
+  border-left: 0;
+}
+
+.project-stat__value {
+  margin: 0 0 var(--space-1);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: clamp(1.8rem, 4vw, 2.65rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.project-stat__label {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+.projects-section-heading {
+  align-items: flex-end;
+}
+
+.projects-section-heading__lead {
+  max-width: 68ch;
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+/* 代表作品用左右双栏：左侧是由真实技术标签组成的抽象封面，右侧承载可核实的信息。
+   视觉不使用伪造截图，未来有真实产品图时可直接替换 visual 区而不动正文结构。 */
+.project-showcase {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.project-showcase__visual {
+  position: relative;
+  display: flex;
+  min-height: 390px;
+  padding: var(--space-5);
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--color-accent);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 24%, transparent), transparent 48%),
+    repeating-linear-gradient(90deg, transparent 0 47px, color-mix(in srgb, var(--color-border) 55%, transparent) 48px),
+    repeating-linear-gradient(0deg, transparent 0 47px, color-mix(in srgb, var(--color-border) 55%, transparent) 48px),
+    var(--color-bg-muted);
+  border-right: 1px solid var(--color-border);
+}
+
+.project-showcase__number {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+/* 两个同心圆模拟持续运行的信号，而不是某个真实产品界面，避免产生错误联想。 */
+.project-showcase__signal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(150px, 22vw, 240px);
+  aspect-ratio: 1;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.72;
+}
+
+.project-showcase__signal::before,
+.project-showcase__signal::after {
+  content: "";
+  position: absolute;
+  inset: 17%;
+  border: 1px solid currentColor;
+  border-radius: inherit;
+}
+
+.project-showcase__signal::after {
+  inset: 41%;
+  background-color: currentColor;
+}
+
+.project-showcase__stack {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-self: flex-end;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+.project-showcase__stack span {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--color-bg) 82%, transparent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 650;
+}
+
+.project-showcase__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(var(--space-5), 4vw, var(--space-8));
+}
+
+.project-showcase__kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-showcase__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-size: clamp(1.55rem, 3vw, var(--text-3xl));
+}
+
+.project-showcase__title .icon {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  color: var(--color-accent);
+}
+
+.project-showcase__desc {
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+}
+
+.project-showcase__highlights {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.project-showcase__highlights p {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.project-showcase__highlights ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1.15em;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.project-showcase__highlights li::marker {
+  color: var(--color-accent);
+}
+
+.project-showcase__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: auto;
+  padding-top: var(--space-6);
+}
+
+.project-showcase__tags,
+.project-incubator-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.project-showcase__action .icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* 构想卡片用三列档案格。minmax(0, 1fr) 允许长英文标题收缩，不把容器撑宽。 */
+.project-incubator-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.project-incubator-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 315px;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg);
+  transition: border-color var(--duration) var(--ease),
+              transform var(--duration) var(--ease);
+}
+
+.project-incubator-card:hover,
+.project-incubator-card:focus-within {
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+}
+
+.project-incubator-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.project-incubator-card__index {
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+}
+
+.project-incubator-card__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-top: var(--space-6);
+  border-radius: var(--radius-md);
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+.project-incubator-card__icon .icon {
+  width: 19px;
+  height: 19px;
+}
+
+.project-incubator-card__title {
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-xl);
+}
+
+.project-incubator-card__desc {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.project-incubator-card__footer {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: auto;
+  padding-top: var(--space-5);
+}
+
+.project-incubator-card__footer .card__link {
+  justify-self: start;
+}
+
 /* 分类分组（装备页 / 近况页用）：一个分类标题 + 下面一套卡片网格。
    margin-top 让不同分类之间留白，避免挤在一起。 */
 .subsection { margin-top: var(--space-8); }
@@ -2417,6 +2736,21 @@ hr {
    ============================================================================= */
 
 @media (max-width: 960px) {
+
+  /* 项目页引言在平板改为纵向，统计仍保留三列，避免信息被压在狭窄右栏。 */
+  .projects-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: var(--space-6);
+  }
+
+  .project-stats {
+    width: min(100%, 620px);
+  }
+
+  .project-incubator-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
   /* 三列基地总览在平板宽度按内容顺序改为单列，避免侧栏被压成窄长文字。 */
   .home-dashboard {
@@ -2549,6 +2883,25 @@ hr {
 }
 
 @media (max-width: 640px) {
+  /* 手机上代表作品改成视觉在上、说明在下；阅读顺序与 DOM 一致，无需 order 重排。 */
+  .project-showcase {
+    grid-template-columns: 1fr;
+  }
+
+  .project-showcase__visual {
+    min-height: 260px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .project-incubator-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-incubator-card {
+    min-height: 0;
+  }
+
   .home-hero {
     min-height: 500px;
   }
@@ -2595,6 +2948,23 @@ hr {
 }
 
 @media (max-width: 480px) {
+  .project-stat {
+    padding-inline: var(--space-2);
+  }
+
+  .project-stat__value {
+    font-size: 1.7rem;
+  }
+
+  .project-showcase__footer {
+    align-items: stretch;
+  }
+
+  .project-showcase__action {
+    justify-content: center;
+    width: 100%;
+  }
+
   /* 极窄屏隐藏 Logo 文字，只保留品牌色方块；链接的 aria-label 仍提供完整名称。 */
   .site-logo > span:last-child {
     display: none;

@@ -21,6 +21,9 @@
  *   desc   按语言代码保存的简介，当前支持 zh / en；
  *   url    项目详情页或外部仓库地址；
  *   icon   js/icons.js 中的图标名称；
+ *   featured 是否作为当前代表作品展示；只有已经可访问、值得重点介绍的项目才设为 true；
+ *   highlights 按语言保存的事实亮点数组，项目页会把它渲染成简短清单；
+ *   linkType 链接语义：site(访问成品) / profile(查看作者主页) / project(查看项目)；
  *   status active(运行中) / wip(开发中) / idea(规划中) / arch(已归档)，
  *          对应不同颜色徽章；idea 暂时复用 wip 的琥珀色，但保留独立文案和数据语义；
  *   tags   用于概括技术或项目类型的标签数组。
@@ -34,8 +37,14 @@ window.PROJECTS = [
     },
     url: "index.html",
     icon: "layout",
+    featured: true,
+    highlights: {
+      zh: ["原生 HTML / CSS / JavaScript", "四套可切换皮肤与中英界面", "Markdown 静态文章工作流"],
+      en: ["Plain HTML / CSS / JavaScript", "Four switchable skins with Chinese and English UI", "A static Markdown publishing workflow"],
+    },
+    linkType: "site",
     status: "active",
-    tags: ["Web", "Static"],
+    tags: ["HTML", "CSS", "JavaScript"],
   },
   {
     title: { zh: "SensorLink", en: "SensorLink" },
@@ -45,6 +54,8 @@ window.PROJECTS = [
     },
     url: "https://github.com/magicbude",
     icon: "code",
+    featured: false,
+    linkType: "profile",
     status: "idea",
     tags: ["Tool", "Embedded"],
   },
@@ -56,6 +67,8 @@ window.PROJECTS = [
     },
     url: "https://github.com/magicbude",
     icon: "pen",
+    featured: false,
+    linkType: "profile",
     status: "idea",
     tags: ["Web", "PWA"],
   },
@@ -67,6 +80,8 @@ window.PROJECTS = [
     },
     url: "https://github.com/magicbude",
     icon: "sparkles",
+    featured: false,
+    linkType: "profile",
     status: "idea",
     tags: ["Fun"],
   },
