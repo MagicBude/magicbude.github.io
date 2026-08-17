@@ -25,11 +25,11 @@
 window.SITE_CONFIG = {
 
   // #region 身份与基础信息（name / tagline / bio）
-  // 站点名 / 你的网络 ID。开屏页大标题、导航 Logo 都用它。
+  // 站点名 / 你的网络 ID。首页与导航 Logo 都用它。
   name: "magicbude",
 
   // 一句话标语。多语：用 { zh, en } 对象。
-  // 首页 Hero 的小徽章、开屏页副标题会用到。
+  // 首页 Hero 的主标题会用到。
   tagline: {
     zh: "在代码与兴趣之间，留下自己的数字轨迹",
     en: "A personal trail between code and curiosity",
@@ -60,7 +60,7 @@ window.SITE_CONFIG = {
   // 主导航。顺序即展示顺序。i18n 是对应的多语字典 key（见 js/i18n.js）。
   // href 保存相对于站点根目录的语义化路径；main.js 会按当前部署位置解析为完整地址。
   nav: [
-    { key: "home",     href: "home/index.html",     i18n: "nav.home" },
+    { key: "home",     href: "index.html",          i18n: "nav.home" },
     { key: "blog",     href: "blog/index.html",     i18n: "nav.blog" },
     { key: "projects", href: "projects/index.html", i18n: "nav.projects" },
     { key: "now",      href: "now/index.html",      i18n: "nav.now" },

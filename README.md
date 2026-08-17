@@ -4,7 +4,7 @@ magicbude 的个人数字基地与原生前端学习项目，用于汇集项目�
 
 ## 如何打开
 
-直接双击根目录的 `index.html`，点击“进入”后会打开 `home/index.html`。也可以在仓库根目录运行 `python -m http.server`，再访问浏览器显示的本地地址。
+直接双击根目录的 `index.html` 即可浏览完整首页。也可以在仓库根目录运行 `python -m http.server`，再访问浏览器显示的本地地址。
 
 主站零构建：修改页面目录中的 `index.html`、`assets/css/main.css` 或 `assets/js/` 后，保存并刷新浏览器即可。
 

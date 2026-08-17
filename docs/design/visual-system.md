@@ -53,7 +53,7 @@
 | `--shadow-sm` / `--shadow-md` | 阴影（暗色用更深黑色） |
 | `--space-1..9` | 4px 基准间距阶梯 |
 | `--radius-*` | 圆角 |
-| `--width-content` / `--width-wide` | 720px / 1100px 容器宽度 |
+| `--width-content` / `--width-wide` / `--width-home` | 720px 正文 / 1100px 栏目 / 1320px 首页容器宽度 |
 | `--text-*` | 流式字号（clamp） |
 
 **规则**：组件里禁止硬编码颜色/字号，一律引用变量。想换主色只改一处。
@@ -126,7 +126,7 @@ window.SITE_CONFIG = {
   tagline: { zh: "写代码，也打球", en: "Code, and play." },
   bio: { zh: "...", en: "..." },
   social: [ { type: "github", url: "https://github.com/..." }, /* ... */ ],
-  nav: [ { key: "home", href: "home/index.html", i18n: "nav.home" }, /* blog/projects/now/uses/links/about */ ],
+  nav: [ { key: "home", href: "index.html", i18n: "nav.home" }, /* blog/projects/now/uses/links/about */ ],
 };
 ```
 
@@ -152,12 +152,12 @@ window.SITE_CONFIG = {
 
 ---
 
-## 10. 页面清单（开屏页 + 8 内容页 + 功能）
+## 10. 页面清单（首页 + 8 内容页 + 功能）
 
 | 页面 | 文件 | 说明 |
 |------|------|------|
-| 开屏页 | `index.html` | 极简封面：名字 + slogan + 「进入」按钮，可当多站 portal 入口 |
-| 首页 | `home/index.html` | 总枢纽：可编辑简介 + 各板块快捷入口 + 全站最新动态 |
+| 首页 | `index.html` | 总枢纽：原创封面 + 可编辑简介 + 各板块快捷入口 + 全站最新动态 |
+| 兼容跳转 | `home/index.html` | 接住旧 `/home/` 书签并跳转到根首页，不参与导航与索引 |
 | 博客列表 | `blog/index.html` | 读文章数据渲染，支持按语言/标签筛选 |
 | 文章详情 | `blog/<slug>/index.html` | 构建脚本生成 |
 | 项目 | `projects/index.html` | GitHub / Gitee 项目、自建子站链接 |
@@ -170,8 +170,7 @@ window.SITE_CONFIG = {
 | RSS | `feed.xml` | 构建脚本生成（功能） |
 | 站点地图 | `sitemap.xml` | 构建或手写（功能） |
 
-> GitHub Pages 用户站根目录必须是 `index.html`，所以**开屏页占 `index.html`**，真正首页放 `home/index.html`，
-> 点「进入」跳过去。以后不想用开屏，把 `index.html` 直接换成首页内容即可。
+> GitHub Pages 用户站根目录必须是 `index.html`，本站让根文件直接承载正式首页，减少一次无意义的“进入”操作。
 
 ---
 

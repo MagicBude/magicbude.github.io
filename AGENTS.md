@@ -29,8 +29,7 @@
 - `assets/css/` `assets/js/`：样式、核心脚本与共享数据。**提交**。
 - `blog/`：列表页与文章详情页（详情为构建产物，提交）。`content/posts/`：Markdown 源（提交）。
 - `.internal/`：本地草稿 / 笔记 / 对话记录，**gitignore 不提交**，需要时取出即用。
-- `index.html` = 开屏页；`home/index.html` = 真正首页
-  （GitHub Pages 用户站根目录必须是 `index.html`，所以开屏页占它，点「进入」跳 `/home/`）。
+- `index.html` = 网站首页；`home/index.html` 仅保留为旧地址兼容跳转，不承载内容。
 - `.github/workflows/`：当前仅保留占位；部署方式确认后再添加真实工作流。
 
 ## 编码规范（教材级，最重要）

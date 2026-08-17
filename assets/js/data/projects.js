@@ -32,7 +32,7 @@ window.PROJECTS = [
       zh: "你正在看的这个纯静态个人站，零构建、手写 HTML/CSS/JS。",
       en: "The static personal site you're on — zero-build, hand-written HTML/CSS/JS.",
     },
-    url: "home/index.html",
+    url: "index.html",
     icon: "layout",
     status: "active",
     tags: ["Web", "Static"],

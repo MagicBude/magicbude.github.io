@@ -123,7 +123,8 @@
 
   /* --- 布局尺寸 ----------------------------------------------------------- */
   --width-content: 720px;   /* 正文宽度。约 40-45 个中文字/行，是阅读舒适区 */
-  --width-wide: 1100px;     /* 宽容器，用于卡片网格等 */
+  --width-wide: 1100px;     /* 常规宽容器，用于栏目页与卡片网格 */
+  --width-home: 1320px;     /* 首页信息密度更高，单独放宽；文章正文仍保持 720px */
   --header-height: 64px;
 
   /* --- 动画 ---------------------------------------------------------------
@@ -444,6 +445,12 @@ hr {
    一行文字太长眼睛会难以找到下一行的开头，控制在 720px 左右最舒服 */
 .container--narrow {
   max-width: var(--width-content);
+}
+
+/* 首页在大屏上需要容纳档案、内容流和近况三列，因此比普通栏目页更宽。
+   单独加修饰类而不修改 .container，避免文章和其他页面被一起拉宽。 */
+.container--home {
+  max-width: var(--width-home);
 }
 
 /* 主内容区。flex: 1 让它占满剩余空间，把页脚推到底部 */
@@ -1275,6 +1282,33 @@ hr {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   white-space: nowrap;
+}
+
+/* --- 首页本地时钟 --------------------------------------------------------- */
+
+.home-clock__time {
+  display: block;
+  margin-top: var(--space-3);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: clamp(1.9rem, 3vw, 2.7rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: var(--leading-tight);
+}
+
+.home-clock__date {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.home-clock__zone {
+  margin-top: var(--space-1);
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
 }
 
 .home-calendar__grid {

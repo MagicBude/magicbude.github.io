@@ -8,10 +8,10 @@
 
 ```text
 magicbude.github.io/
-├─ index.html                         # 开屏入口；GitHub Pages 根网址首先打开此文件
+├─ index.html                         # 网站首页；汇总项目、文章、近况和栏目入口
 ├─ 404.html                           # 找不到页面时展示的静态错误页
-├─ home/                              # 主站首页路由目录，对应网址 /home/
-│  └─ index.html                      # 首页内容；汇总项目、文章、近况和栏目入口
+├─ home/                              # 旧首页地址兼容目录
+│  └─ index.html                      # 跳转到根首页，不参与导航与站点地图
 ├─ about/                             # 关于栏目目录，对应网址 /about/
 │  └─ index.html                      # 个人介绍、站点定位和联系方式
 ├─ projects/                          # 项目栏目目录，对应网址 /projects/
@@ -75,7 +75,7 @@ magicbude.github.io/
 
 ## 页面路由为什么不用 `pages/`
 
-如果使用 `pages/about/index.html`，公开网址会自然变成 `/pages/about/`。“pages”是源码分类概念，不是访客理解的网站栏目。把语义目录直接放在根目录，可以得到 `/about/`、`/projects/`，同时根目录仍然只保留两个必须直接访问的 HTML 文件：开屏入口和 404 页面。
+如果使用 `pages/about/index.html`，公开网址会自然变成 `/pages/about/`。“pages”是源码分类概念，不是访客理解的网站栏目。把语义目录直接放在根目录，可以得到 `/about/`、`/projects/`；根目录的 `index.html` 同时就是访问者看到的正式首页。
 
 ## 两种开发流程
 

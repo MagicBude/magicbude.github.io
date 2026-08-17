@@ -116,7 +116,7 @@
 
     host.innerHTML =
       '<div class="site-header__inner container">' +
-        '<a class="site-logo" href="' + siteUrl("home/index.html") + '" aria-label="' +
+        '<a class="site-logo" href="' + siteUrl("index.html") + '" aria-label="' +
           (CONFIG.name || "site") + '">' +
           '<span class="site-logo__mark"></span>' +
           "<span>" + (CONFIG.name || "site") + "</span>" +
@@ -351,7 +351,7 @@
 
   // 给当前页对应的导航项加 .is-active（高亮）。
   function markActive() {
-    // pathname 末尾的文件名；开屏页是 index.html。
+    // 把目录地址与其 index.html 统一成同一种形式，便于准确判断当前导航项。
     function normalizePath(url) {
       var pathname = new URL(url).pathname;
       return pathname.endsWith("/index.html")
@@ -359,12 +359,10 @@
         : pathname;
     }
     var here = normalizePath(location.href);
-    var splash = normalizePath(siteUrl("index.html"));
     var links = document.querySelectorAll(".site-nav__link");
     links.forEach(function (a) {
       var href = normalizePath(a.href);
-      // index.html（开屏页）不算「当前页」，避免和 home 重复高亮。
-      if (href === here && here !== splash) {
+      if (href === here) {
         a.classList.add("is-active");
       }
     });

@@ -1,7 +1,7 @@
 // assets/js/data/posts.js
 // 由 tools/build.mjs 自动生成，请勿手改。
 // 改文章请编辑 content/posts/*.md 后重跑 `node tools/build.mjs`。
-// 字段供 home/（最新动态）与 blog/（列表 / 筛选）渲染使用。
+// 字段供根首页（最新动态）与 blog/（列表 / 筛选）渲染使用。
 window.POSTS = [
   {
     slug: "2026-svg-charts",

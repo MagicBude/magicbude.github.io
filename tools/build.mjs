@@ -6,7 +6,7 @@
  * 它做三件事：
  *   1. 读 content/posts/*.md（你写的 Markdown 源）→ 解析 frontmatter + 正文
  *   2. 用内置的 Markdown→HTML 转换器，生成 blog/<slug>/index.html（完整静态详情页）
- *   3. 重新生成 assets/js/data/posts.js（window.POSTS，供 blog/ / home/ 列表渲染）
+ *   3. 重新生成 assets/js/data/posts.js（window.POSTS，供 blog/ / 根首页渲染）
  *      和 feed.xml（RSS 订阅源）
  *   4. 生成 sitemap.xml（静态栏目 + 博客详情页）
  *
@@ -464,7 +464,7 @@ ${bodyHtml}
 // #endregion
 
 // #region 列表数据（js/posts.js）与 RSS（feed.xml）生成
-// 生成文章索引：window.POSTS 数组。home/ 与 blog/ 都读它渲染列表。
+// 生成文章索引：window.POSTS 数组。根首页与 blog/ 都读它渲染列表。
 // 字段保持兼容：date(YYYY-MM-DD) / url / title / excerpt 是首页已用的；
 // 额外加 slug / lang / tags / summary / translation 供博客筛选与详情互链。
 function renderPostsJs(list) {
@@ -490,7 +490,7 @@ function renderPostsJs(list) {
     "// assets/js/data/posts.js\n" +
     "// 由 tools/build.mjs 自动生成，请勿手改。\n" +
     "// 改文章请编辑 content/posts/*.md 后重跑 `node tools/build.mjs`。\n" +
-    "// 字段供 home/（最新动态）与 blog/（列表 / 筛选）渲染使用。\n" +
+    "// 字段供根首页（最新动态）与 blog/（列表 / 筛选）渲染使用。\n" +
     "window.POSTS = [\n" +
     items +
     "\n];\n"
@@ -537,7 +537,6 @@ function renderFeed(posts) {
 function renderSitemap(posts) {
   const staticPages = [
     "",
-    "home/",
     "blog/",
     "projects/",
     "now/",
