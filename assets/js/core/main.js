@@ -71,7 +71,8 @@
   function skinSelectHTML() {
     var skins = CONFIG.skins || [];
     // 用 <html data-style> 上的当前值决定哪个 option 选中，保证刷新后选择器显示正确。
-    var style = document.documentElement.getAttribute("data-style") || "instrument";
+    var style = document.documentElement.getAttribute("data-style") ||
+      (CONFIG.defaults && CONFIG.defaults.style) || "magazine";
     var lang = currentLang();
     var opts = skins.map(function (s) {
       var label = (s.label && s.label[lang]) ? s.label[lang] : s.value;
@@ -115,7 +116,8 @@
 
     host.innerHTML =
       '<div class="site-header__inner container">' +
-        '<a class="site-logo" href="' + siteUrl("home/index.html") + '">' +
+        '<a class="site-logo" href="' + siteUrl("home/index.html") + '" aria-label="' +
+          (CONFIG.name || "site") + '">' +
           '<span class="site-logo__mark"></span>' +
           "<span>" + (CONFIG.name || "site") + "</span>" +
         "</a>" +
@@ -169,7 +171,7 @@
     var dpr = Math.min(window.devicePixelRatio || 1, 2); // 限制到 2 倍，避免超大屏太吃性能
     var w = 0, h = 0;
     var particles = [];
-    var accent = "#4aa8ff"; // 兜底色，读不到变量时用
+    var accent = "#b45309"; // 默认杂志皮肤的琥珀色，读不到变量时使用
     var raf = 0;
     var last = 0;
 
@@ -185,7 +187,7 @@
     // 把 "#rrggbb" 转成 "r,g,b"，方便给粒子叠加透明度。
     function toRGB(c) {
       var m = c.match(/^#([0-9a-f]{6})$/i);
-      if (!m) return "74,168,255";
+      if (!m) return "180,83,9";
       var n = parseInt(m[1], 16);
       return [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(",");
     }

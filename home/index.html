@@ -5,7 +5,7 @@
   协同：site.config.js（身份 / 导航）、projects.js（项目）、posts.js（文章）、now.js（近况）、main.js（公共框架）、i18n.js（多语）。
   数据驱动：底部的 window.renderHome 从多个 window.* 数据源读取内容并渲染，各内容页与首页只维护一份数据。
 -->
-<html lang="zh" data-style="instrument" data-scheme="dark">
+<html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
@@ -22,7 +22,7 @@
   <script>
     (function () {
       try {
-        var s = localStorage.getItem("site-style") || "instrument";
+        var s = localStorage.getItem("site-style") || "magazine";
         var l = localStorage.getItem("site-lang") || "zh";
         // 明暗由皮肤决定：instrument / terminal 暗，minimal / magazine 亮。
         var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
@@ -47,20 +47,118 @@
   <!-- 顶部导航栏容器：内容由 js/main.js 根据 site.config.js 注入（数据驱动，不写死） -->
   <header id="site-header" class="site-header"></header>
 
-  <main class="site-main" id="main">
-    <!-- ============ Hero 区 ============ -->
-    <!-- 文案全部由底部内联脚本从 site.config.js 填入，这里只放兜底文字，
-         JS 没跑也不会空白。这也是「数据 → DOM」最直观的例子。 -->
-    <section class="hero container">
-      <p class="hero__greeting" data-i18n="home.greeting">你好，我是</p>
-      <h1 class="hero__name" id="hero-name">magicbude</h1>
-      <!-- 小徽章：一句话定位，随语言切换 -->
-      <span class="hero__tagline" id="hero-tagline" data-i18n="home.badge">在代码与兴趣之间，留下自己的数字轨迹</span>
-      <!-- 自我介绍：从 site.config.js 的 bio 字段取，多语 -->
-      <p class="hero__intro" id="hero-bio">我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。这里是我的个人数字基地。</p>
+  <main class="site-main site-main--home" id="main">
+    <!-- #region 首页封面 -->
+    <!--
+      Hero 使用真实 <img> 而不是 CSS background：浏览器可以提早发现并加载图片，
+      同时空 alt 明确告诉读屏软件它只是营造氛围，重要信息仍全部保留为可选中的 HTML 文本。
+    -->
+    <section class="home-hero" aria-labelledby="home-hero-title">
+      <img class="home-hero__image" src="../assets/images/home/editorial-desk.png" alt="" fetchpriority="high">
+      <div class="home-hero__overlay" aria-hidden="true"></div>
+      <div class="home-hero__content container">
+        <p class="home-hero__eyebrow"><span id="hero-owner">magicbude</span> · <span data-i18n="home.hero.eyebrow">个人数字基地</span></p>
+        <h1 class="home-hero__title" id="home-hero-title">在代码与兴趣之间，留下自己的数字轨迹</h1>
+        <p class="home-hero__lead" data-i18n="home.hero.lead">把做过的、想过的和正在发生的事，整理成一个可以长期生长的坐标。</p>
+      </div>
     </section>
 
-    <!-- ============ 精选项目（共享 projects.js） ============ -->
+    <!-- 搜索入口与封面重叠，形成从“认识这个站”到“开始探索”的自然过渡。 -->
+    <div class="home-search-shell container">
+      <a class="home-search" href="../search/index.html" aria-label="搜索站内内容" data-i18n="home.search.aria" data-i18n-attr="aria-label">
+        <span class="home-search__icon" id="home-search-icon" aria-hidden="true"></span>
+        <span class="home-search__text" data-i18n="home.search.placeholder">搜索文章、项目、工具与收藏…</span>
+        <span class="home-search__hint" aria-hidden="true">/</span>
+      </a>
+    </div>
+    <!-- #endregion -->
+
+    <!-- #region 基地总览 -->
+    <!--
+      宽屏采用“个人档案 / 内容流 / 近况栏”三列，分别回答“这是谁、有什么、最近怎样”。
+      DOM 顺序与视觉顺序一致，窄屏改为单列后仍保持自然的阅读逻辑。
+    -->
+    <section class="home-dashboard container" aria-label="基地总览" data-i18n="home.dashboard.aria" data-i18n-attr="aria-label">
+      <aside class="home-panel home-profile" aria-labelledby="home-profile-title">
+        <div class="home-profile__mark" id="profile-mark" aria-hidden="true">M</div>
+        <p class="home-panel__kicker" data-i18n="home.profile.kicker">基地维护者</p>
+        <h2 class="home-profile__name" id="home-profile-title">magicbude</h2>
+        <p class="home-profile__bio" id="hero-bio">我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。</p>
+
+        <!-- dl 表达“名称—数值”关系，比三个普通 div 更符合统计数据语义。 -->
+        <dl class="home-stats">
+          <div class="home-stat">
+            <dt data-i18n="home.stat.posts">文章</dt>
+            <dd id="home-stat-posts">0</dd>
+          </div>
+          <div class="home-stat">
+            <dt data-i18n="home.stat.tags">标签</dt>
+            <dd id="home-stat-tags">0</dd>
+          </div>
+          <div class="home-stat">
+            <dt data-i18n="home.stat.projects">项目</dt>
+            <dd id="home-stat-projects">0</dd>
+          </div>
+        </dl>
+
+        <a class="home-profile__more" href="../about/index.html">
+          <span data-i18n="home.profile.more">认识更多</span>
+          <span id="profile-arrow" aria-hidden="true"></span>
+        </a>
+      </aside>
+
+      <section class="home-panel home-feed" aria-labelledby="home-feed-title">
+        <div class="home-panel__header">
+          <div>
+            <p class="home-panel__kicker" data-i18n="home.feed.kicker">中文独立网站</p>
+            <h2 id="home-feed-title" data-i18n="home.section.recent">最新文章</h2>
+          </div>
+          <a class="section__more" href="../blog/index.html">
+            <span data-i18n="section.viewAll">查看全部</span>
+            <span id="recent-arrow" aria-hidden="true"></span>
+          </a>
+        </div>
+        <!-- 文章与标签都读取构建器生成的 posts.js，不在首页复制内容。 -->
+        <div class="post-list home-feed__posts" id="recent-posts"></div>
+        <div class="home-topics">
+          <h3 data-i18n="home.section.tags">正在生长的主题</h3>
+          <div class="tag-list" id="home-tags"></div>
+        </div>
+      </section>
+
+      <aside class="home-rail">
+        <section class="home-panel" aria-labelledby="home-now-title">
+          <div class="home-panel__header home-panel__header--compact">
+            <div>
+              <p class="home-panel__kicker" data-i18n="home.now.kicker">此刻切片</p>
+              <h2 id="home-now-title" data-i18n="home.section.now">最近在做</h2>
+            </div>
+            <a class="section__more" href="../now/index.html" aria-label="查看全部近况" data-i18n="home.now.more" data-i18n-attr="aria-label">
+              <span id="now-arrow" aria-hidden="true"></span>
+            </a>
+          </div>
+          <div class="home-now-list" id="home-now"></div>
+        </section>
+
+        <section class="home-panel home-calendar" aria-labelledby="home-calendar-title">
+          <div class="home-panel__header home-panel__header--compact">
+            <div>
+              <p class="home-panel__kicker" data-i18n="home.calendar.kicker">更新轨迹</p>
+              <h2 id="home-calendar-title" data-i18n="home.section.calendar">发布日历</h2>
+            </div>
+            <strong class="home-calendar__month" id="home-calendar-month"></strong>
+          </div>
+          <div class="home-calendar__grid" id="home-calendar-grid"></div>
+          <p class="home-calendar__meta">
+            <span data-i18n="home.calendar.updated">最近更新</span>
+            <time id="home-last-updated" datetime="">—</time>
+          </p>
+        </section>
+      </aside>
+    </section>
+    <!-- #endregion -->
+
+    <!-- #region 精选项目与栏目入口 -->
     <section class="section container">
       <div class="section__header">
         <h2 class="section__title" data-i18n="home.section.featured">精选项目</h2>
@@ -69,45 +167,16 @@
           <span id="featured-arrow" aria-hidden="true"></span>
         </a>
       </div>
-      <!-- 取共享项目数据中的前三项；项目状态与完整项目页使用相同语义。 -->
       <div class="card-grid" id="featured-projects"></div>
     </section>
 
-    <!-- ============ 最新文章 + 最近在做（桌面双栏，窄屏自动单列） ============ -->
-    <section class="section container home-overview">
-      <div class="home-overview__column">
-        <div class="section__header">
-          <h2 class="section__title" data-i18n="home.section.recent">最新文章</h2>
-          <a class="section__more" href="../blog/index.html">
-            <span data-i18n="section.viewAll">查看全部</span>
-            <span id="recent-arrow" aria-hidden="true"></span>
-          </a>
-        </div>
-        <!-- 文章列表由构建生成的 window.POSTS 提供；首页只展示最新两篇。 -->
-        <div class="post-list" id="recent-posts"></div>
-      </div>
-
-      <div class="home-overview__column">
-        <div class="section__header">
-          <h2 class="section__title" data-i18n="home.section.now">最近在做</h2>
-          <a class="section__more" href="../now/index.html">
-            <span data-i18n="section.viewAll">查看全部</span>
-            <span id="now-arrow" aria-hidden="true"></span>
-          </a>
-        </div>
-        <!-- 每个近况分类取第一项，形成不重复维护的首页摘要。 -->
-        <div class="home-now-list" id="home-now"></div>
-      </div>
-    </section>
-
-    <!-- ============ 探索栏目（稳定的全站导航） ============ -->
     <section class="section container">
       <div class="section__header">
         <h2 class="section__title" data-i18n="home.section.explore">探索更多</h2>
       </div>
-      <!-- 根据 site.config.js 的导航生成卡片，排除首页与搜索两个功能入口。 -->
       <div class="card-grid card-grid--compact" id="entry-cards"></div>
     </section>
+    <!-- #endregion -->
   </main>
 
   <!-- 页脚容器：内容由 js/main.js 注入（版权 + 社交链接） -->
@@ -128,9 +197,9 @@
     首页特有的「多数据源 → DOM」渲染脚本。
     放在 body 末尾、主脚本之后，DOM 已就绪，且 main.js 已经把头部/页脚注好。
     这里做的事情都是前端最基础也最常用的数据驱动模式：
-      1) 把配置里的文本填进 Hero（名字 / 定位 / 简介）
-      2) 从共享项目数据生成精选项目
-      3) 从文章与近况数据生成双栏摘要
+      1) 把配置里的文本填进封面与个人档案
+      2) 从文章数据计算统计、标签和发布日历
+      3) 从共享项目与近况数据生成内容摘要
       4) 把导航项渲染成探索栏目卡片
     把它挂到 window.renderHome，main.js 在切换语言时会再调一次，保证文案同步刷新。
   -->
@@ -173,24 +242,133 @@
       return (field && field[lang]) ? field[lang] : (field && field.zh) || "";
     }
 
+    // 动态内容最终进入 innerHTML，统一转义能避免标题里的 & / < 等字符破坏 DOM。
+    function esc(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    // 从文章数组汇总标签计数；对象结构便于后面排序与渲染，也与博客筛选数据保持同源。
+    function collectTags(posts) {
+      var counts = {};
+      posts.forEach(function (post) {
+        (post.tags || []).forEach(function (tag) {
+          counts[tag] = (counts[tag] || 0) + 1;
+        });
+      });
+      return Object.keys(counts).map(function (name) {
+        return { name: name, count: counts[name] };
+      }).sort(function (a, b) {
+        return b.count - a.count || a.name.localeCompare(b.name);
+      });
+    }
+
+    /*
+      发布日历只读 posts.js，不引入日期库。日期字符串按 YYYY-MM-DD 拆分，
+      避免 new Date("2026-08-08") 被浏览器按 UTC 解释后在不同时区偏移一天。
+    */
+    function renderCalendar(posts, lang) {
+      var monthHost = document.getElementById("home-calendar-month");
+      var grid = document.getElementById("home-calendar-grid");
+      var updated = document.getElementById("home-last-updated");
+      if (!monthHost || !grid || !updated) return;
+
+      var latest = posts.length ? String(posts[0].date || "").slice(0, 10) : "";
+      var parts = latest ? latest.split("-").map(Number) : [];
+      var now = new Date();
+      var year = parts[0] || now.getFullYear();
+      var month = parts[1] || now.getMonth() + 1;
+      var monthDate = new Date(year, month - 1, 1);
+      var monthText = new Intl.DateTimeFormat(lang === "zh" ? "zh-CN" : "en-US", {
+        year: "numeric", month: "short"
+      }).format(monthDate);
+      monthHost.textContent = monthText;
+
+      var byDay = {};
+      posts.forEach(function (post) {
+        var date = String(post.date || "").slice(0, 10);
+        var p = date.split("-").map(Number);
+        if (p[0] === year && p[1] === month) {
+          if (!byDay[p[2]]) byDay[p[2]] = [];
+          byDay[p[2]].push(post);
+        }
+      });
+
+      var weekdayShort = lang === "zh"
+        ? ["一", "二", "三", "四", "五", "六", "日"]
+        : ["M", "T", "W", "T", "F", "S", "S"];
+      var weekdayLong = lang === "zh"
+        ? ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+        : ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      var cells = weekdayShort.map(function (label, index) {
+        return '<span class="home-calendar__weekday" title="' + esc(weekdayLong[index]) + '">' + label + "</span>";
+      });
+
+      // JavaScript 的星期日是 0；转换成星期一为每周第一天，更符合中文阅读习惯。
+      var leading = (monthDate.getDay() + 6) % 7;
+      for (var blank = 0; blank < leading; blank++) {
+        cells.push('<span class="home-calendar__day home-calendar__day--blank" aria-hidden="true"></span>');
+      }
+
+      var days = new Date(year, month, 0).getDate();
+      for (var day = 1; day <= days; day++) {
+        var dayPosts = byDay[day] || [];
+        var padded = String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+        var iso = year + "-" + padded;
+        if (dayPosts.length) {
+          var first = dayPosts[0];
+          var label = iso + " · " + first.title;
+          cells.push(
+            '<a class="home-calendar__day is-active" href="' + window.siteUrl(first.url) +
+            '" aria-label="' + esc(label) + '" title="' + esc(first.title) + '">' + day + "</a>"
+          );
+        } else {
+          cells.push('<span class="home-calendar__day">' + day + "</span>");
+        }
+      }
+      grid.innerHTML = cells.join("");
+      updated.textContent = latest || I18N.t("home.calendar.empty");
+      if (latest) updated.setAttribute("datetime", latest);
+      else updated.removeAttribute("datetime");
+    }
+
     // 渲染整个首页（Hero + 卡片 + 最新动态）。幂等，可反复调用。
     function renderHome() {
       var lang = I18N.getLang();
 
-      // ---- 1) Hero ----
-      var nameEl  = document.getElementById("hero-name");
-      if (nameEl && CONFIG.name) nameEl.textContent = CONFIG.name;
+      var posts = window.POSTS || [];
+      var projects = window.PROJECTS || [];
+      var tags = collectTags(posts);
 
-      var tagEl   = document.getElementById("hero-tagline");
+      // ---- 1) 封面与个人档案 ----
+      var ownerEl = document.getElementById("hero-owner");
+      var profileName = document.getElementById("home-profile-title");
+      var profileMark = document.getElementById("profile-mark");
+      if (ownerEl && CONFIG.name) ownerEl.textContent = CONFIG.name;
+      if (profileName && CONFIG.name) profileName.textContent = CONFIG.name;
+      if (profileMark && CONFIG.name) profileMark.textContent = CONFIG.name.charAt(0).toUpperCase();
+
+      var tagEl = document.getElementById("home-hero-title");
       if (tagEl && CONFIG.tagline) tagEl.textContent = CONFIG.tagline[lang] || CONFIG.tagline.zh;
 
       var bioEl   = document.getElementById("hero-bio");
       if (bioEl && CONFIG.bio) bioEl.textContent = CONFIG.bio[lang] || CONFIG.bio.zh;
 
+      var postStat = document.getElementById("home-stat-posts");
+      var tagStat = document.getElementById("home-stat-tags");
+      var projectStat = document.getElementById("home-stat-projects");
+      if (postStat) postStat.textContent = posts.length;
+      if (tagStat) tagStat.textContent = tags.length;
+      if (projectStat) projectStat.textContent = projects.length;
+
       // ---- 2) 精选项目：共享项目数组的前三项 ----
       var featured = document.getElementById("featured-projects");
       if (featured) {
-        featured.innerHTML = (window.PROJECTS || []).slice(0, 3).map(function (project) {
+        featured.innerHTML = projects.slice(0, 3).map(function (project) {
           var state = PROJECT_STATUS[project.status];
           var badge = state
             ? '<span class="badge ' + state.cls + '">' + I18N.t(state.key) + "</span>"
@@ -199,8 +377,8 @@
           return (
             '<a class="card card--featured" href="' + (external ? project.url : window.siteUrl(project.url || "projects/index.html")) + '"' +
               (external ? ' target="_blank" rel="noopener"' : "") + ">" +
-              '<span class="card__title">' + ICON(project.icon || "code") + "<span>" + bi(project.title, lang) + "</span></span>" +
-              '<span class="card__desc">' + bi(project.desc, lang) + "</span>" +
+              '<span class="card__title">' + ICON(project.icon || "code") + "<span>" + esc(bi(project.title, lang)) + "</span></span>" +
+              '<span class="card__desc">' + esc(bi(project.desc, lang)) + "</span>" +
               '<span class="card__meta">' + badge +
                 '<span class="card__link ml-auto">' + I18N.t("projects.view") + ICON(external ? "external" : "arrowRight") + "</span>" +
               "</span>" +
@@ -212,15 +390,18 @@
       // ---- 3) 最新文章：构建脚本生成文章数据后，window.POSTS 才有值 ----
       var recent = document.getElementById("recent-posts");
       if (recent) {
-        if (window.POSTS && window.POSTS.length) {
-          // 双栏布局中展示最新两篇，控制列表高度并为近况栏留出相近的视觉重量。
-          recent.innerHTML = window.POSTS.slice(0, 2).map(function (post) {
+        if (posts.length) {
+          // 内容流最多展示四篇；当前内容较少时不会生成虚假的占位文章。
+          recent.innerHTML = posts.slice(0, 4).map(function (post) {
             var date = post.date ? String(post.date).slice(0, 10) : "";
+            var postTags = (post.tags || []).slice(0, 3).map(function (tag) {
+              return '<span class="tag">' + esc(tag) + "</span>";
+            }).join("");
             return (
               '<a class="post-item" href="' + (post.url ? window.siteUrl(post.url) : "#") + '">' +
-                '<div class="post-item__title">' + (post.title || "") + "</div>" +
-                (post.excerpt ? '<p class="post-item__excerpt">' + post.excerpt + "</p>" : "") +
-                '<div class="post-meta"><span class="post-meta__item">' + ICON("book") + date + "</span></div>" +
+                '<div class="post-item__title">' + esc(post.title || "") + "</div>" +
+                (post.excerpt ? '<p class="post-item__excerpt">' + esc(post.excerpt) + "</p>" : "") +
+                '<div class="post-meta"><span class="post-meta__item">' + ICON("book") + esc(date) + "</span>" + postTags + "</div>" +
               "</a>"
             );
           }).join("");
@@ -229,6 +410,17 @@
             "还没有文章，去博客写第一篇吧。</p>";
         }
       }
+
+      var tagHost = document.getElementById("home-tags");
+      if (tagHost) {
+        tagHost.innerHTML = tags.length
+          ? tags.slice(0, 12).map(function (tag) {
+              return '<span class="tag">' + esc(tag.name) + '<span class="tag__count">' + tag.count + "</span></span>";
+            }).join("")
+          : '<span class="home-topics__empty">' + esc(I18N.t("home.tags.empty")) + "</span>";
+      }
+
+      renderCalendar(posts, lang);
 
       // ---- 4) 最近在做：每个分类取第一项作为摘要 ----
       var nowHost = document.getElementById("home-now");
@@ -240,9 +432,9 @@
             '<div class="home-now-item">' +
               '<span class="home-now-item__icon">' + ICON(category.icon || "sparkles") + "</span>" +
               '<span class="home-now-item__content">' +
-                '<span class="home-now-item__label">' + bi(category.title, lang) + "</span>" +
-                '<strong class="home-now-item__title">' + item.name + "</strong>" +
-                '<span class="home-now-item__note">' + bi(item.note, lang) + "</span>" +
+                '<span class="home-now-item__label">' + esc(bi(category.title, lang)) + "</span>" +
+                '<strong class="home-now-item__title">' + esc(item.name) + "</strong>" +
+                '<span class="home-now-item__note">' + esc(bi(item.note, lang)) + "</span>" +
               "</span>" +
             "</div>"
           );
@@ -261,7 +453,7 @@
             return (
               '<a class="card" href="' + window.siteUrl(it.href) + '">' +
                 '<span class="card__title">' + ICON(ic) + "<span>" + label + "</span></span>" +
-                '<span class="card__desc">' + desc + "</span>" +
+                '<span class="card__desc">' + esc(desc) + "</span>" +
                 '<span class="card__link">' + I18N.t("section.viewAll") + ICON("arrowRight") + "</span>" +
               "</a>"
             );
@@ -271,10 +463,13 @@
       }
 
       // 三个“查看全部”链接共用相同箭头图标，集中注入可以保持 HTML 骨架简洁。
-      ["featured-arrow", "recent-arrow", "now-arrow"].forEach(function (id) {
+      ["featured-arrow", "recent-arrow", "now-arrow", "profile-arrow"].forEach(function (id) {
         var host = document.getElementById(id);
         if (host) host.innerHTML = ICON("arrowRight");
       });
+
+      var searchIcon = document.getElementById("home-search-icon");
+      if (searchIcon) searchIcon.innerHTML = ICON("search");
     }
 
     // 暴露出去，让 main.js 在切换语言时能重渲染首页文案。

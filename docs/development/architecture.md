@@ -46,6 +46,8 @@ magicbude.github.io/
 │  ├─ icons/                          # favicon 和未来独立图标文件
 │  │  └─ favicon.svg                  # 浏览器标签页和收藏夹使用的网站图标
 │  └─ images/                         # 图片资源总目录，按使用场景继续分类
+│     ├─ home/                        # 首页封面等页面级原创图片
+│     │  └─ editorial-desk.png        # 代码、手作与兴趣共同构成的暖色编辑摄影
 │     ├─ profile/                     # 头像、个人照片和身份相关图片
 │     ├─ projects/                    # 项目封面、截图和演示图片
 │     └─ posts/                       # 博客正文与文章封面图片

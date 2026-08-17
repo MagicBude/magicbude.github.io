@@ -65,9 +65,9 @@
   --font-serif:
     Georgia, Cambria, "Times New Roman", "Songti SC", "SimSun", serif;
 
-  /* 标题字体默认先指向等宽（对应默认皮肤 instrument），
+  /* 标题字体默认先指向衬线（对应默认皮肤 magazine），
      下面每个 [data-style] 块会按需覆盖成 等宽 / 无衬线 / 衬线。 */
-  --font-heading: var(--font-mono);
+  --font-heading: var(--font-serif);
 
   /* --- 字号 ---------------------------------------------------------------
      用 clamp() 实现流式字号（fluid typography），这是现代 CSS 的一个大杀器。
@@ -118,6 +118,7 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
+  --radius-xl: 24px;
   --radius-full: 999px;  /* 足够大的值，用于做胶囊形和圆形 */
 
   /* --- 布局尺寸 ----------------------------------------------------------- */
@@ -133,26 +134,34 @@
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --duration: 200ms;
 
-  /* --- 默认皮肤配色（工程仪器风）-----------------------------------------
+  /* --- 默认皮肤配色（杂志编辑风）-----------------------------------------
      这里给一套"兜底"默认值，保证即使 JS 没跑、data-style 没设上，
      页面也有完整配色，不会变成黑底黑字。真正的皮肤在下面的 [data-style] 里覆盖。 */
-  --color-bg:          #0d1117;
-  --color-bg-subtle:   #161b22;
-  --color-bg-muted:    #21262d;
-  --color-text:        #e6edf3;
-  --color-text-muted:  #9198a1;
-  --color-text-subtle: #6e7681;
-  --color-border:      #30363d;
-  --color-border-strong: #444c56;
-  --color-accent:      #4aa8ff;
-  --color-accent-hover:#79c0ff;
-  --color-accent-soft: rgba(74, 168, 255, 0.12);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --color-bg:          #faf8f5;
+  --color-bg-subtle:   #f3efe9;
+  --color-bg-muted:    #ece6dd;
+  --color-text:        #2b2620;
+  --color-text-muted:  #6b6258;
+  --color-text-subtle: #9a9085;
+  --color-border:      #e3dcd2;
+  --color-border-strong: #cfc6b8;
+  --color-accent:      #b45309;
+  --color-accent-hover:#8a3e06;
+  --color-accent-soft: #f6e7d4;
+  --shadow-sm: 0 1px 2px rgba(60, 40, 20, 0.05);
+  --shadow-md: 0 4px 12px rgba(60, 40, 20, 0.08);
+
+  /* 图片上的文字需要独立于四套页面皮肤保持稳定对比度。
+     把它们也定义成语义令牌，避免 Hero 组件里散落白色和黑色常量。 */
+  --color-on-media: #fffaf2;
+  --color-on-media-muted: rgba(255, 250, 242, 0.78);
+  --color-media-overlay:
+    linear-gradient(90deg, rgba(17, 12, 8, 0.90) 0%, rgba(17, 12, 8, 0.64) 48%, rgba(17, 12, 8, 0.20) 100%),
+    linear-gradient(0deg, rgba(17, 12, 8, 0.72) 0%, transparent 60%);
 }
 
 
-/* --- 皮肤 A：工程仪器风（默认，暗）---------------------------------------
+/* --- 皮肤 A：工程仪器风（暗）---------------------------------------------
    深灰底 + 蓝色强调 + 等宽标题。技术感强，适合当教材对照。
    data-scheme 供代码高亮器判断明暗（见第 6 节）。 */
 [data-style="instrument"] {
@@ -210,7 +219,7 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
-/* --- 皮肤 D：杂志编辑风（亮，暖）-----------------------------------------
+/* --- 皮肤 D：杂志编辑风（默认，亮，暖）-----------------------------------
    暖白底 + 琥珀强调 + 衬线标题。偏内容阅读，文艺感强。 */
 [data-style="magazine"] {
   --color-bg:          #faf8f5;
@@ -941,6 +950,385 @@ hr {
   line-height: var(--leading-relaxed);
   color: var(--color-text-muted);
   max-width: 60ch;    /* ch 单位 = 字符"0"的宽度，用来控制文本行长非常直观 */
+}
+
+
+/* --- 首页封面与搜索入口 --------------------------------------------------- */
+
+/* 首页自己控制封面到页脚的节奏，取消 .site-main 的通用顶部内边距。 */
+.site-main--home {
+  padding-top: 0;
+}
+
+/*
+  封面用 Grid 把文字稳定压在底部；图片和遮罩脱离文档流，避免图片的原始宽高比
+  反过来撑高整个首屏。section 仍由 min-height 与文字内容共同决定真实高度。
+*/
+.home-hero {
+  position: relative;
+  display: grid;
+  min-height: clamp(430px, 58vw, 640px);
+  overflow: hidden;
+  isolation: isolate;
+  background-color: var(--color-bg-muted);
+}
+
+.home-hero__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 52%;
+}
+
+.home-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--color-media-overlay);
+}
+
+.home-hero__content {
+  position: relative;
+  z-index: 1;
+  align-self: end;
+  padding-block: var(--space-8) calc(var(--space-8) + var(--space-5));
+  color: var(--color-on-media);
+}
+
+.home-hero__eyebrow {
+  margin-bottom: var(--space-4);
+  color: var(--color-on-media-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.home-hero__title {
+  max-width: 12ch;
+  color: var(--color-on-media);
+  font-family: var(--font-heading);
+  font-size: clamp(2.75rem, 6.4vw, 5.75rem);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.24);
+}
+
+.home-hero__lead {
+  max-width: 48ch;
+  margin-top: var(--space-5);
+  color: var(--color-on-media-muted);
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+}
+
+/* 搜索条向上压住封面边缘，既缩短两块之间的视觉距离，也形成首页的第一个明确操作。 */
+.home-search-shell {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(var(--space-6) * -1);
+}
+
+.home-search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-muted);
+  transition: border-color var(--duration) var(--ease),
+              color var(--duration) var(--ease),
+              transform var(--duration) var(--ease);
+}
+
+.home-search:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+}
+
+.home-search__icon {
+  display: grid;
+  place-items: center;
+  color: var(--color-accent);
+}
+
+.home-search__icon .icon {
+  width: 21px;
+  height: 21px;
+}
+
+.home-search__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-search__hint {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+
+/* --- 首页基地总览 --------------------------------------------------------- */
+
+/*
+  三列不是为了做“后台仪表盘”，而是把三类问题并排回答：
+  左侧介绍主人，中间承载长期内容，右侧呈现此刻状态。minmax(0, 1fr)
+  允许文章标题真正收缩，不会把整个页面撑出横向滚动。
+*/
+.home-dashboard {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.78fr) minmax(0, 1.55fr) minmax(260px, 0.92fr);
+  gap: var(--space-5);
+  align-items: start;
+  margin-top: var(--space-7);
+}
+
+.home-panel {
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-bg-subtle);
+}
+
+.home-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.home-panel__header h2 {
+  font-size: var(--text-xl);
+}
+
+.home-panel__header--compact {
+  margin-bottom: var(--space-4);
+}
+
+.home-panel__kicker {
+  margin-bottom: var(--space-1);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-profile__mark {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--color-accent-soft), var(--color-bg-muted));
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+.home-profile__name {
+  font-size: var(--text-2xl);
+}
+
+.home-profile__bio {
+  margin-top: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-block: var(--space-4);
+  border-block: 1px solid var(--color-border);
+}
+
+.home-stat {
+  display: grid;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.home-stat dt {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.home-stat dd {
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.home-profile__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.home-profile__more .icon {
+  width: 15px;
+  height: 15px;
+  transition: transform var(--duration) var(--ease);
+}
+
+.home-profile__more:hover .icon {
+  transform: translateX(3px);
+}
+
+.home-feed__posts .post-item {
+  margin-inline: 0;
+  padding: var(--space-4) 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.home-feed__posts .post-item:first-child {
+  padding-top: 0;
+}
+
+.home-feed__posts .post-item:hover {
+  background-color: transparent;
+}
+
+.home-feed__posts .post-item__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+}
+
+.home-feed__posts .post-meta .tag {
+  padding-block: 2px;
+}
+
+.home-topics {
+  margin-top: var(--space-5);
+}
+
+.home-topics h3 {
+  margin-bottom: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.home-topics__empty {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}
+
+.home-rail {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.home-rail .home-now-item {
+  padding: var(--space-3) 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.home-rail .home-now-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.home-rail .home-now-item__note {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.home-calendar__month {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.home-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.home-calendar__weekday,
+.home-calendar__day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.home-calendar__weekday {
+  aspect-ratio: auto;
+  min-height: 24px;
+  color: var(--color-text-subtle);
+  font-weight: 650;
+}
+
+.home-calendar__day.is-active {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  font-weight: 700;
+}
+
+.home-calendar__day.is-active:hover {
+  background-color: var(--color-accent-hover);
+  color: var(--color-bg);
+}
+
+.home-calendar__day--blank {
+  visibility: hidden;
+}
+
+.home-calendar__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.home-calendar__meta time {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
 }
 
 
@@ -1865,6 +2253,20 @@ hr {
 
 @media (max-width: 960px) {
 
+  /* 三列基地总览在平板宽度按内容顺序改为单列，避免侧栏被压成窄长文字。 */
+  .home-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  /* 右侧两个模块在平板上横排，继续利用可用宽度；手机断点再改回单列。 */
+  .home-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-profile__bio {
+    max-width: 68ch;
+  }
+
   /* 双栏总览在窄屏改为单列，保持文章在前、近况在后的阅读顺序。 */
   .home-overview {
     grid-template-columns: 1fr;
@@ -1978,6 +2380,82 @@ hr {
 
   .post-item:hover {
     background-color: transparent;   /* 触屏没有 hover 概念，去掉避免点击后残留高亮 */
+  }
+}
+
+@media (max-width: 640px) {
+  .home-hero {
+    min-height: 500px;
+  }
+
+  /* 手机上把取景焦点略向左移，保留键盘、笔记本和琥珀玻璃三个身份线索。 */
+  .home-hero__image {
+    object-position: 35% center;
+  }
+
+  .home-hero__content {
+    padding-block: var(--space-7) calc(var(--space-8) + var(--space-5));
+  }
+
+  .home-hero__title {
+    max-width: 10ch;
+    font-size: clamp(2.5rem, 13vw, 4rem);
+  }
+
+  .home-hero__lead {
+    font-size: var(--text-base);
+  }
+
+  .home-search {
+    min-height: 58px;
+    padding-inline: var(--space-4);
+  }
+
+  .home-search__hint {
+    display: none;
+  }
+
+  .home-panel {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+
+  .home-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .home-panel__header {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 极窄屏隐藏 Logo 文字，只保留品牌色方块；链接的 aria-label 仍提供完整名称。 */
+  .site-logo > span:last-child {
+    display: none;
+  }
+
+  .site-header__inner {
+    flex-wrap: nowrap;
+    gap: var(--space-2);
+  }
+
+  .site-logo {
+    margin-right: auto;
+  }
+
+  .skin-select {
+    max-width: 112px;
+  }
+
+  /* 导航面板绝对定位到单行头部下方，不再为了隐藏菜单预留第二行高度。 */
+  .site-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: var(--space-3) var(--space-5);
+    background-color: var(--color-bg);
+    box-shadow: var(--shadow-md);
   }
 }
 

@@ -6,7 +6,7 @@
   数据驱动：文章列表由 window.POSTS（构建脚本生成）经 window.renderBlog 渲染；
             挂到 window.renderBlog，main.js 在切换语言时会重渲染，让筛选标签/文案同步。
 -->
-<html lang="zh" data-style="instrument" data-scheme="dark">
+<html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
@@ -18,7 +18,7 @@
   <script>
     (function () {
       try {
-        var s = localStorage.getItem("site-style") || "instrument";
+        var s = localStorage.getItem("site-style") || "magazine";
         var l = localStorage.getItem("site-lang") || "zh";
         var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
         var d = document.documentElement;

@@ -6,7 +6,7 @@
   数据驱动：正文文案由 SITE_CONFIG / i18n 运行时填充，本文件只留结构骨架。
   皮肤 / 语言在 CSS 加载前由 head 内防闪白内联脚本设好。
 -->
-<html lang="zh" data-style="instrument" data-scheme="dark">
+<html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
@@ -24,7 +24,7 @@
   <script>
     (function () {
       try {
-        var s = localStorage.getItem("site-style") || "instrument";
+        var s = localStorage.getItem("site-style") || "magazine";
         var l = localStorage.getItem("site-lang") || "zh";
         // 明暗由皮肤决定：instrument / terminal 暗，minimal / magazine 亮。
         var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";

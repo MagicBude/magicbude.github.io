@@ -15,7 +15,7 @@
  *   - 加社交：往 social 数组里加 { type, url }（type 对应 icons.js 里的图标名）
  *   - 加皮肤：往 skins 数组加一项，并在 css/main.css 加一个 [data-style="xxx"] 令牌块
  *
- * 这个文件通过 <script src="js/site.config.js"> 加载，
+ * 这个文件通过各页面的 <script src="assets/js/core/site.config.js"> 加载，
  * 会把数据挂到全局 window.SITE_CONFIG 上供其他脚本读取。
  * 加载顺序：site.config.js → icons.js → i18n.js → main.js
  * ============================================================================
@@ -47,7 +47,7 @@ window.SITE_CONFIG = {
 
   // #endregion 身份与基础信息
   // #region 社交链接与导航
-  // 社交 / 外部链接。type 必须对应 js/icons.js 里定义的图标名，
+  // 社交 / 外部链接。type 必须对应 assets/js/core/icons.js 里定义的图标名，
   // 例如 "github" / "gitee" / "x" / "mail" / "rss"。
   social: [
     { type: "github", url: "https://github.com/magicbude",    label: "GitHub" },
@@ -72,9 +72,9 @@ window.SITE_CONFIG = {
   // #endregion 社交链接与导航
   // #region 皮肤定义与默认值
 
-  // 可切换的视觉皮肤。value 对应 css/main.css 里的 [data-style="xxx"]。
+  // 可切换的视觉皮肤。value 对应 assets/css/main.css 里的 [data-style="xxx"]。
   // label 也做多语，下拉框里会按当前语言显示。
-  // 想加新皮肤？在 css/main.css 加一个 [data-style="yyy"] 令牌块，再在这里加一项即可，
+  // 想加新皮肤？在 assets/css/main.css 加一个 [data-style="yyy"] 令牌块，再在这里加一项即可，
   // 页面组件零改动。
   skins: [
     { value: "instrument", label: { zh: "工程仪器", en: "Instrument" } },
@@ -86,7 +86,7 @@ window.SITE_CONFIG = {
   // 默认皮肤与默认语言（仅在 localStorage 没有记录时生效）。
   // 注意：真正的首屏应用由 HTML 里的防闪白内联脚本完成，这里只是兜底值。
   defaults: {
-    style: "instrument",
+    style: "magazine",
     lang: "zh",
   },
   // #endregion 皮肤定义与默认值

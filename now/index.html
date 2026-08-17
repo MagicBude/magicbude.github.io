@@ -4,7 +4,7 @@
   协同：assets/js/core/ 公共脚本与 assets/js/data/now.js 共享近况数据。
   数据驱动：分类卡片由 window.NOW 经 window.renderNow 渲染（与 uses 同结构，纯记录无外链）。
 -->
-<html lang="zh" data-style="instrument" data-scheme="dark">
+<html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
@@ -15,7 +15,7 @@
   <script>
     (function () {
       try {
-        var s = localStorage.getItem("site-style") || "instrument";
+        var s = localStorage.getItem("site-style") || "magazine";
         var l = localStorage.getItem("site-lang") || "zh";
         var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
         var d = document.documentElement;

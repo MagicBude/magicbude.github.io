@@ -4,7 +4,7 @@
   协同：assets/js/core/ 中的站点配置、公共渲染与多语言脚本。
   数据驱动：引言 / 简介 / 板块卡片 / 联系胶囊由 window.renderAbout 从 SITE_CONFIG 渲染。
 -->
-<html lang="zh" data-style="instrument" data-scheme="dark">
+<html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
@@ -19,7 +19,7 @@
   <script>
     (function () {
       try {
-        var s = localStorage.getItem("site-style") || "instrument";
+        var s = localStorage.getItem("site-style") || "magazine";
         var l = localStorage.getItem("site-lang") || "zh";
         var scheme = (s === "instrument" || s === "terminal") ? "dark" : "light";
         var d = document.documentElement;
