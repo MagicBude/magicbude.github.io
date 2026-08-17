@@ -95,9 +95,18 @@ window.i18n = (function () {
       "home.noPosts": "还没有文章，去博客写第一篇吧。",
 
       "about.eyebrow": "关于",
-      "about.section.here": "这个站有",
-      "about.section.contact": "联系我",
-      "about.section.contactDesc": "在这些地方可以找到我：",
+      "about.identity.kicker": "个人档案",
+      "about.identity.base": "PERSONAL DIGITAL BASE",
+      "about.interests.title": "我关注的事",
+      "about.interests.lead": "技术是长期主线，但不是全部。这里也会留下游戏、动漫、电影、运动和日常生活。",
+      "about.principles.title": "为什么保留这个站",
+      "about.principles.lead": "它首先服务于我自己：整理做过的事，也让后来的人能够沿着真实记录认识我。",
+      "about.next.title": "从这里继续",
+      "about.next.lead": "如果想快速了解我，可以从作品、文章和最近在做的事开始。",
+      "about.next.aria": "站内推荐栏目",
+      "about.next.open": "前往栏目",
+      "about.contact.title": "找到我",
+      "about.contact.desc": "代码与公开项目优先放在 GitHub 和 Gitee；也可以通过邮件联系，或订阅本站 RSS。",
 
       "notfound.quick": "或者去",
 
@@ -254,9 +263,18 @@ window.i18n = (function () {
       "home.noPosts": "No posts yet — go write the first one.",
 
       "about.eyebrow": "About",
-      "about.section.here": "What's on this site",
-      "about.section.contact": "Get in touch",
-      "about.section.contactDesc": "You can find me on:",
+      "about.identity.kicker": "Profile",
+      "about.identity.base": "PERSONAL DIGITAL BASE",
+      "about.interests.title": "What I care about",
+      "about.interests.lead": "Technology is a long-running thread, but not the whole picture. Games, anime, film, movement, and everyday life belong here too.",
+      "about.principles.title": "Why keep this site",
+      "about.principles.lead": "It serves me first: organizing what I make while letting others get to know me through an honest record.",
+      "about.next.title": "Continue from here",
+      "about.next.lead": "For a quick introduction, start with the projects, writing, and what I am doing now.",
+      "about.next.aria": "Recommended site sections",
+      "about.next.open": "Open section",
+      "about.contact.title": "Find me",
+      "about.contact.desc": "Code and public projects live primarily on GitHub and Gitee. You can also email me or subscribe to this site's RSS feed.",
 
       "notfound.quick": "Or head to",
 

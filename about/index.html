@@ -2,7 +2,8 @@
 <!--
   about/index.html - 关于页
   协同：assets/js/core/ 中的站点配置、公共渲染与多语言脚本。
-  数据驱动：引言 / 简介 / 板块卡片 / 联系胶囊由 window.renderAbout 从 SITE_CONFIG 渲染。
+  数据驱动：身份档案、兴趣、建站原则、栏目入口与联系方式均由 window.renderAbout
+  从 SITE_CONFIG 渲染；切换语言时由 main.js 调用同一函数重绘。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -42,39 +43,76 @@
   <header id="site-header" class="site-header"></header>
 
   <main class="site-main" id="main">
-    <!-- ============ 页面引言 ============ -->
-    <section class="hero container container--narrow">
-      <!-- 小标签（eyebrow）：比标题低一级，用来点明这是「关于」页 -->
-      <p class="page-eyebrow" data-i18n="about.eyebrow">关于</p>
-      <!-- 名字与定位从 site.config.js 读，中英切换时由 renderAbout 刷新 -->
-      <h1 class="hero__name" id="about-name">magicbude</h1>
-      <span class="hero__tagline" id="about-tagline" data-i18n="home.badge">在代码与兴趣之间，留下自己的数字轨迹</span>
-    </section>
+    <!-- #region 身份引言 -->
+    <section class="hero container about-hero">
+      <div class="about-hero__copy">
+        <p class="page-eyebrow" data-i18n="about.eyebrow">关于</p>
+        <!-- 名字、标语和简介属于身份信息，只从 site.config.js 读取。 -->
+        <h1 class="about-hero__name" id="about-name">magicbude</h1>
+        <p class="about-hero__tagline" id="about-tagline">在代码与兴趣之间，留下自己的数字轨迹</p>
+        <p class="about-hero__bio" id="about-bio">我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。这里是我的个人数字基地。</p>
+      </div>
 
-    <!-- ============ 自我介绍（长文，用 .prose 排版） ============ -->
-    <section class="section container container--narrow">
-      <!-- 内容由 renderAbout 用 config.bio 填充；JS 没跑也留兜底文字 -->
-      <div class="prose" id="about-bio">我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。</div>
+      <!-- 这不是虚构头像：用站点缩写和可核实资料组成一张纯文字身份卡。 -->
+      <aside class="about-identity" aria-labelledby="about-identity-title">
+        <header class="about-identity__header">
+          <span class="about-identity__mark" id="about-mark" aria-hidden="true">MB</span>
+          <div>
+            <p class="about-identity__kicker" data-i18n="about.identity.kicker">个人档案</p>
+            <h2 class="about-identity__name" id="about-identity-title">magicbude</h2>
+          </div>
+        </header>
+        <dl class="about-identity__facts" id="about-facts"></dl>
+        <p class="about-identity__base" data-i18n="about.identity.base">PERSONAL DIGITAL BASE</p>
+      </aside>
     </section>
+    <!-- #endregion 身份引言 -->
 
-    <!-- ============ 这个站有（板块入口，复用首页卡片模式） ============ -->
+    <!-- #region 兴趣与关注 -->
     <section class="section container">
-      <div class="section__header">
-        <h2 class="section__title" data-i18n="about.section.here">这个站有</h2>
+      <div class="section__header about-section-heading">
+        <div>
+          <h2 class="section__title" data-i18n="about.interests.title">我关注的事</h2>
+          <p class="about-section-heading__lead" data-i18n="about.interests.lead">技术是长期主线，但不是全部。这里也会留下游戏、动漫、电影、运动和日常生活。</p>
+        </div>
       </div>
-      <!-- 卡片由 renderAbout 根据 nav 生成（排除 首页/搜索/关于 自身） -->
-      <div class="card-grid" id="about-sections"></div>
+      <div class="about-interest-grid" id="about-interests"></div>
     </section>
+    <!-- #endregion 兴趣与关注 -->
 
-    <!-- ============ 联系我 ============ -->
-    <section class="section container container--narrow">
-      <div class="section__header">
-        <h2 class="section__title" data-i18n="about.section.contact">联系我</h2>
+    <!-- #region 建站原则 -->
+    <section class="section container about-principles-section">
+      <div class="section__header about-section-heading">
+        <div>
+          <h2 class="section__title" data-i18n="about.principles.title">为什么保留这个站</h2>
+          <p class="about-section-heading__lead" data-i18n="about.principles.lead">它首先服务于我自己：整理做过的事，也让后来的人能够沿着真实记录认识我。</p>
+        </div>
       </div>
-      <p class="about-contact-desc" data-i18n="about.section.contactDesc">在这些地方可以找到我：</p>
-      <!-- 社交链接胶囊，由 renderAbout 根据 config.social 生成 -->
-      <div class="contact-list" id="about-contact"></div>
+      <ol class="about-principle-list" id="about-principles"></ol>
     </section>
+    <!-- #endregion 建站原则 -->
+
+    <!-- #region 继续探索与联系 -->
+    <section class="section container about-next-grid">
+      <div class="about-next-panel">
+        <p class="page-eyebrow" data-i18n="about.next.title">从这里继续</p>
+        <p class="about-next-panel__lead" data-i18n="about.next.lead">如果想快速了解我，可以从作品、文章和最近在做的事开始。</p>
+        <!-- 只突出三个最有认识价值的栏目，顺序由 SITE_CONFIG.about.featuredNav 决定。 -->
+        <nav class="about-route-list" id="about-sections" aria-label="站内推荐栏目" data-i18n="about.next.aria" data-i18n-attr="aria-label"></nav>
+      </div>
+
+      <aside class="about-contact-panel">
+        <p class="page-eyebrow" data-i18n="about.contact.title">找到我</p>
+        <p class="about-contact-panel__desc" data-i18n="about.contact.desc">代码与公开项目优先放在 GitHub 和 Gitee；也可以通过邮件联系，或订阅本站 RSS。</p>
+        <!-- 外链与站内 RSS 使用不同路径解析规则，由 renderAbout 统一处理。 -->
+        <div class="contact-list" id="about-contact"></div>
+      </aside>
+
+      <noscript>
+        <p class="empty-state">页面资料需要 JavaScript 读取本地配置；你仍可直接访问 <a href="../projects/index.html">项目</a>、<a href="../blog/index.html">博客</a>，或发送邮件到 <a href="mailto:magicbude1998@gmail.com">magicbude1998@gmail.com</a>。</p>
+      </noscript>
+    </section>
+    <!-- #endregion 继续探索与联系 -->
   </main>
 
   <footer id="site-footer" class="site-footer"></footer>
@@ -100,64 +138,141 @@
     var ICON  = window.icon  || function () { return ""; };
     var I18N  = window.i18n  || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
 
-    // 导航 key → 图标名（与 home.html 保持一致）。
+    var ABOUT = CONFIG.about || {};
+
+    // 导航 key → 图标名（与首页保持一致）。
     var NAV_ICON = {
       home: "home", blog: "book", projects: "code",
       now: "sparkles", uses: "tool", links: "link",
       search: "search", about: "user"
     };
 
-    // 「这个站有」卡片的一句话说明（多语）。和 home 的入口说明同源，
-    // 集中写在这里，改文案只动这一处。
+    // 关于页只推荐最能帮助访客认识站主的三个栏目；文案保持长期有效，不写阶段性宣传语。
     var ENTRY_DESC = {
-      blog:     { zh: "写代码、做小工具的记录与踩坑",   en: "Notes & lessons from coding and tinkering" },
-      projects: { zh: "我做过的网站、工具与开源项目",   en: "Sites, tools and open-source I've built" },
-      now:      { zh: "最近在玩、在看、在搞啥",         en: "What I'm playing, watching and building now" },
-      uses:     { zh: "日常在用的硬件与软件",           en: "Hardware & software I use daily" },
-      links:    { zh: "朋友们和觉得有用的站",           en: "Friends and useful sites" }
+      projects: { zh: "正在运行和计划中的网站与工具", en: "Live and planned websites and tools" },
+      blog:     { zh: "代码、工具与学习过程的长期记录", en: "Long-form notes on code, tools, and learning" },
+      now:      { zh: "此刻正在关注、学习和制作的事", en: "What I'm focusing on, learning, and making now" }
     };
+
+    // 配置内容最终进入 innerHTML；统一转义，避免特殊字符被浏览器解释成标签或属性。
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // 所有身份内容采用一致的语言回退：当前语言缺失时显示中文，而不是留下空白。
+    function localize(value, lang) {
+      if (!value) return "";
+      return value[lang] != null ? value[lang] : value.zh || "";
+    }
+
+    function resolveContactLink(item) {
+      var rawUrl = item.url || "";
+      var hasScheme = /^(?:[a-z]+:|\/\/)/i.test(rawUrl);
+      var externalWeb = /^https?:\/\//i.test(rawUrl);
+      return {
+        href: hasScheme ? rawUrl : window.siteUrl(rawUrl),
+        attrs: externalWeb ? ' target="_blank" rel="noopener"' : "",
+      };
+    }
 
     function renderAbout() {
       var lang = I18N.getLang();
 
-      // ---- 1) 引言：名字 + 定位 ----
+      // ---- 1) 引言：名字 + 定位 + 简介 ----
       var nameEl = document.getElementById("about-name");
       if (nameEl && CONFIG.name) nameEl.textContent = CONFIG.name;
 
+      var identityName = document.getElementById("about-identity-title");
+      if (identityName && CONFIG.name) identityName.textContent = CONFIG.name;
+
       var tagEl = document.getElementById("about-tagline");
-      if (tagEl && CONFIG.tagline) tagEl.textContent = CONFIG.tagline[lang] || CONFIG.tagline.zh;
+      if (tagEl && CONFIG.tagline) tagEl.textContent = localize(CONFIG.tagline, lang);
 
-      // ---- 2) 自我介绍长文 ----
       var bioEl = document.getElementById("about-bio");
-      if (bioEl && CONFIG.bio) bioEl.textContent = CONFIG.bio[lang] || CONFIG.bio.zh;
+      if (bioEl && CONFIG.bio) bioEl.textContent = localize(CONFIG.bio, lang);
 
-      // ---- 3) 「这个站有」卡片（排除 首页 / 搜索 / 关于 自身） ----
-      var grid = document.getElementById("about-sections");
-      if (grid && CONFIG.nav) {
-        grid.innerHTML = CONFIG.nav
-          .filter(function (it) { return it.key !== "home" && it.key !== "search" && it.key !== "about"; })
+      var markEl = document.getElementById("about-mark");
+      if (markEl && ABOUT.mark) markEl.textContent = ABOUT.mark;
+
+      // ---- 2) 快速资料：dl 保留“字段名 / 字段值”的语义，而不是用普通 div 冒充表格。 ----
+      var factsHost = document.getElementById("about-facts");
+      if (factsHost) {
+        factsHost.innerHTML = (ABOUT.facts || []).map(function (fact) {
+          return (
+            '<div class="about-identity__fact">' +
+              "<dt>" + escapeHtml(localize(fact.label, lang)) + "</dt>" +
+              "<dd>" + escapeHtml(localize(fact.value, lang)) + "</dd>" +
+            "</div>"
+          );
+        }).join("");
+      }
+
+      // ---- 3) 兴趣：每张卡只陈述长期兴趣，不把爱好包装成专业履历。 ----
+      var interestsHost = document.getElementById("about-interests");
+      if (interestsHost) {
+        interestsHost.innerHTML = (ABOUT.interests || []).map(function (interest, index) {
+          return (
+            '<article class="about-interest-card">' +
+              '<header><span class="about-interest-card__index">' + String(index + 1).padStart(2, "0") + "</span>" +
+                '<span class="about-interest-card__icon">' + ICON(interest.icon || "sparkles") + "</span></header>" +
+              '<h3 class="about-interest-card__title">' + escapeHtml(localize(interest.title, lang)) + "</h3>" +
+              '<p class="about-interest-card__desc">' + escapeHtml(localize(interest.desc, lang)) + "</p>" +
+            "</article>"
+          );
+        }).join("");
+      }
+
+      // ---- 4) 建站原则：有序列表中的编号是内容的一部分，CSS 只负责把它排成档案行。 ----
+      var principlesHost = document.getElementById("about-principles");
+      if (principlesHost) {
+        principlesHost.innerHTML = (ABOUT.principles || []).map(function (principle, index) {
+          return (
+            '<li class="about-principle">' +
+              '<span class="about-principle__index" aria-hidden="true">' + String(index + 1).padStart(2, "0") + "</span>" +
+              '<h3 class="about-principle__title">' + escapeHtml(localize(principle.title, lang)) + "</h3>" +
+              '<p class="about-principle__desc">' + escapeHtml(localize(principle.desc, lang)) + "</p>" +
+            "</li>"
+          );
+        }).join("");
+      }
+
+      // ---- 5) 推荐入口：featuredNav 控制顺序，nav 继续负责真实地址与翻译 key。 ----
+      var routesHost = document.getElementById("about-sections");
+      if (routesHost && CONFIG.nav) {
+        var featuredKeys = ABOUT.featuredNav || ["projects", "blog", "now"];
+        routesHost.innerHTML = featuredKeys.map(function (key) {
+            return CONFIG.nav.find(function (item) { return item.key === key; });
+          })
+          .filter(Boolean)
           .map(function (it) {
             var ic    = NAV_ICON[it.key] || "layout";
             var label = I18N.t(it.i18n);
-            var desc  = ENTRY_DESC[it.key] ? (ENTRY_DESC[it.key][lang] || ENTRY_DESC[it.key].zh) : "";
+            var desc  = localize(ENTRY_DESC[it.key], lang);
             return (
-              '<a class="card" href="' + window.siteUrl(it.href) + '">' +
-                '<span class="card__title">' + ICON(ic) + "<span>" + label + "</span></span>" +
-                '<span class="card__desc">' + desc + "</span>" +
-                '<span class="card__link">' + I18N.t("section.viewAll") + ICON("arrowRight") + "</span>" +
+              '<a class="about-route" href="' + escapeHtml(window.siteUrl(it.href)) + '">' +
+                '<span class="about-route__icon">' + ICON(ic) + "</span>" +
+                '<span class="about-route__copy"><strong>' + escapeHtml(label) + "</strong>" +
+                  "<small>" + escapeHtml(desc) + "</small></span>" +
+                '<span class="about-route__action"><span>' + escapeHtml(I18N.t("about.next.open")) + "</span>" + ICON("arrowRight") + "</span>" +
               "</a>"
             );
           })
           .join("");
       }
 
-      // ---- 4) 联系我：社交链接做成胶囊按钮 ----
+      // ---- 6) 联系方式：HTTP 外链开新页，mailto 直接唤起邮件，RSS 用 siteUrl 指向站点根目录。 ----
       var contact = document.getElementById("about-contact");
       if (contact && CONFIG.social) {
         contact.innerHTML = CONFIG.social.map(function (s) {
+          var link = resolveContactLink(s);
           return (
-            '<a class="btn btn--ghost" href="' + s.url + '" target="_blank" rel="noopener">' +
-              ICON(s.type) + "<span>" + (s.label || s.type) + "</span>" +
+            '<a class="btn btn--ghost" href="' + escapeHtml(link.href) + '"' + link.attrs + ">" +
+              ICON(s.type) + "<span>" + escapeHtml(s.label || s.type) + "</span>" +
             "</a>"
           );
         }).join("");

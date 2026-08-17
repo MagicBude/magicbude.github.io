@@ -45,6 +45,87 @@ window.SITE_CONFIG = {
         "Its digital garden is where knowledge and ideas continue to grow.",
   },
 
+  /*
+   * 关于页的个人资料也属于站点身份，因此继续放在唯一配置源里，而不是写死进 HTML。
+   * facts 用于快速认识，interests 记录长期兴趣，principles 解释为什么维护这个站。
+   * 这些字段只陈述已经确认的信息；未来兴趣或定位变化时，在这里统一更新。
+   */
+  about: {
+    mark: "MB",
+    facts: [
+      {
+        label: { zh: "角色", en: "Role" },
+        value: { zh: "个人数字基地维护者", en: "Keeper of a personal digital base" },
+      },
+      {
+        label: { zh: "兴趣", en: "Interests" },
+        value: { zh: "编程、游戏、动漫、电影、羽毛球", en: "Programming, games, anime, film, badminton" },
+      },
+      {
+        label: { zh: "建站方式", en: "Built as" },
+        value: { zh: "原生静态网页", en: "A plain static website" },
+      },
+    ],
+    interests: [
+      {
+        icon: "code",
+        title: { zh: "编程与动手", en: "Programming & making" },
+        desc: {
+          zh: "喜欢把想法做成可以运行的小工具，也把实现过程整理成可复习的记录。",
+          en: "I like turning ideas into small working tools and keeping the process as notes I can revisit.",
+        },
+      },
+      {
+        icon: "gamepad",
+        title: { zh: "游戏与动漫", en: "Games & anime" },
+        desc: {
+          zh: "游戏和动漫是技术之外长期保留的兴趣，也构成这个站个人气质的一部分。",
+          en: "Games and anime are long-running interests beyond technology, and part of this site's personality.",
+        },
+      },
+      {
+        icon: "film",
+        title: { zh: "电影与故事", en: "Film & stories" },
+        desc: {
+          zh: "电影也是日常兴趣的一部分，相关的观看与想法会在内容积累后慢慢留下。",
+          en: "Film is part of everyday life too; viewing notes and thoughts can grow here over time.",
+        },
+      },
+      {
+        icon: "heart",
+        title: { zh: "羽毛球与日常", en: "Badminton & everyday life" },
+        desc: {
+          zh: "羽毛球是屏幕之外的日常活动之一，这里也会保留真实生活的痕迹。",
+          en: "Badminton is one of my regular activities away from the screen, alongside traces of everyday life.",
+        },
+      },
+    ],
+    principles: [
+      {
+        title: { zh: "自己掌握的空间", en: "A space I control" },
+        desc: {
+          zh: "不依赖社交平台的时间线，把重要内容放在自己能够长期维护的位置。",
+          en: "Keep important work somewhere I can maintain over time, instead of relying on a social feed.",
+        },
+      },
+      {
+        title: { zh: "真实比完整更重要", en: "Truth before completeness" },
+        desc: {
+          zh: "只把已经发生的作品和记录当作成果；仍在构想的内容会明确标注状态。",
+          en: "Present only work and notes that truly exist; ideas still taking shape are labeled clearly.",
+        },
+      },
+      {
+        title: { zh: "边做边整理", en: "Build, then organize" },
+        desc: {
+          zh: "这个站不是一次写完的简历，而是随项目、文章和兴趣持续更新的个人档案。",
+          en: "This is not a résumé finished in one sitting, but a personal archive that grows with projects, writing, and interests.",
+        },
+      },
+    ],
+    featuredNav: ["projects", "blog", "now"],
+  },
+
   // #endregion 身份与基础信息
   // #region 社交链接与导航
   // 社交 / 外部链接。type 必须对应 assets/js/core/icons.js 里定义的图标名，
@@ -52,7 +133,6 @@ window.SITE_CONFIG = {
   social: [
     { type: "github", url: "https://github.com/magicbude",    label: "GitHub" },
     { type: "gitee",  url: "https://gitee.com/magicbude",     label: "Gitee" },
-    { type: "x",      url: "https://x.com/",                  label: "X" },
     { type: "mail",   url: "mailto:magicbude1998@gmail.com", label: "Email" },
     { type: "rss",    url: "feed.xml",                       label: "RSS" },
   ],
