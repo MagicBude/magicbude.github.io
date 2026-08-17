@@ -3,7 +3,7 @@
   index.html - 网站首页与全站枢纽
   作用：用 Hero、精选项目、最新文章、近况摘要和栏目导航组成个人数字基地的总入口。
   协同：site.config.js（身份 / 导航）、projects.js（项目）、posts.js（文章）、now.js（近况）、main.js（公共框架）、i18n.js（多语）。
-  数据驱动：底部的 window.renderHome 从多个 window.* 数据源读取内容并渲染，各内容页与首页只维护一份数据。
+  数据驱动：底部的 window.renderHome 从多个 window.* 数据源读取站内内容；天气由访客主动授权后从 Open-Meteo 获取。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -149,6 +149,48 @@
           <p class="home-clock__zone" id="home-clock-zone">—</p>
         </section>
 
+        <!--
+          天气属于渐进增强：只有访客主动点击后才申请浏览器定位并请求 Open-Meteo。
+          页面不会在首屏自动发送位置，拒绝权限或断网时也不影响其他内容。
+        -->
+        <section class="home-panel home-weather" aria-labelledby="home-weather-title">
+          <p class="home-panel__kicker" data-i18n="home.weather.kicker">实时天气</p>
+          <h2 id="home-weather-title" data-i18n="home.weather.title">你所在地区</h2>
+
+          <div class="home-weather__result" id="home-weather-result" hidden>
+            <div class="home-weather__primary">
+              <span class="home-weather__icon" id="home-weather-icon" aria-hidden="true"></span>
+              <strong class="home-weather__temperature" id="home-weather-temperature">—</strong>
+              <span class="home-weather__condition" id="home-weather-condition">—</span>
+            </div>
+            <dl class="home-weather__details">
+              <div>
+                <dt data-i18n="home.weather.feels">体感</dt>
+                <dd id="home-weather-feels">—</dd>
+              </div>
+              <div>
+                <dt data-i18n="home.weather.humidity">湿度</dt>
+                <dd id="home-weather-humidity">—</dd>
+              </div>
+              <div>
+                <dt data-i18n="home.weather.wind">风速</dt>
+                <dd id="home-weather-wind">—</dd>
+              </div>
+            </dl>
+          </div>
+
+          <p class="home-weather__status" id="home-weather-status" role="status" aria-live="polite">点击后获取当前位置天气；位置不会被本站保存。</p>
+          <button class="btn btn--ghost home-weather__button" id="home-weather-locate" type="button">
+            <span id="home-weather-button-icon" aria-hidden="true"></span>
+            <span id="home-weather-button-text" data-i18n="home.weather.locate">使用我的位置</span>
+          </button>
+          <p class="home-weather__credit">
+            <span data-i18n="home.weather.source">天气数据</span>：
+            <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>
+            · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>
+          </p>
+        </section>
+
         <section class="home-panel home-calendar" aria-labelledby="home-calendar-title">
           <div class="home-panel__header home-panel__header--compact">
             <div>
@@ -244,6 +286,13 @@
       wip:    { cls: "badge--wip", key: "projects.status.wip" },
       idea:   { cls: "badge--wip", key: "projects.status.idea" },
       arch:   { cls: "badge--arch", key: "projects.status.arch" }
+    };
+
+    // 天气状态独立保存于当前页面内存：不写 localStorage，刷新后不会留下位置或天气记录。
+    var weatherState = {
+      status: "idle",
+      data: null,
+      errorKey: ""
     };
 
     // 读取双语字段；当前语言缺少内容时回退到中文，避免卡片出现空白。
@@ -367,6 +416,121 @@
       zoneHost.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local time";
     }
 
+    /*
+      Open-Meteo 使用 WMO 天气代码。这里把几十个细分代码归并成访客容易理解的九类，
+      同时选择本地图标；UI 不直接显示难懂的数字，也不依赖外部图标库。
+    */
+    function weatherCondition(code, isDay) {
+      if (code === 0) return { key: "home.weather.clear", icon: isDay ? "sun" : "moon" };
+      if (code === 1 || code === 2) return { key: "home.weather.partlyCloudy", icon: "cloud" };
+      if (code === 3) return { key: "home.weather.overcast", icon: "cloud" };
+      if (code === 45 || code === 48) return { key: "home.weather.fog", icon: "cloud" };
+      if (code >= 51 && code <= 57) return { key: "home.weather.drizzle", icon: "cloudRain" };
+      if (code >= 61 && code <= 67) return { key: "home.weather.rain", icon: "cloudRain" };
+      if (code >= 71 && code <= 77) return { key: "home.weather.snow", icon: "cloud" };
+      if (code >= 80 && code <= 86) return { key: "home.weather.showers", icon: "cloudRain" };
+      if (code >= 95 && code <= 99) return { key: "home.weather.thunderstorm", icon: "cloudRain" };
+      return { key: "home.weather.overcast", icon: "cloud" };
+    }
+
+    // 根据当前状态统一重绘天气卡片；语言切换时 renderHome 会再次调用它。
+    function renderWeather() {
+      var result = document.getElementById("home-weather-result");
+      var status = document.getElementById("home-weather-status");
+      var button = document.getElementById("home-weather-locate");
+      var buttonText = document.getElementById("home-weather-button-text");
+      var buttonIcon = document.getElementById("home-weather-button-icon");
+      if (!result || !status || !button || !buttonText || !buttonIcon) return;
+
+      buttonIcon.innerHTML = ICON("mapPin");
+      button.disabled = weatherState.status === "loading";
+      button.setAttribute("aria-busy", weatherState.status === "loading" ? "true" : "false");
+      buttonText.textContent = I18N.t(weatherState.status === "idle" ? "home.weather.locate" : "home.weather.retry");
+
+      if (weatherState.status !== "ready" || !weatherState.data) {
+        result.hidden = true;
+        status.hidden = false;
+        if (weatherState.status === "loading") status.textContent = I18N.t("home.weather.loading");
+        else if (weatherState.status === "error") status.textContent = I18N.t(weatherState.errorKey);
+        else status.textContent = I18N.t("home.weather.intro");
+        return;
+      }
+
+      var current = weatherState.data.current;
+      var units = weatherState.data.current_units || {};
+      var condition = weatherCondition(Number(current.weather_code), Number(current.is_day) === 1);
+      document.getElementById("home-weather-icon").innerHTML = ICON(condition.icon);
+      document.getElementById("home-weather-temperature").textContent = Math.round(current.temperature_2m) + (units.temperature_2m || "°C");
+      document.getElementById("home-weather-condition").textContent = I18N.t(condition.key);
+      document.getElementById("home-weather-feels").textContent = Math.round(current.apparent_temperature) + (units.apparent_temperature || "°C");
+      document.getElementById("home-weather-humidity").textContent = Math.round(current.relative_humidity_2m) + (units.relative_humidity_2m || "%");
+      document.getElementById("home-weather-wind").textContent = Math.round(current.wind_speed_10m) + " " + (units.wind_speed_10m || "km/h");
+      result.hidden = false;
+      status.hidden = true;
+    }
+
+    /*
+      坐标保留两位小数（约公里级）后再发送：天气模型不需要门牌级精度，
+      这样能在满足本地天气需求的同时减少不必要的位置精度暴露。
+    */
+    function fetchWeather(latitude, longitude) {
+      var lat = Number(latitude).toFixed(2);
+      var lon = Number(longitude).toFixed(2);
+      var fields = "temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,wind_speed_10m";
+      var endpoint = "https://api.open-meteo.com/v1/forecast?latitude=" + lat +
+        "&longitude=" + lon + "&current=" + fields + "&timezone=auto&forecast_days=1";
+      var controller = typeof AbortController === "function" ? new AbortController() : null;
+      var timer = window.setTimeout(function () { if (controller) controller.abort(); }, 10000);
+
+      fetch(endpoint, controller ? { signal: controller.signal } : {})
+        .then(function (response) {
+          if (!response.ok) throw new Error("Weather HTTP " + response.status);
+          return response.json();
+        })
+        .then(function (payload) {
+          if (!payload || !payload.current) throw new Error("Weather payload missing current data");
+          weatherState.status = "ready";
+          weatherState.data = payload;
+          weatherState.errorKey = "";
+        })
+        .catch(function () {
+          weatherState.status = "error";
+          weatherState.data = null;
+          weatherState.errorKey = "home.weather.network";
+        })
+        .then(function () {
+          window.clearTimeout(timer);
+          renderWeather();
+        });
+    }
+
+    // 定位必须由按钮点击触发；浏览器会负责展示并记录用户的权限选择。
+    function requestWeather() {
+      if (!navigator.geolocation || typeof window.fetch !== "function" || !window.isSecureContext) {
+        weatherState.status = "error";
+        weatherState.errorKey = "home.weather.unsupported";
+        renderWeather();
+        return;
+      }
+
+      weatherState.status = "loading";
+      weatherState.errorKey = "";
+      renderWeather();
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          fetchWeather(position.coords.latitude, position.coords.longitude);
+        },
+        function (error) {
+          weatherState.status = "error";
+          weatherState.errorKey = error && error.code === 1
+            ? "home.weather.denied"
+            : "home.weather.unavailable";
+          renderWeather();
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 900000 }
+      );
+    }
+
     // 渲染整个首页（Hero + 卡片 + 最新动态）。幂等，可反复调用。
     function renderHome() {
       var lang = I18N.getLang();
@@ -453,6 +617,7 @@
 
       renderCalendar(posts, lang);
       renderClock();
+      renderWeather();
 
       // ---- 4) 最近在做：每个分类取第一项作为摘要 ----
       var nowHost = document.getElementById("home-now");
@@ -509,6 +674,8 @@
 
     // 立即渲染一次（脚本在 body 末尾，DOM 已就绪）。
     renderHome();
+    var weatherButton = document.getElementById("home-weather-locate");
+    if (weatherButton) weatherButton.addEventListener("click", requestWeather);
     window.setInterval(renderClock, 1000);
   })();
   </script>

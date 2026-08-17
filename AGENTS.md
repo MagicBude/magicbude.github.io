@@ -5,13 +5,14 @@
 ## 项目是什么
 
 个人网站（不是纯博客），公开定位为「个人数字基地」；数字花园是其中整理知识与想法的内容部分，同时承担多站 portal。
-**主站零构建、纯静态**：原生 HTML / CSS / JS，无框架、无打包器、无外部运行时依赖、无 CDN。
+**主站零构建、纯静态**：原生 HTML / CSS / JS，无框架、无打包器、无外部 UI 运行时依赖、无 CDN。
 可直接双击打开；本地预览用 `python -m http.server`（在仓库根目录启动）。
 `tools/build.mjs` 是唯一例外，而且只在写 Markdown 文章时按需运行，不参与主站页面开发。
 
 ## 技术栈与约束
 
-- 无框架、无打包器。所有 CSS / JS 内联或本地文件，**零外链资源**。
+- 无框架、无打包器。CSS、JS、字体、图片与图标必须本地托管；允许经过评估的外部**数据 API**，禁止用 CDN 引入页面运行时代码。
+- 外部数据能力必须渐进增强：失败时不影响核心内容；主动发送位置等隐私数据前必须由访客触发；前端禁止存 API 密钥；遵守来源署名、许可和调用限制。
 - 视觉是「4 种可切换皮肤」：`<html data-style>` 切 `instrument / minimal / terminal / magazine`，
   配色全用 `var(--color-*)` 抽象变量（见 `assets/css/main.css`）。换皮肤 = 换变量，组件零改动。
   明暗嵌在皮肤里（instrument / terminal 暗，minimal / magazine 亮），不再单独做亮暗开关。
@@ -29,7 +30,7 @@
 - `assets/css/` `assets/js/`：样式、核心脚本与共享数据。**提交**。
 - `blog/`：列表页与文章详情页（详情为构建产物，提交）。`content/posts/`：Markdown 源（提交）。
 - `.internal/`：本地草稿 / 笔记 / 对话记录，**gitignore 不提交**，需要时取出即用。
-- `index.html` = 网站首页；`home/index.html` 仅保留为旧地址兼容跳转，不承载内容。
+- `index.html` = 网站首页；不再保留 `home/` 兼容目录。
 - `.github/workflows/`：当前仅保留占位；部署方式确认后再添加真实工作流。
 
 ## 编码规范（教材级，最重要）

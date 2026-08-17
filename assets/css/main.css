@@ -1311,6 +1311,104 @@ hr {
   overflow-wrap: anywhere;
 }
 
+/* --- 首页实时天气 ---------------------------------------------------------
+   天气卡片把“主要读数”和“三项补充数据”分层：先扫到温度与天气，再查看体感等细节。
+   所有颜色仍来自皮肤令牌，外部 API 只提供数据，不控制任何视觉表现。 */
+
+.home-weather__primary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.home-weather__icon {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.home-weather__icon .icon {
+  width: 28px;
+  height: 28px;
+}
+
+.home-weather__temperature {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+}
+
+.home-weather__condition {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.home-weather__details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.home-weather__details div {
+  min-width: 0;
+}
+
+.home-weather__details dt {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.home-weather__details dd {
+  margin-top: var(--space-1);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.home-weather__status {
+  margin-top: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.home-weather__button {
+  width: 100%;
+  min-height: 44px;
+  justify-content: center;
+  margin-top: var(--space-4);
+}
+
+.home-weather__button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.home-weather__credit {
+  margin-top: var(--space-3);
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+}
+
+.home-weather__credit a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .home-calendar__grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));

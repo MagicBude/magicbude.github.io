@@ -157,7 +157,6 @@ window.SITE_CONFIG = {
 | 页面 | 文件 | 说明 |
 |------|------|------|
 | 首页 | `index.html` | 总枢纽：原创封面 + 可编辑简介 + 各板块快捷入口 + 全站最新动态 |
-| 兼容跳转 | `home/index.html` | 接住旧 `/home/` 书签并跳转到根首页，不参与导航与索引 |
 | 博客列表 | `blog/index.html` | 读文章数据渲染，支持按语言/标签筛选 |
 | 文章详情 | `blog/<slug>/index.html` | 构建脚本生成 |
 | 项目 | `projects/index.html` | GitHub / Gitee 项目、自建子站链接 |
