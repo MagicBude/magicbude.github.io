@@ -2,7 +2,8 @@
 <!--
   search/index.html - 站内搜索页
   协同：assets/js/core/ 公共脚本，以及文章、项目、链接、工具四类共享数据文件。
-  数据驱动：输入框触发 window.renderSearch，把四类内容归一为 INDEX 后过滤渲染。
+  数据驱动：页面把导航和四类共享数据归一为本地 INDEX，支持关键词、类型筛选与分组渲染；
+  所有搜索都在浏览器内完成，不向外部服务发送输入内容。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -10,7 +11,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>搜索 · magicbude</title>
-  <meta name="description" content="搜索站内页面、博客文章、项目、友链与资源。">
+  <meta name="description" content="在浏览器本地搜索 magicbude 的页面、文章、项目、资源与参考工具。">
 
   <script>
     (function () {
@@ -37,15 +38,30 @@
   <header id="site-header" class="site-header"></header>
 
   <main class="site-main" id="main">
-    <section class="hero container container--narrow">
-      <p class="page-eyebrow" data-i18n="search.eyebrow">搜索</p>
-      <h1 class="hero__name" data-i18n="search.title">搜一搜</h1>
-    </section>
+    <!-- #region 搜索引言与索引摘要 -->
+    <section class="hero container search-hero">
+      <div class="search-hero__copy">
+        <p class="page-eyebrow" data-i18n="search.eyebrow">全站索引</p>
+        <h1 class="hero__name" data-i18n="search.title">搜索这座数字基地</h1>
+        <p class="lead" data-i18n="search.lead">从页面、文章、项目、资源和工具中查找内容，也可以不输入关键词，直接按类型浏览。</p>
+      </div>
 
-    <section class="section container container--narrow">
-      <!-- 搜索框：左侧放大镜图标由 CSS 绝对定位浮在上面 -->
-      <div class="search-form">
-        <span class="icon-wrap" id="search-icon"></span>
+      <!-- 索引数量由共享数据实时计算，避免内容增加后手写数字失真。 -->
+      <aside class="search-index" aria-labelledby="search-index-title">
+        <p class="search-index__kicker" id="search-index-title" data-i18n="search.snapshot.kicker">LOCAL INDEX</p>
+        <dl class="search-index__stats">
+          <div><dt data-i18n="search.items">索引条目</dt><dd id="search-item-count">0</dd></div>
+          <div><dt data-i18n="search.sources">内容类型</dt><dd id="search-kind-count">0</dd></div>
+        </dl>
+      </aside>
+    </section>
+    <!-- #endregion 搜索引言与索引摘要 -->
+
+    <!-- #region 查询控件与结果索引 -->
+    <section class="section container search-workspace">
+      <div class="search-console">
+        <label class="sr-only" for="search-input" data-i18n="search.label">搜索关键词</label>
+        <span class="search-console__icon" id="search-icon" aria-hidden="true"></span>
         <input
           id="search-input"
           class="search-input"
@@ -55,15 +71,25 @@
           data-i18n-attr="placeholder,aria-label"
           placeholder="搜索站内内容…"
           aria-label="搜索">
+        <span class="search-console__shortcut" data-i18n="search.shortcut">按 / 聚焦</span>
+        <button class="search-console__clear" id="search-clear" type="button" hidden data-i18n="search.clear" data-i18n-attr="aria-label">清空搜索</button>
       </div>
 
-      <p class="search-stats" id="search-stats" hidden></p>
-      <p class="search-stats" id="search-hint" data-i18n="search.hint">支持搜索页面、文章、项目、友链与资源。</p>
+      <!-- 类型按钮由 INDEX 统计生成，aria-pressed 表达当前选中状态。 -->
+      <div class="search-toolbar">
+        <div class="search-filters" id="search-filters" data-i18n="search.filtersLabel" data-i18n-attr="aria-label" aria-label="按内容类型筛选"></div>
+        <p class="search-stats" id="search-stats" aria-live="polite"></p>
+      </div>
 
-      <!-- 结果列表由 renderSearch 填充 -->
-      <div class="result-list" id="search-results"></div>
-      <p class="empty-state" id="search-empty" hidden data-i18n="search.empty">没有匹配的内容，换个关键词试试。</p>
+      <!-- 结果按内容类型分组；空查询时就是完整站点地图。 -->
+      <div class="search-groups" id="search-results"></div>
+      <div class="search-empty" id="search-empty" hidden>
+        <span aria-hidden="true" id="search-empty-icon"></span>
+        <p class="search-empty__title" data-i18n="search.empty">没有匹配的内容，换个关键词试试。</p>
+        <p class="search-empty__lead" data-i18n="search.emptyLead">可以清空关键词，或者切回“全部”查看完整索引。</p>
+      </div>
     </section>
+    <!-- #endregion 查询控件与结果索引 -->
   </main>
 
   <footer id="site-footer" class="site-footer"></footer>
@@ -82,12 +108,9 @@
   <script src="../assets/js/core/main.js"></script>
 
   <!--
-    搜索页「数据 → DOM」+ 事件驱动。
-    思路：
-      1) 建索引：把「页面 / 博客文章 / 项目 / 友链与资源」统一成一种结构 {title, url, excerpt, kind}，
-         存进 INDEX 数组。这样后面过滤逻辑只认这一种结构，不用管数据来自哪。
-      2) 过滤：输入时取输入框文字，转小写，去 title/excerpt/kind 里 substring 匹配。
-      3) 渲染：把命中项拼成 .result 卡片，带类型徽章。
+    搜索页「异构数据 → 本地索引 → 类型筛选 / 关键词过滤 → 分组结果」。
+    索引同时保存当前语言展示字段和中英双语搜索文本，所以中文界面也能搜英文项目名；
+    所有过滤都在浏览器内完成，输入内容不会离开访客设备。
     这是「把异构数据先归一、再做统一处理」的常见前端套路，值得记住。
   -->
   <script>
@@ -98,16 +121,27 @@
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
     var CONFIG = window.SITE_CONFIG || {};
 
-    var INDEX = [];        // 全局搜索索引
-    var bound = false;      // 输入监听只绑定一次，避免语言切换时重复绑定
+    var KIND_ORDER = ["page", "blog", "project", "link", "tool"];
+    var KIND_ICON = { page: "layout", blog: "book", project: "code", link: "link", tool: "tool" };
+    var INDEX = [];
+    var activeKind = "all";
+    var bound = false;
 
     // 把任意字符串安全地转小写（防止 null/undefined 报错）
     function lc(s) { return (s || "").toString().toLowerCase(); }
 
-    // 从 { zh: "...", en: "..." } 形式的字段中读取当前语言；缺译文时回退到中文。
+    // 从双语对象中读取当前语言；普通字符串也直接返回，兼容文章标题等旧数据。
     function bi(field) {
       var lang = I18N.getLang();
-      return (field && field[lang]) ? field[lang] : (field && field.zh) || "";
+      if (typeof field === "string") return field;
+      return (field && field[lang]) ? field[lang] : (field && field.zh) || (field && field.en) || "";
+    }
+
+    // 搜索文本同时收纳中英内容，不让界面语言限制访客能找到什么。
+    function bilingualText(field) {
+      if (typeof field === "string") return field;
+      if (!field) return "";
+      return [field.zh, field.en].filter(Boolean).join(" ");
     }
 
     /*
@@ -116,7 +150,7 @@
      * 把安全边界放在渲染出口，比要求每个数据源自行转义更可靠。
      */
     function escapeHtml(value) {
-      return String(value)
+      return String(value == null ? "" : value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -130,7 +164,11 @@
       return /^(?:[a-z]+:|\/\/)/i.test(url) ? url : window.siteUrl(url);
     }
 
-    // 建索引：从多个数据源归一成一个数组。
+    function isExternalUrl(url) {
+      return /^(?:https?:|mailto:|\/\/)/i.test(url || "");
+    }
+
+    // 建索引：所有来源归一为 title / excerpt / meta / kind / searchText。
     function buildIndex() {
       var items = [];
 
@@ -141,8 +179,10 @@
         items.push({
           title: I18N.t(n.i18n),
           url: n.href,
-          excerpt: "",
+          excerpt: CONFIG.name || "magicbude",
+          meta: n.href,
           kind: "page",
+          searchText: [I18N.t(n.i18n), n.key, n.href].join(" "),
         });
       });
 
@@ -152,7 +192,9 @@
           title: p.title || "",
           url: p.url || "",
           excerpt: p.excerpt || "",
+          meta: [p.date, (p.tags || []).join(" · ")].filter(Boolean).join(" · "),
           kind: "blog",
+          searchText: [p.title, p.excerpt, p.summary, (p.tags || []).join(" ")].join(" "),
         });
       });
 
@@ -162,7 +204,9 @@
           title: bi(p.title),
           url: p.url || "",
           excerpt: bi(p.desc),
+          meta: [I18N.t("projects.status." + p.status), (p.tags || []).join(" · ")].filter(Boolean).join(" · "),
           kind: "project",
+          searchText: [bilingualText(p.title), bilingualText(p.desc), (p.tags || []).join(" "), p.status].join(" "),
         });
       });
 
@@ -174,7 +218,9 @@
             title: link.name || "",
             url: link.url || "",
             excerpt: bi(link.note),
+            meta: link.url || "",
             kind: "link",
+            searchText: [link.name, bilingualText(link.note), link.category].join(" "),
           });
         });
       });
@@ -185,84 +231,144 @@
           title: tool.name || "",
           url: tool.url || "",
           excerpt: bi(tool.note),
+          meta: tool.url || "",
           kind: "tool",
+          searchText: [tool.name, bilingualText(tool.note), tool.category].join(" "),
         });
       });
 
       INDEX = items;
     }
 
-    // 渲染：根据当前输入框文字过滤并画结果。
+    function countByKind(kind) {
+      return INDEX.filter(function (item) { return item.kind === kind; }).length;
+    }
+
+    function renderSummary() {
+      var itemCount = document.getElementById("search-item-count");
+      var kindCount = document.getElementById("search-kind-count");
+      if (itemCount) itemCount.textContent = INDEX.length;
+      if (kindCount) kindCount.textContent = KIND_ORDER.filter(function (kind) { return countByKind(kind) > 0; }).length;
+    }
+
+    function renderFilters() {
+      var root = document.getElementById("search-filters");
+      if (!root) return;
+      var buttons = [{ key: "all", count: INDEX.length }].concat(KIND_ORDER.map(function (kind) {
+        return { key: kind, count: countByKind(kind) };
+      }).filter(function (item) { return item.count > 0; }));
+      root.innerHTML = buttons.map(function (item) {
+        var label = item.key === "all" ? I18N.t("search.filterAll") : I18N.t("search.kind." + item.key);
+        var icon = item.key === "all" ? "search" : KIND_ICON[item.key];
+        return '<button class="search-filter' + (activeKind === item.key ? " is-active" : "") +
+          '" type="button" data-kind="' + item.key + '" aria-pressed="' + (activeKind === item.key) + '">' +
+          ICON(icon) + '<span>' + escapeHtml(label) + '</span><span class="search-filter__count">' + item.count + "</span></button>";
+      }).join("");
+    }
+
+    function renderResult(item, index) {
+      var external = isExternalUrl(item.url);
+      var attrs = external ? ' target="_blank" rel="noopener"' : "";
+      return '<a class="search-result" href="' + escapeHtml(resolveUrl(item.url)) + '"' + attrs + ">" +
+        '<span class="search-result__index">' + String(index + 1).padStart(2, "0") + "</span>" +
+        '<span class="search-result__body"><strong>' + escapeHtml(item.title) + "</strong>" +
+          '<span class="search-result__excerpt">' + escapeHtml(item.excerpt) + "</span>" +
+          '<span class="search-result__meta">' + escapeHtml(item.meta) + "</span></span>" +
+        '<span class="search-result__action">' + escapeHtml(I18N.t("search.open")) + ICON(external ? "external" : "arrowRight") + "</span>" +
+      "</a>";
+    }
+
+    function renderGroup(kind, items) {
+      var countKey = items.length === 1 ? "search.groupItem" : "search.groupCount";
+      return '<section class="search-group">' +
+        '<header class="search-group__heading"><span class="search-group__icon">' + ICON(KIND_ICON[kind]) + "</span>" +
+          '<h2>' + escapeHtml(I18N.t("search.kind." + kind)) + "</h2>" +
+          '<span>' + escapeHtml(I18N.t(countKey).replace("{n}", items.length)) + "</span></header>" +
+        '<div class="search-group__list">' + items.map(renderResult).join("") + "</div></section>";
+    }
+
+    // 先按类型、再按关键词过滤；空查询保留完整索引，承担站点地图角色。
     function renderSearch() {
-      buildIndex(); // 语言切换后页面标题会变化，因此每次渲染都重新建立轻量索引。
-      var q = lc(document.getElementById("search-input").value).trim();
+      buildIndex();
+      var input = document.getElementById("search-input");
+      var q = lc(input && input.value).trim();
       var results = document.getElementById("search-results");
       var empty = document.getElementById("search-empty");
       var stats = document.getElementById("search-stats");
-      var hint = document.getElementById("search-hint");
+      var clear = document.getElementById("search-clear");
       if (!results) return;
 
-      // substring 匹配：空查询 → 显示全部（相当于站内地图）
-      var hits = INDEX.filter(function (it) {
-        if (!q) return true;
-        return lc(it.title).indexOf(q) >= 0 ||
-               lc(it.excerpt).indexOf(q) >= 0 ||
-               lc(it.kind).indexOf(q) >= 0;
+      var hits = INDEX.filter(function (item) {
+        var kindMatches = activeKind === "all" || item.kind === activeKind;
+        var queryMatches = !q || lc([item.title, item.excerpt, item.meta, item.searchText, item.kind].join(" ")).indexOf(q) >= 0;
+        return kindMatches && queryMatches;
       });
 
-      // 统计与提示的显隐
-      if (q) {
-        if (stats) {
-          stats.hidden = false;
-          // {n} 占位符替换成真实数量（i18n 里写 "找到 {n} 条结果"）
-          stats.textContent = I18N.t("search.results").replace("{n}", hits.length);
-        }
-        if (hint) hint.hidden = true;
-      } else {
-        if (stats) stats.hidden = true;
-        if (hint) hint.hidden = false;
-      }
+      renderSummary();
+      renderFilters();
+      if (clear) clear.hidden = !q;
+      if (stats) stats.textContent = I18N.t(q || activeKind !== "all" ? "search.results" : "search.browse").replace("{n}", hits.length);
 
-      if (hits.length === 0) {
+      if (!hits.length) {
         results.innerHTML = "";
         if (empty) empty.hidden = false;
         return;
       }
       if (empty) empty.hidden = true;
 
-      // 命中项 → 结果卡片。type 徽章用 i18n 的 search.kind.*
-      results.innerHTML = hits.map(function (it) {
-        var kindLabel = escapeHtml(I18N.t("search.kind." + it.kind));
-        var excerpt = it.excerpt
-          ? '<p class="result__excerpt">' + escapeHtml(it.excerpt) + "</p>"
-          : "";
-        return (
-          '<a class="result" href="' + escapeHtml(resolveUrl(it.url)) + '">' +
-            '<span class="result__kind">' + kindLabel + "</span>" +
-            '<span class="result__title">' + escapeHtml(it.title) + "</span>" +
-            excerpt +
-          "</a>"
-        );
+      results.innerHTML = KIND_ORDER.map(function (kind) {
+        var group = hits.filter(function (item) { return item.kind === kind; });
+        return group.length ? renderGroup(kind, group) : "";
       }).join("");
     }
 
-    // 首次绑定输入监听（只一次）
+    function clearSearch() {
+      var input = document.getElementById("search-input");
+      if (!input) return;
+      input.value = "";
+      input.focus();
+      renderSearch();
+    }
+
+    // 事件只绑定一次；语言切换只重建文本，不会叠加监听器。
     function bindOnce() {
       if (bound) return;
       var input = document.getElementById("search-input");
       var iconHost = document.getElementById("search-icon");
+      var emptyIcon = document.getElementById("search-empty-icon");
+      var filters = document.getElementById("search-filters");
+      var clear = document.getElementById("search-clear");
       if (iconHost) iconHost.innerHTML = ICON("search");
-      if (input) {
-        // input 事件在每次按键/输入变化时触发，比 change（失焦才触发）更跟手。
-        input.addEventListener("input", renderSearch);
-        bound = true;
-      }
+      if (emptyIcon) emptyIcon.innerHTML = ICON("search");
+      if (!input) return;
+
+      input.addEventListener("input", renderSearch);
+      if (clear) clear.addEventListener("click", clearSearch);
+      if (filters) filters.addEventListener("click", function (event) {
+        var button = event.target.closest("[data-kind]");
+        if (!button) return;
+        activeKind = button.getAttribute("data-kind") || "all";
+        renderSearch();
+      });
+      document.addEventListener("keydown", function (event) {
+        var target = event.target;
+        var isTyping = target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName);
+        if (event.key === "/" && !isTyping && !event.metaKey && !event.ctrlKey && !event.altKey) {
+          event.preventDefault();
+          input.focus();
+        }
+        if (event.key === "Escape" && document.activeElement === input && input.value) clearSearch();
+      });
+      bound = true;
     }
 
     // 暴露给 main.js 的语言切换钩子
     window.renderSearch = function () { bindOnce(); renderSearch(); };
 
-    // 页面加载即初始化
+    // 允许以后用 /search/?q=关键词 分享查询；没有参数时保持完整索引。
+    var initialQuery = new URLSearchParams(window.location.search).get("q");
+    if (initialQuery) document.getElementById("search-input").value = initialQuery;
+
     bindOnce();
     renderSearch();
   })();

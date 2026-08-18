@@ -21,7 +21,7 @@ magicbude.github.io/
 ├─ links/                             # 导航栏目目录，对应网址 /links/
 │  └─ index.html                      # 已确认友链、交换入口与网页资源收藏
 ├─ search/                            # 搜索栏目目录，对应网址 /search/
-│  └─ index.html                      # 在浏览器中搜索页面、文章、项目和链接
+│  └─ index.html                      # 浏览器本地双语搜索与分组全站索引
 ├─ blog/                              # 博客公开页面目录，同时包含列表页和文章子路由
 │  ├─ index.html                      # 博客列表与筛选页面，对应网址 /blog/
 │  └─ <slug>/                         # 单篇文章的语义化路由目录
