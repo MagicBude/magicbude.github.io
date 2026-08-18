@@ -16,7 +16,7 @@ magicbude 的个人数字基地与原生前端学习项目，用于汇集项目�
 node tools/build.mjs
 ```
 
-它只更新 `blog/<slug>/index.html`、`assets/js/data/posts.js` 和 `feed.xml`，不会改写其他页面、公共样式、公共脚本或项目文档。
+它只更新 `blog/<slug>/index.html`、`assets/js/data/posts.js`、`feed.xml` 和 `sitemap.xml`，不会改写其他页面、公共样式、公共脚本或项目文档。
 
 ## 从哪里开始阅读
 

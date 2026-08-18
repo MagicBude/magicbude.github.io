@@ -3,7 +3,7 @@
  * ============================================================================
  * 博客构建脚本（仅在「写作时」手动运行，例如：`node tools/build.mjs`）。
  *
- * 它做三件事：
+ * 它做四件事：
  *   1. 读 content/posts/*.md（你写的 Markdown 源）→ 解析 frontmatter + 正文
  *   2. 用内置的 Markdown→HTML 转换器，生成 blog/<slug>/index.html（完整静态详情页）
  *   3. 重新生成 assets/js/data/posts.js（window.POSTS，供 blog/ / 根首页渲染）

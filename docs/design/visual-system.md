@@ -146,7 +146,7 @@ window.SITE_CONFIG = {
   1. 读 `content/posts/*.md` → 解析 frontmatter + 正文
   2. 用共享模板生成 `blog/<slug>/index.html`（含 header/footer + i18n 钩子 + 上一篇/下一篇 + TOC）
   3. 重新生成 `assets/js/data/posts.js`（文章数组，供 `blog/` 列表渲染）
-  4. 重新生成 `feed.xml`（RSS）
+  4. 重新生成 `feed.xml`（RSS）与 `sitemap.xml`（静态栏目和文章网址）
 - **网页呈现**：`blog/index.html` 读 `assets/js/data/posts.js` 渲染列表（数据→DOM，可学）；点卡片进 `blog/<slug>/index.html` 详情（纯静态 HTML，可对照源码）。
 - 脚本本身短小可读，也能当教材看「MD 怎么变 HTML」。
 
@@ -165,7 +165,7 @@ window.SITE_CONFIG = {
 | 404 | `404.html` | 找不到页面 |
 | 搜索 | `search/index.html` | 客户端统一过滤页面、文章、项目、友链与资源 |
 | RSS | `feed.xml` | 构建脚本生成（功能） |
-| 站点地图 | `sitemap.xml` | 构建或手写（功能） |
+| 站点地图 | `sitemap.xml` | 构建器生成静态栏目与文章网址（功能） |
 
 > GitHub Pages 用户站根目录必须是 `index.html`，本站让根文件直接承载正式首页，减少一次无意义的“进入”操作。
 

@@ -2922,26 +2922,6 @@ hr {
   justify-self: start;
 }
 
-/* 分类分组：一个分类标题 + 下面一套卡片网格。
-   margin-top 让不同分类之间留白，避免挤在一起。 */
-.subsection { margin-top: var(--space-8); }
-.subsection:first-of-type { margin-top: 0; }
-.subsection__title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-xl);
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  margin: 0 0 var(--space-4);
-  color: var(--color-text);
-}
-.subsection__title .icon { color: var(--color-accent); }
-
-/* 链接卡片（导航页用）：在 .card 基础上强调「外链」属性。
-   复用 .card 的圆角/边框，只补一条外链箭头提示这是跳出本站。 */
-.card--link .card__link { color: var(--color-accent); }
-
 /* ---- 搜索页 ------------------------------------------------------------- */
 .search-hero {
   display: grid;

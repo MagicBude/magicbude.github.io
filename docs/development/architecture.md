@@ -57,7 +57,7 @@ magicbude.github.io/
 ├─ .github/                           # GitHub 平台配置与未来自动化工作流
 ├─ .internal/                         # 不提交的草稿、历史备份和本地参考资料
 ├─ feed.xml                           # RSS 订阅文件，由博客构建器更新
-├─ sitemap.xml                        # 搜索引擎使用的公开网址清单，手工维护
+├─ sitemap.xml                        # 搜索引擎使用的公开网址清单，由博客构建器更新
 ├─ robots.txt                         # 告诉搜索引擎允许抓取的范围和站点地图位置
 ├─ .nojekyll                          # 关闭 Jekyll，让 Pages 原样发布所有静态文件
 ├─ README.md                          # 面向访客和协作者的仓库快速说明
@@ -82,10 +82,11 @@ content/posts/<slug>.md
           └─ node tools/build.mjs
                     ├─ blog/<slug>/index.html
                     ├─ assets/js/data/posts.js
-                    └─ feed.xml
+                    ├─ feed.xml
+                    └─ sitemap.xml
 ```
 
-这三个产物都提交到仓库，所以 GitHub Pages 只负责发布静态文件，不需要在线安装依赖或执行构建。
+这四个产物都提交到仓库，所以 GitHub Pages 只负责发布静态文件，不需要在线安装依赖或执行构建。
 
 ## 发布前检查
 
