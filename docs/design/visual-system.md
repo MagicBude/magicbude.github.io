@@ -161,7 +161,7 @@ window.SITE_CONFIG = {
 | 文章详情 | `blog/<slug>/index.html` | 构建脚本生成 |
 | 项目 | `projects/index.html` | GitHub / Gitee 项目、自建子站链接 |
 | 近况 | `now/index.html` | 当前在玩 / 看 / 搞啥（nownownow 概念） |
-| 装备 | `uses/index.html` | 我在用的硬件 / 软件 / 服务（可选附产品或官网链接） |
+| 工作台 | `uses/index.html` | 可验证的本站制作流程 / 参考工具箱（个人设备需确认后加入） |
 | 导航 / 友链 | `links/index.html` | 其他站、朋友站、资源收藏 |
 | 关于 | `about/index.html` | 通用自我介绍（中英双语，内容来自 site.config） |
 | 404 | `404.html` | 找不到页面 |

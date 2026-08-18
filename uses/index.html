@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <!--
-  uses/index.html - 装备页
+  uses/index.html - 工作台与工具箱页
   协同：assets/js/core/ 中的公共头部、页脚与多语言脚本。
-  数据驱动：assets/js/data/uses.js 提供装备、工具与分类，页面脚本只负责筛选和渲染。
+  数据驱动：assets/js/data/uses.js 提供已确认工作流、参考工具与分类；
+  页面脚本负责统计、双语渲染和分类筛选，不在 HTML 中写死个人设备。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>装备 · magicbude</title>
-  <meta name="description" content="magicbude 日常在用的硬件与软件。">
+  <title>工作台 · magicbude</title>
+  <meta name="description" content="magicbude 制作个人网站的已确认工作流，以及一份不等同于日常使用的参考工具箱。">
 
   <script>
     (function () {
@@ -37,40 +38,64 @@
   <header id="site-header" class="site-header"></header>
 
   <main class="site-main" id="main">
-    <section class="hero container container--narrow">
-      <p class="page-eyebrow" data-i18n="uses.eyebrow">装备</p>
-      <h1 class="hero__name" data-i18n="uses.title">我在用什么</h1>
-      <p class="lead" data-i18n="uses.lead">日常使用的硬件、软件与服务，以及选择它们的原因。</p>
-    </section>
+    <!-- #region 工作台引言与核对信息 -->
+    <section class="hero container uses-hero">
+      <div class="uses-hero__copy">
+        <p class="page-eyebrow" data-i18n="uses.eyebrow">工作台</p>
+        <h1 class="hero__name" data-i18n="uses.title">本站如何被制作</h1>
+        <p class="lead" data-i18n="uses.lead">先公开能够从仓库确认的制作流程；个人设备与日常软件等信息，确认以后再加入。</p>
+      </div>
 
-    <div class="container">
-      <!-- #region 我的装备 -->
-      <section class="subsection" aria-labelledby="gear-title">
-        <h2 class="subsection__title" id="gear-title">
-          <span id="gear-title-icon" aria-hidden="true"></span>
-          <span data-i18n="uses.gearTitle">我的装备</span>
-        </h2>
-        <p class="section__intro" data-i18n="uses.gearLead">我实际使用的设备、软件与服务；这部分会随着使用习惯继续更新。</p>
+      <!-- 右侧摘要由 uses.js 的真实数组计算，数据增减时不需要手改数字。 -->
+      <aside class="uses-ledger" aria-labelledby="uses-ledger-title">
+        <div class="uses-ledger__topline">
+          <span class="uses-ledger__mark" aria-hidden="true"></span>
+          <p id="uses-ledger-title" data-i18n="uses.snapshot.kicker">VERIFIED WORKFLOW</p>
+        </div>
+        <p class="uses-ledger__updated"><span data-i18n="uses.updated">最后核对</span> <time id="uses-updated" datetime="2026-08-18">2026.08.18</time></p>
+        <dl class="uses-ledger__stats">
+          <div><dt data-i18n="uses.categories">流程分组</dt><dd id="uses-category-count">0</dd></div>
+          <div><dt data-i18n="uses.steps">确认条目</dt><dd id="uses-item-count">0</dd></div>
+          <div><dt data-i18n="uses.references">参考工具</dt><dd id="uses-tool-count">0</dd></div>
+        </dl>
+        <p class="uses-ledger__note" data-i18n="uses.snapshot.note">这里的“正在使用”只指已核实的本站工作流，不延伸猜测个人设备。</p>
+      </aside>
+    </section>
+    <!-- #endregion 工作台引言与核对信息 -->
+
+    <div class="container uses-content">
+      <!-- #region 已确认工作台 -->
+      <section class="uses-block" aria-labelledby="gear-title">
+        <header class="uses-block__heading">
+          <p class="uses-block__index">01 / WORKBENCH</p>
+          <div>
+            <h2 id="gear-title" data-i18n="uses.gearTitle">已确认的工作台</h2>
+            <p data-i18n="uses.gearLead">这些内容可以直接由当前仓库结构、文件和发布方式验证。</p>
+          </div>
+        </header>
         <div id="uses-root"></div>
       </section>
-      <!-- #endregion 我的装备 -->
+      <!-- #endregion 已确认工作台 -->
 
-      <!-- #region 工具箱 -->
-      <section class="subsection" aria-labelledby="toolbox-title">
-        <h2 class="subsection__title" id="toolbox-title">
-          <span id="toolbox-title-icon" aria-hidden="true"></span>
-          <span data-i18n="uses.toolboxTitle">工具箱</span>
-        </h2>
-        <p class="section__intro" data-i18n="uses.toolboxLead">值得收藏的软件与开发工具目录；收录不等于当前正在使用。</p>
+      <!-- #region 参考工具箱 -->
+      <section class="uses-block uses-block--toolbox" aria-labelledby="toolbox-title">
+        <header class="uses-block__heading">
+          <p class="uses-block__index">02 / REFERENCE</p>
+          <div>
+            <h2 id="toolbox-title" data-i18n="uses.toolboxTitle">参考工具箱</h2>
+            <p data-i18n="uses.toolboxLead">一份精简的软件索引，方便需要时回看；收录不代表已经安装、购买或正在使用。</p>
+          </div>
+        </header>
 
         <!--
           筛选按钮由数据中的分类动态生成。使用一个容器监听点击事件，
           即使以后增加分类，也不需要为每个新按钮单独绑定监听器。
         -->
         <div class="toolbox-filters" id="toolbox-filters" aria-label="工具分类"></div>
-        <div class="card-grid" id="toolbox-root"></div>
+        <div class="toolbox-list" id="toolbox-root"></div>
+        <p class="empty-state" id="toolbox-empty" hidden data-i18n="uses.empty">这个分类还没有工具。</p>
       </section>
-      <!-- #endregion 工具箱 -->
+      <!-- #endregion 参考工具箱 -->
     </div>
   </main>
 
@@ -85,8 +110,8 @@
   <script src="../assets/js/data/uses.js"></script>
 
   <!--
-    装备页「数据 → DOM」：装备按分类进行两层渲染；工具箱先按当前分类筛选，
-    再将结果映射为卡片。切换语言时 main.js 会再次调用 window.renderUses。
+    工作台页「数据 → DOM」：已确认流程按分类渲染，摘要数字从数组计算；
+    参考工具箱先按当前分类筛选，再映射为紧凑索引。切换语言时 main.js 会重新调用。
   -->
   <script>
   (function () {
@@ -111,15 +136,22 @@
       return value && (value[lang] || value.zh || value.en) || "";
     }
 
-    // 有链接的装备用 <a>，纯说明项用 <article>；避免用 href="#" 制造无意义的页面跳动。
-    function renderGearCard(item, lang) {
+    // 名称允许使用普通字符串或双语对象，旧数据迁移时也不会渲染成 [object Object]。
+    function localizeName(value, lang) {
+      return typeof value === "string" ? value : localized(value, lang);
+    }
+
+    // 有资料链接的条目使用 <a>，纯站内事实使用 <article>，不制造 href="#" 的假链接。
+    function renderWorkflowCard(item, lang, index) {
       var tag = item.url ? "a" : "article";
       var attrs = item.url ? ' href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener"' : "";
       return (
-        "<" + tag + ' class="card"' + attrs + ">" +
-          '<span class="card__title">' + escapeHtml(item.name) + "</span>" +
-          '<span class="card__desc">' + escapeHtml(localized(item.note, lang)) + "</span>" +
-          (item.url ? '<span class="card__link">' + I18N.t("uses.officialSite") + ICON("external") + "</span>" : "") +
+        "<" + tag + ' class="uses-workflow-card"' + attrs + ">" +
+          '<header class="uses-workflow-card__top"><span>' + String(index + 1).padStart(2, "0") +
+          '</span><span>' + escapeHtml(localized(item.type, lang)) + "</span></header>" +
+          '<h4 class="uses-workflow-card__title">' + escapeHtml(localizeName(item.name, lang)) + "</h4>" +
+          '<p class="uses-workflow-card__desc">' + escapeHtml(localized(item.note, lang)) + "</p>" +
+          (item.url ? '<span class="uses-workflow-card__link">' + escapeHtml(I18N.t("uses.viewReference")) + ICON("external") + "</span>" : "") +
         "</" + tag + ">"
       );
     }
@@ -127,13 +159,14 @@
     function renderGear(lang) {
       var root = document.getElementById("uses-root");
       if (!root) return;
-      root.innerHTML = (window.USES || []).map(function (category) {
+      root.innerHTML = (window.USES || []).map(function (category, categoryIndex) {
         return (
-          '<section class="uses-category">' +
-            '<h3 class="uses-category__title">' + ICON(category.icon || "layout") +
-              "<span>" + escapeHtml(localized(category.title, lang)) + "</span></h3>" +
-            '<div class="card-grid">' + (category.items || []).map(function (item) {
-              return renderGearCard(item, lang);
+          '<section class="uses-category uses-category--' + escapeHtml(category.key || "general") + '">' +
+            '<header class="uses-category__header"><span class="uses-category__icon">' + ICON(category.icon || "layout") +
+              '</span><div><span class="uses-category__number">0' + (categoryIndex + 1) +
+              '</span><h3 class="uses-category__title">' + escapeHtml(localized(category.title, lang)) + "</h3></div></header>" +
+            '<div class="uses-category__items">' + (category.items || []).map(function (item, itemIndex) {
+              return renderWorkflowCard(item, lang, itemIndex);
             }).join("") + "</div>" +
           "</section>"
         );
@@ -144,33 +177,40 @@
       var root = document.getElementById("toolbox-filters");
       var categories = window.TOOL_CATEGORIES || {};
       if (!root) return;
+      var allCount = (window.TOOLBOX || []).length;
       var buttons = '<button class="tag tag-btn' + (activeToolCategory === "all" ? " is-active" : "") +
-        '" type="button" data-category="all">' + I18N.t("uses.filterAll") + "</button>";
+        '" type="button" data-category="all" aria-pressed="' + (activeToolCategory === "all") + '">' +
+        escapeHtml(I18N.t("uses.filterAll")) + '<span class="toolbox-filter__count">' + allCount + "</span></button>";
       buttons += Object.keys(categories).map(function (key) {
         var category = categories[key];
+        var count = (window.TOOLBOX || []).filter(function (tool) { return tool.category === key; }).length;
         return '<button class="tag tag-btn' + (activeToolCategory === key ? " is-active" : "") +
-          '" type="button" data-category="' + key + '">' +
-          ICON(category.icon) + escapeHtml(localized(category.label, lang)) + "</button>";
+          '" type="button" data-category="' + key + '" aria-pressed="' + (activeToolCategory === key) + '">' +
+          ICON(category.icon) + escapeHtml(localized(category.label, lang)) +
+          '<span class="toolbox-filter__count">' + count + "</span></button>";
       }).join("");
       root.innerHTML = buttons;
     }
 
     function renderToolbox(lang) {
       var root = document.getElementById("toolbox-root");
+      var empty = document.getElementById("toolbox-empty");
       var categories = window.TOOL_CATEGORIES || {};
       var tools = window.TOOLBOX || [];
       if (!root) return;
       if (activeToolCategory !== "all") {
         tools = tools.filter(function (tool) { return tool.category === activeToolCategory; });
       }
-      root.innerHTML = tools.map(function (tool) {
+      if (empty) empty.hidden = tools.length > 0;
+      root.innerHTML = tools.map(function (tool, index) {
         var category = categories[tool.category] || { label: {}, icon: "tool" };
         return (
-          '<a class="card tool-card" href="' + escapeHtml(tool.url) + '" target="_blank" rel="noopener">' +
-            '<span class="card__title">' + ICON(category.icon) + "<span>" + escapeHtml(tool.name) + "</span></span>" +
-            '<span class="tag tool-card__category">' + escapeHtml(localized(category.label, lang)) + "</span>" +
-            '<span class="card__desc">' + escapeHtml(localized(tool.note, lang)) + "</span>" +
-            '<span class="card__link">' + I18N.t("uses.officialSite") + ICON("external") + "</span>" +
+          '<a class="tool-card" href="' + escapeHtml(tool.url) + '" target="_blank" rel="noopener">' +
+            '<span class="tool-card__index">' + String(index + 1).padStart(2, "0") + "</span>" +
+            '<span class="tool-card__identity"><strong>' + escapeHtml(tool.name) +
+              '</strong><span>' + escapeHtml(localized(tool.note, lang)) + "</span></span>" +
+            '<span class="tag tool-card__category">' + ICON(category.icon) + escapeHtml(localized(category.label, lang)) + "</span>" +
+            '<span class="tool-card__arrow">' + ICON("arrowRight") + "</span>" +
           "</a>"
         );
       }).join("");
@@ -190,14 +230,36 @@
 
     function renderUses() {
       var lang = I18N.getLang();
-      var gearIcon = document.getElementById("gear-title-icon");
-      var toolboxIcon = document.getElementById("toolbox-title-icon");
-      if (gearIcon) gearIcon.innerHTML = ICON("layout");
-      if (toolboxIcon) toolboxIcon.innerHTML = ICON("tool");
+      var categories = window.USES || [];
+      var itemCount = categories.reduce(function (sum, category) {
+        return sum + (category.items || []).length;
+      }, 0);
+      var categoryCount = document.getElementById("uses-category-count");
+      var itemCountHost = document.getElementById("uses-item-count");
+      var toolCount = document.getElementById("uses-tool-count");
+      if (categoryCount) categoryCount.textContent = categories.length;
+      if (itemCountHost) itemCountHost.textContent = itemCount;
+      if (toolCount) toolCount.textContent = (window.TOOLBOX || []).length;
+      renderUpdatedDate(lang);
       renderGear(lang);
       renderToolFilters(lang);
       renderToolbox(lang);
       bindToolFilters();
+    }
+
+    // 手工核对日期按本地年月日构造，避免 YYYY-MM-DD 被当成 UTC 后显示为前一天。
+    function renderUpdatedDate(lang) {
+      var host = document.getElementById("uses-updated");
+      var raw = window.USES_UPDATED || "";
+      if (!host || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return;
+      var parts = raw.split("-").map(Number);
+      var date = new Date(parts[0], parts[1] - 1, parts[2]);
+      host.setAttribute("datetime", raw);
+      host.textContent = new Intl.DateTimeFormat(lang === "en" ? "en-US" : "zh-CN", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+      }).format(date);
     }
 
     window.renderUses = renderUses;

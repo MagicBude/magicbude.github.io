@@ -3724,42 +3724,257 @@ hr {
 
 /* #region 装备与工具箱 */
 
-/* 说明文字限制行宽，避免在宽屏上形成难以阅读的超长行。 */
-.section__intro {
-  max-width: 68ch;
-  margin: calc(var(--space-2) * -1) 0 var(--space-6);
-  color: var(--color-text-muted);
+/* Hero 与核对账本并排，左侧叙事、右侧事实；比例与 Now 页呼应但不复刻卡片。 */
+.uses-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  align-items: end;
+  gap: clamp(var(--space-7), 8vw, 130px);
 }
 
-/* 每个装备分类保持清晰的垂直节奏；第一组无需额外顶距。 */
-.uses-category + .uses-category {
-  margin-top: var(--space-8);
+.uses-hero__copy {
+  min-width: 0;
 }
 
-.uses-category__title {
+.uses-hero__copy .lead {
+  margin-bottom: 0;
+}
+
+.uses-ledger {
+  padding: var(--space-5);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.uses-ledger__topline {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-bottom: var(--space-4);
+}
+
+.uses-ledger__topline p {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.uses-ledger__mark {
+  width: 20px;
+  height: 2px;
+  background-color: var(--color-accent);
+}
+
+.uses-ledger__updated {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+  padding-block: var(--space-3);
+  border-block: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.uses-ledger__updated time {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+}
+
+.uses-ledger__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.uses-ledger__stats div {
+  min-width: 0;
+}
+
+.uses-ledger__stats dt {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.uses-ledger__stats dd {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+.uses-ledger__note {
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.uses-content {
+  display: grid;
+  gap: clamp(var(--space-9), 10vw, 140px);
+  padding-bottom: var(--space-9);
+}
+
+.uses-block {
+  border-top: 1px solid var(--color-border-strong);
+}
+
+/* 标题区独占一行并使用较窄正文，避免说明文字与下面的复杂网格争夺注意力。 */
+.uses-block__heading {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.28fr) minmax(0, 1fr);
+  gap: clamp(var(--space-5), 6vw, var(--space-9));
+  padding-block: var(--space-6);
+}
+
+.uses-block__index {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.uses-block__heading h2 {
+  margin: 0;
+  font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+}
+
+.uses-block__heading div > p {
+  max-width: 70ch;
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+}
+
+/* 每组流程仍使用相同两列轴线：左侧是阶段，右侧是可核实的具体条目。 */
+.uses-category {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.28fr) minmax(0, 1fr);
+  gap: clamp(var(--space-5), 6vw, var(--space-9));
+  padding-block: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.uses-category__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.uses-category__icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+.uses-category__icon .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.uses-category__number {
+  display: block;
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.uses-category__title {
+  margin: var(--space-1) 0 0;
   font-size: var(--text-lg);
 }
 
-.uses-category__title .icon {
-  color: var(--color-accent);
+.uses-category__items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--color-border-strong);
 }
 
-/* 筛选器允许自动换行；新增分类时不会把移动端页面撑宽。 */
+.uses-workflow-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 230px;
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  transition: background-color var(--duration) var(--ease);
+}
+
+.uses-workflow-card:nth-child(odd) {
+  border-right: 1px solid var(--color-border-strong);
+}
+
+a.uses-workflow-card:hover {
+  color: var(--color-text);
+  background-color: var(--color-bg-subtle);
+}
+
+.uses-workflow-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.uses-workflow-card__title {
+  margin: auto 0 0;
+  padding-top: var(--space-6);
+  font-size: clamp(var(--text-lg), 2.4vw, var(--text-2xl));
+  line-height: var(--leading-tight);
+}
+
+.uses-workflow-card__desc {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.uses-workflow-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: 650;
+}
+
+.uses-workflow-card__link .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* 筛选器允许自动换行；数字放在独立弱化胶囊中，能看出每类规模又不喧宾夺主。 */
 .toolbox-filters {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin-bottom: var(--space-6);
+  padding-block: var(--space-5);
+  border-top: 1px solid var(--color-border);
 }
 
 .toolbox-filters .tag-btn {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+  padding: 7px 10px;
 }
 
 .toolbox-filters .icon {
@@ -3767,9 +3982,152 @@ hr {
   height: 14px;
 }
 
-/* 分类徽章只占内容宽度，不随卡片的 flex 布局拉伸。 */
+.toolbox-filter__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 2px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-muted);
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+
+.tag-btn.is-active .toolbox-filter__count {
+  background-color: color-mix(in srgb, var(--color-accent) 16%, var(--color-bg));
+  color: var(--color-accent);
+}
+
+.toolbox-list {
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.tool-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto 24px;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 98px;
+  padding: var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  transition: background-color var(--duration) var(--ease),
+              padding-inline var(--duration) var(--ease);
+}
+
+.tool-card:hover {
+  padding-inline: var(--space-4);
+  color: var(--color-text);
+  background-color: var(--color-bg-subtle);
+}
+
+.tool-card__index {
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.tool-card__identity {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+
+.tool-card__identity strong {
+  font-size: var(--text-base);
+}
+
+.tool-card__identity > span {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 分类徽章只占内容宽度，不随列表网格拉伸。 */
 .tool-card__category {
-  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.tool-card__category .icon {
+  width: 13px;
+  height: 13px;
+}
+
+.tool-card__arrow {
+  display: grid;
+  place-items: center;
+  color: var(--color-text-subtle);
+}
+
+.tool-card__arrow .icon {
+  width: 17px;
+  height: 17px;
+}
+
+@media (max-width: 960px) {
+  .uses-hero,
+  .uses-block__heading,
+  .uses-category {
+    grid-template-columns: 1fr;
+  }
+
+  .uses-hero {
+    align-items: start;
+    gap: var(--space-6);
+  }
+
+  .uses-ledger {
+    width: min(100%, 680px);
+  }
+
+  .uses-block__heading,
+  .uses-category {
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 640px) {
+  .uses-ledger__stats {
+    gap: var(--space-2);
+  }
+
+  .uses-ledger__stats dd {
+    font-size: var(--text-xl);
+  }
+
+  .uses-category__items {
+    grid-template-columns: 1fr;
+  }
+
+  .uses-workflow-card:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .uses-workflow-card {
+    min-height: 205px;
+  }
+
+  .tool-card {
+    grid-template-columns: 34px minmax(0, 1fr) 22px;
+    gap: var(--space-3);
+  }
+
+  .tool-card__category {
+    display: none;
+  }
+
+  .tool-card__identity > span {
+    white-space: normal;
+  }
 }
 
 /* #endregion 装备与工具箱 */

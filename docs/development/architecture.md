@@ -16,8 +16,8 @@ magicbude.github.io/
 │  └─ index.html                      # 已完成项目与规划项目列表
 ├─ now/                               # 近况栏目目录，对应网址 /now/
 │  └─ index.html                      # 当前关注、学习和制作中的事项
-├─ uses/                              # 装备栏目目录，对应网址 /uses/
-│  └─ index.html                      # 常用硬件、软件与服务
+├─ uses/                              # 工作台栏目目录，对应网址 /uses/
+│  └─ index.html                      # 已确认的本站工作流与参考工具箱
 ├─ links/                             # 导航栏目目录，对应网址 /links/
 │  └─ index.html                      # 友链与资源收藏
 ├─ search/                            # 搜索栏目目录，对应网址 /search/
@@ -40,7 +40,7 @@ magicbude.github.io/
 │  │     ├─ projects.js               # 项目页、首页与搜索共用的项目数据
 │  │     ├─ now.js                    # 近况页与首页共用的近况数据
 │  │     ├─ links.js                  # 友链页与搜索共用的链接数据
-│  │     └─ uses.js                   # 装备页与搜索共用的装备、工具箱及分类数据
+│  │     └─ uses.js                   # 工作台页与搜索共用的流程、工具箱及分类数据
 │  ├─ icons/                          # favicon 和未来独立图标文件
 │  │  └─ favicon.svg                  # 浏览器标签页和收藏夹使用的网站图标
 │  └─ images/                         # 图片资源总目录，按使用场景继续分类
