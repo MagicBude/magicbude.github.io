@@ -87,6 +87,8 @@
 
     var ICON = window.icon || function () { return ""; };
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
+    var activeCategory = "all";
+    var filtersBound = false;
 
     function escapeHtml(value) {
       return String(value == null ? "" : value)
@@ -140,7 +142,35 @@
     function renderResources(items) {
       var lang = I18N.getLang();
       var categories = window.LINK_CATEGORIES || {};
-      var cards = items.map(function (item, index) {
+      var availableCategories = Object.keys(categories).filter(function (key) {
+        return items.some(function (item) { return item.category === key; });
+      });
+      var visibleItems = activeCategory === "all" ? items : items.filter(function (item) {
+        return item.category === activeCategory;
+      });
+
+      // 分类按钮只显示真实存在的分类，并把数量放在按钮内，切换前就能判断内容规模。
+      var filterItems = [{ key: "all", label: I18N.t("links.filterAll"), icon: "layout", count: items.length }]
+        .concat(availableCategories.map(function (key) {
+          return {
+            key: key,
+            label: localized(categories[key].label, lang),
+            icon: categories[key].icon,
+            count: items.filter(function (item) { return item.category === key; }).length,
+          };
+        }));
+      var filters = '<div class="links-library__toolbar">' +
+        '<div class="links-filters" aria-label="' + escapeHtml(I18N.t("links.filtersLabel")) + '">' +
+          filterItems.map(function (filter) {
+            return '<button class="links-filter' + (filter.key === activeCategory ? " is-active" : "") +
+              '" type="button" data-link-category="' + escapeHtml(filter.key) + '" aria-pressed="' +
+              (filter.key === activeCategory) + '">' + ICON(filter.icon) + '<span>' + escapeHtml(filter.label) +
+              '</span><span class="links-filter__count">' + filter.count + "</span></button>";
+          }).join("") +
+        '</div><p class="links-library__status" aria-live="polite">' +
+          escapeHtml(I18N.t("links.showing").replace("{n}", visibleItems.length)) + "</p></div>";
+
+      var cards = visibleItems.map(function (item, index) {
         var category = categories[item.category] || { label: {}, icon: "link" };
         return '<a class="links-resource" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' +
           '<span class="links-resource__number">' + String(index + 1).padStart(2, "0") + "</span>" +
@@ -151,7 +181,7 @@
         "</a>";
       }).join("");
       return '<section class="links-section">' + renderHeading(2, "links.resource", "links.resourceLead") +
-        '<div class="links-resources">' + cards + "</div></section>";
+        filters + '<div class="links-resources">' + cards + "</div></section>";
     }
 
     // 手工核对日期使用本地年月日，避免 ISO 日期在部分时区显示成前一天。
@@ -181,7 +211,21 @@
       root.innerHTML = renderFriends(friends) + renderResources(resources);
     }
 
-    window.renderLinks = renderLinks;
+    // 事件委托只绑定一次；重绘筛选按钮后无需逐个重新绑定监听器。
+    function bindFilters() {
+      var root = document.getElementById("links-root");
+      if (!root || filtersBound) return;
+      root.addEventListener("click", function (event) {
+        var button = event.target.closest("[data-link-category]");
+        if (!button) return;
+        activeCategory = button.getAttribute("data-link-category") || "all";
+        renderLinks();
+      });
+      filtersBound = true;
+    }
+
+    window.renderLinks = function () { bindFilters(); renderLinks(); };
+    bindFilters();
     renderLinks();
   })();
   </script>

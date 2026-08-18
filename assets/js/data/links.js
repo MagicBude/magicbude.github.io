@@ -17,10 +17,7 @@
 window.LINKS_UPDATED = "2026-08-18";
 
 window.LINK_CATEGORIES = {
-  reference: { label: { zh: "网页参考", en: "Web reference" }, icon: "book" },
-  compatibility: { label: { zh: "兼容性", en: "Compatibility" }, icon: "globe" },
-  practice: { label: { zh: "实践指南", en: "Practical guidance" }, icon: "sparkles" },
-  hosting: { label: { zh: "发布文档", en: "Publishing docs" }, icon: "github" },
+  web: { label: { zh: "网页参考", en: "Web references" }, icon: "book" },
   dev: { label: { zh: "开发工具", en: "Development" }, icon: "code" },
   browser: { label: { zh: "浏览器", en: "Browsers" }, icon: "globe" },
   writing: { label: { zh: "知识与写作", en: "Knowledge & writing" }, icon: "pen" },
@@ -46,28 +43,28 @@ window.LINKS = {
     {
       name: "MDN Web Docs",
       url: "https://developer.mozilla.org/",
-      category: "reference",
+      category: "web",
       kind: "link",
       note: { zh: "HTML、CSS、JavaScript 与 Web API 的开放网页技术文档。", en: "Documentation for HTML, CSS, JavaScript, Web APIs, and the open web platform." },
     },
     {
       name: "Can I use",
       url: "https://caniuse.com/",
-      category: "compatibility",
+      category: "web",
       kind: "link",
       note: { zh: "查询网页功能在不同浏览器和版本中的支持情况。", en: "Support tables for web features across browsers and versions." },
     },
     {
       name: "web.dev",
       url: "https://web.dev/",
-      category: "practice",
+      category: "web",
       kind: "link",
       note: { zh: "围绕性能、可访问性与跨浏览器体验的网页实践指南。", en: "Practical guidance for performance, accessibility, and cross-browser experiences." },
     },
     {
       name: "GitHub Pages Docs",
       url: "https://docs.github.com/pages/",
-      category: "hosting",
+      category: "web",
       kind: "link",
       note: { zh: "本站当前静态发布方式的官方配置与维护文档。", en: "Official setup and maintenance documentation for this site's publishing method." },
     },
