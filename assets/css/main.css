@@ -447,7 +447,7 @@ hr {
   max-width: var(--width-content);
 }
 
-/* 首页在大屏上需要容纳档案、内容流和近况三列，因此比普通栏目页更宽。
+/* 首页在大屏上需要容纳档案、内容流和发布日历，因此比普通栏目页更宽。
    单独加修饰类而不修改 .container，避免文章和其他页面被一起拉宽。 */
 .container--home {
   max-width: var(--width-home);
@@ -1096,12 +1096,12 @@ hr {
 
 /*
   三列不是为了做“后台仪表盘”，而是按内容寿命分工：
-  左侧是身份与当地信息，中间是文章和项目等长期内容，右侧是近况与发布节奏。
+  左侧是身份、当地信息和发布日历，右侧是文章与项目等长期内容。
   三列各自独立向下生长，避免某一栏内容增多时把其他栏拉出大片空白。
 */
 .home-dashboard {
   display: grid;
-  grid-template-columns: minmax(240px, 0.92fr) minmax(0, 1.55fr) minmax(260px, 0.95fr);
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.6fr);
   gap: var(--space-5);
   align-items: start;
   margin-top: var(--space-7);
@@ -1263,26 +1263,6 @@ hr {
 .home-rail {
   display: grid;
   gap: var(--space-5);
-}
-
-.home-rail .home-now-item {
-  padding: var(--space-3) 0;
-  border: 0;
-  border-bottom: 1px solid var(--color-border);
-  border-radius: 0;
-  background: transparent;
-}
-
-.home-rail .home-now-item:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.home-rail .home-now-item__note {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
 .home-calendar__month {
@@ -1731,98 +1711,6 @@ hr {
 .card__link:hover .icon {
   transform: translateX(3px);
 }
-
-/* --- 首页总览组件 --------------------------------------------------------- */
-
-/*
-  最新文章与近况属于同一级信息，因此宽屏使用等宽双栏并列展示。
-  Grid 适合表达二维列关系；窄屏时只需把列模板改成单列，无须调整 HTML 顺序。
-*/
-.home-overview {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-8);
-}
-
-/* min-width: 0 允许网格子项收缩，避免长标题把整列撑出容器。 */
-.home-overview__column {
-  min-width: 0;
-}
-
-.home-overview__column .post-item {
-  margin-inline: 0;
-  border: 1px solid transparent;
-}
-
-.home-overview__column .post-item:hover {
-  border-color: var(--color-border);
-}
-
-/* 探索栏目承担次级导航，降低最小列宽可以在宽屏容纳更多入口。 */
-.card-grid--compact {
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-}
-
-.card--featured {
-  min-height: 210px;
-}
-
-.home-now-list {
-  display: grid;
-  gap: var(--space-3);
-}
-
-/*
-  近况摘要使用“图标 + 内容”的两列网格：图标宽度固定，文字列占用剩余空间，
-  多行说明会自然与标题左边缘对齐，比逐项设置外边距更稳定。
-*/
-.home-now-item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background-color: var(--color-bg);
-}
-
-.home-now-item__icon {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-md);
-  color: var(--color-accent);
-  background-color: var(--color-accent-soft);
-}
-
-.home-now-item__icon .icon {
-  width: 17px;
-  height: 17px;
-}
-
-.home-now-item__content {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.home-now-item__label {
-  color: var(--color-accent);
-  font-size: var(--text-xs);
-  font-weight: 600;
-}
-
-.home-now-item__title {
-  color: var(--color-text);
-  font-size: var(--text-base);
-}
-
-.home-now-item__note {
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  line-height: var(--leading-normal);
-}
-
 
 /* --- 文章正文 ------------------------------------------------------------- */
 
@@ -2369,15 +2257,7 @@ hr {
   line-height: var(--leading-normal);
 }
 
-/* 末段把站内入口与外部联系并列：一个负责继续探索，一个负责离开本站后联系。 */
-.about-next-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
-  align-items: stretch;
-  gap: var(--space-5);
-}
-
-.about-next-panel,
+/* About 以联系方式收尾，不再重复主导航已经提供的栏目入口。 */
 .about-contact-panel {
   padding: clamp(var(--space-5), 4vw, var(--space-7));
   border: 1px solid var(--color-border);
@@ -2385,93 +2265,17 @@ hr {
   background-color: var(--color-bg);
 }
 
-.about-next-panel__lead,
+/* 删除重复导览后，联系方式独占一行；限制文字宽度仍能保持舒适阅读。 */
+.about-contact-panel--wide {
+  width: 100%;
+}
+
 .about-contact-panel__desc {
   max-width: 58ch;
   margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
-}
-
-.about-route-list {
-  display: grid;
-  gap: var(--space-2);
-  margin-top: var(--space-5);
-}
-
-.about-route {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  border: 1px solid transparent;
-  border-radius: var(--radius-lg);
-  color: inherit;
-  transition: color var(--duration) var(--ease),
-              border-color var(--duration) var(--ease),
-              background-color var(--duration) var(--ease);
-}
-
-.about-route:hover,
-.about-route:focus-visible {
-  color: inherit;
-  border-color: var(--color-border);
-  background-color: var(--color-bg-muted);
-}
-
-.about-route__icon {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-md);
-  color: var(--color-accent);
-  background-color: var(--color-accent-soft);
-}
-
-.about-route__icon .icon {
-  width: 17px;
-  height: 17px;
-}
-
-.about-route__copy {
-  display: grid;
-  min-width: 0;
-  gap: 2px;
-}
-
-.about-route__copy strong {
-  font-size: var(--text-sm);
-}
-
-.about-route__copy small {
-  overflow: hidden;
-  color: var(--color-text-muted);
-  font-size: var(--text-xs);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.about-route__action {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--color-accent);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.about-route__action .icon {
-  width: 14px;
-  height: 14px;
-  transition: transform var(--duration) var(--ease);
-}
-
-.about-route:hover .about-route__action .icon {
-  transform: translateX(3px);
 }
 
 .about-contact-panel {
@@ -2750,11 +2554,11 @@ hr {
 /* #endregion 代码高亮配色 */
 
 /* =============================================================================
-   7.5 内容页专属组件（项目 / 装备 / 近况 / 导航 / 搜索）
+   7.5 内容页专属组件（项目 / 收藏 / 搜索）
    这些页面都是「数据 -> DOM」渲染：HTML 里只留空容器，
-   由每页底部的内联脚本把数组循环拼成卡片。所以这里大多是「卡片内排版」的样式。
+   由每页底部的内联脚本把数组循环拼成卡片，所以这里集中维护页面级布局与卡片排版。
    ============================================================================= */
-/* #region 内容页专属组件（项目 / 装备 / 近况 / 导航 / 搜索） */
+/* #region 内容页专属组件（项目 / 收藏 / 搜索） */
 
 /* 页面引言下的一句引导语（muted 灰色小字）。
    hero 给大标题，.lead 给一句话补充说明，分工清晰。 */
@@ -2798,226 +2602,6 @@ hr {
 .badge--ok  { color: var(--color-pos);   border-color: color-mix(in srgb, var(--color-pos) 40%, transparent); }
 .badge--wip { color: var(--color-warn);  border-color: color-mix(in srgb, var(--color-warn) 40%, transparent); }
 .badge--arch{ color: var(--color-text-muted); }
-
-/* ---- 近况页：当前切片 ---------------------------------------------------
-   Now 页不是时间线或完整日志，而是少量仍然有效的当前信息。
-   宽屏把分类说明与条目并列，便于快速扫描；窄屏再按文档顺序堆叠。 */
-
-.now-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(310px, 0.75fr);
-  align-items: end;
-  gap: clamp(var(--space-7), 8vw, 130px);
-}
-
-.now-hero__copy {
-  min-width: 0;
-}
-
-.now-hero__copy .lead {
-  margin-bottom: 0;
-}
-
-.now-snapshot {
-  padding: var(--space-5);
-  border-block: 1px solid var(--color-border-strong);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 65%);
-}
-
-.now-snapshot__topline {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.now-snapshot__topline p {
-  margin: 0;
-  color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
-
-.now-snapshot__signal {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--color-pos);
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-pos) 12%, transparent);
-}
-
-.now-snapshot__date-label {
-  margin: var(--space-5) 0 var(--space-1);
-  color: var(--color-text-subtle);
-  font-size: var(--text-xs);
-}
-
-.now-snapshot__date {
-  display: block;
-  color: var(--color-text);
-  font-family: var(--font-mono);
-  font-size: clamp(1.65rem, 4vw, 2.5rem);
-  font-weight: 700;
-  line-height: 1.1;
-}
-
-.now-snapshot__note {
-  max-width: 38ch;
-  margin: var(--space-4) 0 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  line-height: var(--leading-normal);
-}
-
-.now-feed {
-  border-top: 1px solid var(--color-border-strong);
-}
-
-/* 每个分类是一行“索引 + 内容”：Grid 比 flex 更适合保持多组标题与卡片的列线一致。 */
-.now-section {
-  display: grid;
-  grid-template-columns: minmax(190px, 0.28fr) minmax(0, 1fr);
-  gap: clamp(var(--space-5), 6vw, var(--space-9));
-  padding-block: var(--space-7);
-  border-bottom: 1px solid var(--color-border-strong);
-}
-
-.now-section__header {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-
-.now-section__icon {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-md);
-  color: var(--color-accent);
-  background-color: var(--color-accent-soft);
-}
-
-.now-section__icon .icon {
-  width: 19px;
-  height: 19px;
-}
-
-.now-section__title {
-  margin: 0;
-  font-size: var(--text-xl);
-}
-
-.now-section__count {
-  margin: var(--space-1) 0 0;
-  color: var(--color-text-subtle);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
-
-.now-section__items {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-.now-section__items--single {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.now-entry {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 245px;
-  padding: var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background-color: var(--color-bg);
-  transition: border-color var(--duration) var(--ease),
-              transform var(--duration) var(--ease);
-}
-
-.now-entry:hover {
-  border-color: var(--color-border-strong);
-  transform: translateY(-2px);
-}
-
-/* 正在制作只有一条时允许卡片横向舒展，但正文仍限制行长，避免一行文字过长。 */
-.now-section--building .now-entry {
-  min-height: 260px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 9%, transparent), transparent 58%),
-    var(--color-bg);
-}
-
-.now-section--building .now-entry__note {
-  max-width: 68ch;
-}
-
-.now-entry__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.now-entry__index {
-  color: var(--color-text-subtle);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-}
-
-.now-status {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 9px;
-  border: 1px solid currentColor;
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: 650;
-  line-height: 1.7;
-}
-
-.now-status--active {
-  color: var(--color-pos);
-}
-
-.now-status--recent {
-  color: var(--color-accent);
-}
-
-.now-status--ongoing {
-  color: var(--color-warn);
-}
-
-.now-entry__title {
-  margin: auto 0 0;
-  padding-top: var(--space-6);
-  font-size: clamp(var(--text-lg), 2.5vw, var(--text-2xl));
-  line-height: var(--leading-tight);
-}
-
-.now-entry__meta {
-  margin: var(--space-2) 0 0;
-  color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  line-height: var(--leading-normal);
-}
-
-.now-entry__note {
-  margin: var(--space-4) 0 0;
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  line-height: var(--leading-normal);
-}
 
 /* ---- 项目页：真实作品档案 -------------------------------------------------
    项目页刻意把“已经运行”和“仍在规划”拆成两层，视觉权重对应真实完成度。
@@ -3338,7 +2922,7 @@ hr {
   justify-self: start;
 }
 
-/* 分类分组（装备页 / 近况页用）：一个分类标题 + 下面一套卡片网格。
+/* 分类分组：一个分类标题 + 下面一套卡片网格。
    margin-top 让不同分类之间留白，避免挤在一起。 */
 .subsection { margin-top: var(--space-8); }
 .subsection:first-of-type { margin-top: 0; }
@@ -3782,26 +3366,6 @@ hr {
    ============================================================================= */
 
 @media (max-width: 960px) {
-
-  /* Now 页的日期卡在平板移到标题下方，分类索引也改为上下排列，保留卡片双列。 */
-  .now-hero,
-  .now-section {
-    grid-template-columns: 1fr;
-  }
-
-  .now-hero {
-    align-items: start;
-    gap: var(--space-6);
-  }
-
-  .now-snapshot {
-    width: min(100%, 620px);
-  }
-
-  .now-section {
-    gap: var(--space-5);
-  }
-
   /* About 页在平板把身份卡放到简介下方，避免右栏过窄；兴趣改为两列继续利用宽度。 */
   .about-hero {
     grid-template-columns: 1fr;
@@ -3816,11 +3380,6 @@ hr {
   .about-interest-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .about-next-grid {
-    grid-template-columns: 1fr;
-  }
-
   /* 项目页引言在平板改为纵向，统计仍保留三列，避免信息被压在狭窄右栏。 */
   .projects-hero {
     grid-template-columns: 1fr;
@@ -3836,24 +3395,18 @@ hr {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* 三列基地总览在平板宽度按内容顺序改为单列，避免侧栏被压成窄长文字。 */
+  /* 两列基地总览在平板宽度按内容顺序改为单列，避免侧栏被压成窄长文字。 */
   .home-dashboard {
     grid-template-columns: 1fr;
   }
 
-  /* 右侧两个模块在平板上横排，继续利用可用宽度；手机断点再改回单列。 */
+  /* 左栏的身份、当地信息和发布日历横排，手机断点再改回单列。 */
   .home-rail {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .home-profile__bio {
     max-width: 68ch;
-  }
-
-  /* 双栏总览在窄屏改为单列，保持文章在前、近况在后的阅读顺序。 */
-  .home-overview {
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
   }
 
   /*
@@ -3967,15 +3520,6 @@ hr {
 }
 
 @media (max-width: 640px) {
-  .now-section__items {
-    grid-template-columns: 1fr;
-  }
-
-  .now-entry,
-  .now-section--building .now-entry {
-    min-height: 220px;
-  }
-
   .about-interest-grid {
     grid-template-columns: 1fr;
   }
@@ -4075,12 +3619,6 @@ hr {
     grid-template-columns: 1fr;
     gap: var(--space-1);
   }
-
-  .about-route__action > span {
-    /* 极窄屏只留箭头，避免动作文字挤压较长的英文栏目说明。 */
-    display: none;
-  }
-
   .project-stat {
     padding-inline: var(--space-2);
   }
@@ -4470,416 +4008,6 @@ hr {
 }
 
 /* #endregion 导航与友链 */
-
-/* #region 装备与工具箱 */
-
-/* Hero 与核对账本并排，左侧叙事、右侧事实；比例与 Now 页呼应但不复刻卡片。 */
-.uses-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
-  align-items: end;
-  gap: clamp(var(--space-7), 8vw, 130px);
-}
-
-.uses-hero__copy {
-  min-width: 0;
-}
-
-.uses-hero__copy .lead {
-  margin-bottom: 0;
-}
-
-.uses-ledger {
-  padding: var(--space-5);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-lg);
-  background-color: var(--color-bg-subtle);
-  box-shadow: var(--shadow-sm);
-}
-
-.uses-ledger__topline {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.uses-ledger__topline p {
-  margin: 0;
-  color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
-
-.uses-ledger__mark {
-  width: 20px;
-  height: 2px;
-  background-color: var(--color-accent);
-}
-
-.uses-ledger__updated {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin: var(--space-4) 0;
-  padding-block: var(--space-3);
-  border-block: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-}
-
-.uses-ledger__updated time {
-  color: var(--color-text);
-  font-family: var(--font-mono);
-}
-
-.uses-ledger__stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-3);
-  margin: 0;
-}
-
-.uses-ledger__stats div {
-  min-width: 0;
-}
-
-.uses-ledger__stats dt {
-  color: var(--color-text-subtle);
-  font-size: var(--text-xs);
-}
-
-.uses-ledger__stats dd {
-  margin: var(--space-1) 0 0;
-  color: var(--color-text);
-  font-family: var(--font-mono);
-  font-size: var(--text-2xl);
-  font-weight: 700;
-}
-
-.uses-ledger__note {
-  margin: var(--space-4) 0 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  line-height: var(--leading-normal);
-}
-
-.uses-content {
-  display: grid;
-  gap: clamp(var(--space-9), 10vw, 140px);
-  padding-bottom: var(--space-9);
-}
-
-.uses-block {
-  border-top: 1px solid var(--color-border-strong);
-}
-
-/* 标题区独占一行并使用较窄正文，避免说明文字与下面的复杂网格争夺注意力。 */
-.uses-block__heading {
-  display: grid;
-  grid-template-columns: minmax(150px, 0.28fr) minmax(0, 1fr);
-  gap: clamp(var(--space-5), 6vw, var(--space-9));
-  padding-block: var(--space-6);
-}
-
-.uses-block__index {
-  margin: 0;
-  color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.uses-block__heading h2 {
-  margin: 0;
-  font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
-}
-
-.uses-block__heading div > p {
-  max-width: 70ch;
-  margin: var(--space-3) 0 0;
-  color: var(--color-text-muted);
-}
-
-/* 每组流程仍使用相同两列轴线：左侧是阶段，右侧是可核实的具体条目。 */
-.uses-category {
-  display: grid;
-  grid-template-columns: minmax(150px, 0.28fr) minmax(0, 1fr);
-  gap: clamp(var(--space-5), 6vw, var(--space-9));
-  padding-block: var(--space-6);
-  border-top: 1px solid var(--color-border);
-}
-
-.uses-category__header {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-
-.uses-category__icon {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  color: var(--color-accent);
-  background-color: var(--color-accent-soft);
-}
-
-.uses-category__icon .icon {
-  width: 18px;
-  height: 18px;
-}
-
-.uses-category__number {
-  display: block;
-  color: var(--color-text-subtle);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
-
-.uses-category__title {
-  margin: var(--space-1) 0 0;
-  font-size: var(--text-lg);
-}
-
-.uses-category__items {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--color-border-strong);
-}
-
-.uses-workflow-card {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 230px;
-  padding: var(--space-5);
-  border-bottom: 1px solid var(--color-border-strong);
-  color: var(--color-text);
-  transition: background-color var(--duration) var(--ease);
-}
-
-.uses-workflow-card:nth-child(odd) {
-  border-right: 1px solid var(--color-border-strong);
-}
-
-a.uses-workflow-card:hover {
-  color: var(--color-text);
-  background-color: var(--color-bg-subtle);
-}
-
-.uses-workflow-card__top {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-3);
-  color: var(--color-text-subtle);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
-
-.uses-workflow-card__title {
-  margin: auto 0 0;
-  padding-top: var(--space-6);
-  font-size: clamp(var(--text-lg), 2.4vw, var(--text-2xl));
-  line-height: var(--leading-tight);
-}
-
-.uses-workflow-card__desc {
-  margin: var(--space-3) 0 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  line-height: var(--leading-normal);
-}
-
-.uses-workflow-card__link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  margin-top: var(--space-4);
-  color: var(--color-accent);
-  font-size: var(--text-sm);
-  font-weight: 650;
-}
-
-.uses-workflow-card__link .icon {
-  width: 14px;
-  height: 14px;
-}
-
-/* 筛选器允许自动换行；数字放在独立弱化胶囊中，能看出每类规模又不喧宾夺主。 */
-.toolbox-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  padding-block: var(--space-5);
-  border-top: 1px solid var(--color-border);
-}
-
-.toolbox-filters .tag-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 7px 10px;
-}
-
-.toolbox-filters .icon {
-  width: 14px;
-  height: 14px;
-}
-
-.toolbox-filter__count {
-  display: inline-grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  margin-left: 2px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-bg-muted);
-  color: var(--color-text-subtle);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-}
-
-.tag-btn.is-active .toolbox-filter__count {
-  background-color: color-mix(in srgb, var(--color-accent) 16%, var(--color-bg));
-  color: var(--color-accent);
-}
-
-.toolbox-list {
-  border-top: 1px solid var(--color-border-strong);
-}
-
-.tool-card {
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto 24px;
-  align-items: center;
-  gap: var(--space-4);
-  min-height: 98px;
-  padding: var(--space-4) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text);
-  transition: background-color var(--duration) var(--ease),
-              padding-inline var(--duration) var(--ease);
-}
-
-.tool-card:hover {
-  padding-inline: var(--space-4);
-  color: var(--color-text);
-  background-color: var(--color-bg-subtle);
-}
-
-.tool-card__index {
-  color: var(--color-text-subtle);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
-
-.tool-card__identity {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  gap: 3px;
-}
-
-.tool-card__identity strong {
-  font-size: var(--text-base);
-}
-
-.tool-card__identity > span {
-  overflow: hidden;
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* 分类徽章只占内容宽度，不随列表网格拉伸。 */
-.tool-card__category {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  justify-self: end;
-  white-space: nowrap;
-}
-
-.tool-card__category .icon {
-  width: 13px;
-  height: 13px;
-}
-
-.tool-card__arrow {
-  display: grid;
-  place-items: center;
-  color: var(--color-text-subtle);
-}
-
-.tool-card__arrow .icon {
-  width: 17px;
-  height: 17px;
-}
-
-@media (max-width: 960px) {
-  .uses-hero,
-  .uses-block__heading,
-  .uses-category {
-    grid-template-columns: 1fr;
-  }
-
-  .uses-hero {
-    align-items: start;
-    gap: var(--space-6);
-  }
-
-  .uses-ledger {
-    width: min(100%, 680px);
-  }
-
-  .uses-block__heading,
-  .uses-category {
-    gap: var(--space-4);
-  }
-}
-
-@media (max-width: 640px) {
-  .uses-ledger__stats {
-    gap: var(--space-2);
-  }
-
-  .uses-ledger__stats dd {
-    font-size: var(--text-xl);
-  }
-
-  .uses-category__items {
-    grid-template-columns: 1fr;
-  }
-
-  .uses-workflow-card:nth-child(odd) {
-    border-right: 0;
-  }
-
-  .uses-workflow-card {
-    min-height: 205px;
-  }
-
-  .tool-card {
-    grid-template-columns: 34px minmax(0, 1fr) 22px;
-    gap: var(--space-3);
-  }
-
-  .tool-card__category {
-    display: none;
-  }
-
-  .tool-card__identity > span {
-    white-space: normal;
-  }
-}
-
-/* #endregion 装备与工具箱 */
 
 /* #region 博客列表与文章阅读 */
 

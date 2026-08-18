@@ -1,6 +1,6 @@
 # magicbude.github.io
 
-magicbude 的个人数字基地与原生前端学习项目，用于汇集项目、文章、近况、收藏和其他网站入口；数字花园是其中持续整理知识与想法的部分。
+magicbude 的个人数字基地与原生前端学习项目，用于汇集项目、文章、长期收藏和其他网站入口；数字花园是其中持续整理知识与想法的部分。
 
 ## 如何打开
 
@@ -23,7 +23,7 @@ node tools/build.mjs
 - `docs/README.md`：文档入口。
 - `docs/development/architecture.md`：完整目录树，每个重要文件和文件夹均附有用途说明。
 - `assets/js/core/`：站点配置、图标、国际化和公共交互。
-- `assets/js/data/`：文章、项目、近况与友链的共享数据。
+- `assets/js/data/`：文章、项目、网站与工具收藏的共享数据。
 - `assets/css/main.css`：设计令牌、四套皮肤、组件和响应式规则。
 
 ## 项目原则

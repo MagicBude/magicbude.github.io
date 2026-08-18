@@ -53,13 +53,13 @@
         <p class="about-hero__bio" id="about-bio">我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。这里是我的个人数字基地。</p>
       </div>
 
-      <!-- 这不是虚构头像：用站点缩写和可核实资料组成一张纯文字身份卡。 -->
+      <!-- 纯文字身份卡用缩写替代头像，让姓名、兴趣与建站方式成为主要信息。 -->
       <aside class="about-identity" aria-labelledby="about-identity-title">
         <header class="about-identity__header">
           <span class="about-identity__mark" id="about-mark" aria-hidden="true">MB</span>
           <div>
             <p class="about-identity__kicker" data-i18n="about.identity.kicker">个人档案</p>
-            <h2 class="about-identity__name" id="about-identity-title">magicbude</h2>
+            <h2 class="about-identity__name" id="about-identity-title" data-i18n="about.identity.title">快速资料</h2>
           </div>
         </header>
         <dl class="about-identity__facts" id="about-facts"></dl>
@@ -92,16 +92,9 @@
     </section>
     <!-- #endregion 建站原则 -->
 
-    <!-- #region 继续探索与联系 -->
-    <section class="section container about-next-grid">
-      <div class="about-next-panel">
-        <p class="page-eyebrow" data-i18n="about.next.title">从这里继续</p>
-        <p class="about-next-panel__lead" data-i18n="about.next.lead">如果想快速了解我，可以从作品、文章和最近在做的事开始。</p>
-        <!-- 只突出三个最有认识价值的栏目，顺序由 SITE_CONFIG.about.featuredNav 决定。 -->
-        <nav class="about-route-list" id="about-sections" aria-label="站内推荐栏目" data-i18n="about.next.aria" data-i18n-attr="aria-label"></nav>
-      </div>
-
-      <aside class="about-contact-panel">
+    <!-- #region 联系方式 -->
+    <section class="section container">
+      <aside class="about-contact-panel about-contact-panel--wide">
         <p class="page-eyebrow" data-i18n="about.contact.title">找到我</p>
         <p class="about-contact-panel__desc" data-i18n="about.contact.desc">代码与公开项目优先放在 GitHub 和 Gitee；也可以通过邮件联系，或订阅本站 RSS。</p>
         <!-- 外链与站内 RSS 使用不同路径解析规则，由 renderAbout 统一处理。 -->
@@ -112,7 +105,7 @@
         <p class="empty-state">页面资料需要 JavaScript 读取本地配置；你仍可直接访问 <a href="../projects/index.html">项目</a>、<a href="../blog/index.html">博客</a>，或发送邮件到 <a href="mailto:magicbude1998@gmail.com">magicbude1998@gmail.com</a>。</p>
       </noscript>
     </section>
-    <!-- #endregion 继续探索与联系 -->
+    <!-- #endregion 联系方式 -->
   </main>
 
   <footer id="site-footer" class="site-footer"></footer>
@@ -139,20 +132,6 @@
     var I18N  = window.i18n  || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
 
     var ABOUT = CONFIG.about || {};
-
-    // 导航 key → 图标名（与首页保持一致）。
-    var NAV_ICON = {
-      home: "home", blog: "book", projects: "code",
-      now: "sparkles", uses: "tool", links: "link",
-      search: "search", about: "user"
-    };
-
-    // 关于页只推荐最能帮助访客认识站主的三个栏目；文案保持长期有效，不写阶段性宣传语。
-    var ENTRY_DESC = {
-      projects: { zh: "正在运行和计划中的网站与工具", en: "Live and planned websites and tools" },
-      blog:     { zh: "代码、工具与学习过程的长期记录", en: "Long-form notes on code, tools, and learning" },
-      now:      { zh: "此刻正在关注、学习和制作的事", en: "What I'm focusing on, learning, and making now" }
-    };
 
     // 配置内容最终进入 innerHTML；统一转义，避免特殊字符被浏览器解释成标签或属性。
     function escapeHtml(value) {
@@ -186,9 +165,6 @@
       // ---- 1) 引言：名字 + 定位 + 简介 ----
       var nameEl = document.getElementById("about-name");
       if (nameEl && CONFIG.name) nameEl.textContent = CONFIG.name;
-
-      var identityName = document.getElementById("about-identity-title");
-      if (identityName && CONFIG.name) identityName.textContent = CONFIG.name;
 
       var tagEl = document.getElementById("about-tagline");
       if (tagEl && CONFIG.tagline) tagEl.textContent = localize(CONFIG.tagline, lang);
@@ -241,31 +217,7 @@
         }).join("");
       }
 
-      // ---- 5) 推荐入口：featuredNav 控制顺序，nav 继续负责真实地址与翻译 key。 ----
-      var routesHost = document.getElementById("about-sections");
-      if (routesHost && CONFIG.nav) {
-        var featuredKeys = ABOUT.featuredNav || ["projects", "blog", "now"];
-        routesHost.innerHTML = featuredKeys.map(function (key) {
-            return CONFIG.nav.find(function (item) { return item.key === key; });
-          })
-          .filter(Boolean)
-          .map(function (it) {
-            var ic    = NAV_ICON[it.key] || "layout";
-            var label = I18N.t(it.i18n);
-            var desc  = localize(ENTRY_DESC[it.key], lang);
-            return (
-              '<a class="about-route" href="' + escapeHtml(window.siteUrl(it.href)) + '">' +
-                '<span class="about-route__icon">' + ICON(ic) + "</span>" +
-                '<span class="about-route__copy"><strong>' + escapeHtml(label) + "</strong>" +
-                  "<small>" + escapeHtml(desc) + "</small></span>" +
-                '<span class="about-route__action"><span>' + escapeHtml(I18N.t("about.next.open")) + "</span>" + ICON("arrowRight") + "</span>" +
-              "</a>"
-            );
-          })
-          .join("");
-      }
-
-      // ---- 6) 联系方式：HTTP 外链开新页，mailto 直接唤起邮件，RSS 用 siteUrl 指向站点根目录。 ----
+      // ---- 5) 联系方式：HTTP 外链开新页，mailto 直接唤起邮件，RSS 用 siteUrl 指向站点根目录。 ----
       var contact = document.getElementById("about-contact");
       if (contact && CONFIG.social) {
         contact.innerHTML = CONFIG.social.map(function (s) {

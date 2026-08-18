@@ -322,8 +322,6 @@
       // 以下内容页各自挂了 renderXxx，
       // 切换语言时一并重渲染，保证卡片文案、状态徽章、搜索标签都跟着变语言。
       if (typeof window.renderProjects === "function") window.renderProjects();
-      if (typeof window.renderUses === "function") window.renderUses();
-      if (typeof window.renderNow === "function") window.renderNow();
       if (typeof window.renderLinks === "function") window.renderLinks();
       if (typeof window.renderSearch === "function") window.renderSearch();
       // 博客列表页：切语言时重渲染，让筛选标签/卡片文案跟着变语言。

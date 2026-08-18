@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
-  links/index.html - 导航 / 友链页
+  links/index.html - 收藏与友链页
   协同：assets/js/core/ 公共脚本与 assets/js/data/links.js 共享链接数据。
-  数据驱动：window.LINKS 提供真实友链与资源，window.LINK_CATEGORIES 提供资源类型；
+  数据驱动：window.LINKS 提供友链、网站与工具收藏，window.LINK_CATEGORIES 提供资源类型；
   页面还从 SITE_CONFIG 读取公开邮箱，避免在多个页面重复维护联系方式。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
@@ -10,8 +10,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>导航 · magicbude</title>
-  <meta name="description" content="magicbude 已确认的朋友站点，以及与本站制作和发布相关的网页资源。">
+  <title>收藏 · magicbude</title>
+  <meta name="description" content="magicbude 的跨设备收藏夹：常用网站、软件工具、参考资料与朋友站点。">
 
   <script>
     (function () {
@@ -41,18 +41,18 @@
     <!-- #region 导航引言与链接摘要 -->
     <section class="hero container links-hero">
       <div class="links-hero__copy">
-        <p class="page-eyebrow" data-i18n="links.eyebrow">导航</p>
-        <h1 class="hero__name" data-i18n="links.title">书签与连接</h1>
-        <p class="lead" data-i18n="links.lead">真实交换的朋友站点，以及与本站制作方式直接相关、仍值得回看的网页资源。</p>
+        <p class="page-eyebrow" data-i18n="links.eyebrow">个人收藏</p>
+        <h1 class="hero__name" data-i18n="links.title">网站与工具收藏夹</h1>
+        <p class="lead" data-i18n="links.lead">把常用网站、软件工具、参考资料和朋友站点收在一起，换一台设备也能快速找回来。</p>
       </div>
 
-      <!-- 数字由 links.js 的数组长度计算，空友链也会诚实显示为 0。 -->
+      <!-- 数字由 links.js 的数组长度计算，新增收藏后无需手工同步。 -->
       <aside class="links-index" aria-labelledby="links-index-title">
         <p class="links-index__kicker" id="links-index-title" data-i18n="links.snapshot.kicker">CURATED LINKS</p>
         <div class="links-index__date"><span data-i18n="links.updated">最后核对</span><time id="links-updated" datetime="2026-08-18">2026.08.18</time></div>
         <dl class="links-index__stats">
           <div><dt data-i18n="links.friendsCount">公开友链</dt><dd id="links-friends-count">0</dd></div>
-          <div><dt data-i18n="links.resourcesCount">参考资源</dt><dd id="links-resources-count">0</dd></div>
+          <div><dt data-i18n="links.resourcesCount">收藏条目</dt><dd id="links-resources-count">0</dd></div>
         </dl>
       </aside>
     </section>
@@ -78,7 +78,7 @@
   <script src="../assets/js/core/main.js"></script>
 
   <!--
-    导航页「数据 → DOM」。friends 为空时生成真实邀请区，resources 生成编号资源档案；
+    收藏页「数据 → DOM」。friends 为空时生成交换入口，resources 生成编号收藏档案；
     语言切换由 main.js 再次调用 window.renderLinks，并同步日期、分类和说明。
   -->
   <script>

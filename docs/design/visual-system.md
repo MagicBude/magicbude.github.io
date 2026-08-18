@@ -126,7 +126,7 @@ window.SITE_CONFIG = {
   tagline: { zh: "写代码，也打球", en: "Code, and play." },
   bio: { zh: "...", en: "..." },
   social: [ { type: "github", url: "https://github.com/..." }, /* ... */ ],
-  nav: [ { key: "home", href: "index.html", i18n: "nav.home" }, /* blog/projects/now/uses/links/about */ ],
+  nav: [ { key: "home", href: "index.html", i18n: "nav.home" }, /* blog/projects/links/about */ ],
 };
 ```
 
@@ -152,7 +152,7 @@ window.SITE_CONFIG = {
 
 ---
 
-## 10. 页面清单（首页 + 8 内容页 + 功能）
+## 10. 页面清单（首页 + 6 内容页 + 功能）
 
 | 页面 | 文件 | 说明 |
 |------|------|------|
@@ -160,9 +160,7 @@ window.SITE_CONFIG = {
 | 博客列表 | `blog/index.html` | 读文章数据渲染，支持按语言/标签筛选 |
 | 文章详情 | `blog/<slug>/index.html` | 构建脚本生成 |
 | 项目 | `projects/index.html` | GitHub / Gitee 项目、自建子站链接 |
-| 近况 | `now/index.html` | 当前在玩 / 看 / 搞啥（nownownow 概念） |
-| 工作台 | `uses/index.html` | 可验证的本站制作流程 / 参考工具箱（个人设备需确认后加入） |
-| 导航 / 友链 | `links/index.html` | 其他站、朋友站、资源收藏 |
+| 收藏 / 友链 | `links/index.html` | 跨设备保存网站、软件工具、参考资料与朋友站点 |
 | 关于 | `about/index.html` | 通用自我介绍（中英双语，内容来自 site.config） |
 | 404 | `404.html` | 找不到页面 |
 | 搜索 | `search/index.html` | 客户端统一过滤页面、文章、项目、友链与资源 |

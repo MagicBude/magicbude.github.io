@@ -8,18 +8,14 @@
 
 ```text
 magicbude.github.io/
-├─ index.html                         # 网站首页；汇总项目、文章、近况和栏目入口
+├─ index.html                         # 网站首页；汇总项目、文章、发布日历和栏目入口
 ├─ 404.html                           # 找不到页面时展示的静态错误页
 ├─ about/                             # 关于栏目目录，对应网址 /about/
 │  └─ index.html                      # 个人介绍、站点定位和联系方式
 ├─ projects/                          # 项目栏目目录，对应网址 /projects/
 │  └─ index.html                      # 已完成项目与规划项目列表
-├─ now/                               # 近况栏目目录，对应网址 /now/
-│  └─ index.html                      # 当前关注、学习和制作中的事项
-├─ uses/                              # 工作台栏目目录，对应网址 /uses/
-│  └─ index.html                      # 已确认的本站工作流与参考工具箱
-├─ links/                             # 导航栏目目录，对应网址 /links/
-│  └─ index.html                      # 已确认友链、交换入口与网页资源收藏
+├─ links/                             # 收藏栏目目录，对应网址 /links/
+│  └─ index.html                      # 跨设备网站、工具、参考资料与友链收藏
 ├─ search/                            # 搜索栏目目录，对应网址 /search/
 │  └─ index.html                      # 浏览器本地双语搜索与分组全站索引
 ├─ blog/                              # 博客公开页面目录，同时包含列表页和文章子路由
@@ -38,9 +34,7 @@ magicbude.github.io/
 │  │  └─ data/                        # 可被多个页面共享的内容数据
 │  │     ├─ posts.js                  # 构建器生成的文章索引数据，请勿手改
 │  │     ├─ projects.js               # 项目页、首页与搜索共用的项目数据
-│  │     ├─ now.js                    # 近况页与首页共用的近况数据
-│  │     ├─ links.js                  # 友链页与搜索共用的链接数据
-│  │     └─ uses.js                   # 工作台页与搜索共用的流程、工具箱及分类数据
+│  │     └─ links.js                  # 收藏页与搜索共用的网站、工具和友链数据
 │  ├─ icons/                          # favicon 和未来独立图标文件
 │  │  └─ favicon.svg                  # 浏览器标签页和收藏夹使用的网站图标
 │  └─ images/                         # 图片资源总目录，按使用场景继续分类

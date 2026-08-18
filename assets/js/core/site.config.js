@@ -39,10 +39,16 @@ window.SITE_CONFIG = {
   // 以后只有身份、兴趣或站点定位真正变化时才需要修改这里。
   bio: {
     zh: "我是 magicbude，一个喜欢编程、动手实践和探索不同兴趣的人。这里是我的个人数字基地：" +
-        "汇集作品、文章、近况、常用工具和收藏，也连接我创建的其他网站与项目。数字花园则是其中持续整理知识与想法的部分。",
+        "汇集作品、文章和长期收藏，也连接我创建的其他网站与项目。数字花园则是其中持续整理知识与想法的部分。",
     en: "I'm magicbude, interested in programming, hands-on creation, and exploring different interests. " +
-        "This is my personal digital base for projects, writing, current notes, tools, collections, and the other things I create. " +
+        "This is my personal digital base for projects, writing, long-term bookmarks, and the other things I create. " +
         "Its digital garden is where knowledge and ideas continue to grow.",
+  },
+
+  // 首页只展示一句摘要；完整自我介绍留在 About，避免两个页面逐字重复。
+  summary: {
+    zh: "喜欢编程、动手实践，也持续探索游戏、动漫、电影和运动。",
+    en: "Interested in programming, hands-on making, games, anime, film, and sport.",
   },
 
   /*
@@ -109,10 +115,10 @@ window.SITE_CONFIG = {
         },
       },
       {
-        title: { zh: "真实比完整更重要", en: "Truth before completeness" },
+        title: { zh: "随时找得回来", en: "Easy to find again" },
         desc: {
-          zh: "只把已经发生的作品和记录当作成果；仍在构想的内容会明确标注状态。",
-          en: "Present only work and notes that truly exist; ideas still taking shape are labeled clearly.",
+          zh: "把文章、项目和收藏放进清晰稳定的结构，换设备或隔很久回来也能快速定位。",
+          en: "Keep writing, projects, and bookmarks in a stable structure that stays useful across devices and over time.",
         },
       },
       {
@@ -123,7 +129,6 @@ window.SITE_CONFIG = {
         },
       },
     ],
-    featuredNav: ["projects", "blog", "now"],
   },
 
   // #endregion 身份与基础信息
@@ -143,8 +148,6 @@ window.SITE_CONFIG = {
     { key: "home",     href: "index.html",          i18n: "nav.home" },
     { key: "blog",     href: "blog/index.html",     i18n: "nav.blog" },
     { key: "projects", href: "projects/index.html", i18n: "nav.projects" },
-    { key: "now",      href: "now/index.html",      i18n: "nav.now" },
-    { key: "uses",     href: "uses/index.html",     i18n: "nav.uses" },
     { key: "links",    href: "links/index.html",    i18n: "nav.links" },
     { key: "search",   href: "search/index.html",   i18n: "nav.search" },
     { key: "about",    href: "about/index.html",    i18n: "nav.about" },

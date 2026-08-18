@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
   index.html - 网站首页与全站枢纽
-  作用：用 Hero、精选项目、最新文章、近况摘要和栏目导航组成个人数字基地的总入口。
-  协同：site.config.js（身份 / 导航）、projects.js（项目）、posts.js（文章）、now.js（近况）、main.js（公共框架）、i18n.js（多语）。
+  作用：用 Hero、精选项目、最新文章、发布日历和栏目导航组成个人数字基地的总入口。
+  协同：site.config.js（身份 / 导航）、projects.js（项目）、posts.js（文章）、main.js（公共框架）、i18n.js（多语）。
   数据驱动：底部的 window.renderHome 从多个 window.* 数据源读取站内内容；天气由访客主动授权后从 Open-Meteo 获取。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
@@ -11,7 +11,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>magicbude · 个人数字基地</title>
-  <meta name="description" content="magicbude 的个人数字基地：汇集项目、文章、近况、工具、收藏与其他网站入口。">
+  <meta name="description" content="magicbude 的个人数字基地：汇集项目、文章、长期收藏与其他网站入口。">
 
   <!--
     防闪白内联脚本：必须在 CSS 加载之前执行。
@@ -76,7 +76,7 @@
 
     <!-- #region 基地总览 -->
     <!--
-      宽屏采用“个人档案 / 内容流 / 近况栏”三列，分别回答“这是谁、有什么、最近怎样”。
+      宽屏采用“个人档案 / 内容流 / 发布记录”三列，分别回答“这是谁、有什么、怎样持续更新”。
       DOM 顺序与视觉顺序一致，窄屏改为单列后仍保持自然的阅读逻辑。
     -->
     <section class="home-dashboard container container--home" aria-label="基地总览" data-i18n="home.dashboard.aria" data-i18n-attr="aria-label">
@@ -161,6 +161,21 @@
           </p>
         </div>
       </section>
+
+      <section class="home-panel home-calendar" aria-labelledby="home-calendar-title">
+        <div class="home-panel__header home-panel__header--compact">
+          <div>
+            <p class="home-panel__kicker" data-i18n="home.calendar.kicker">更新轨迹</p>
+            <h2 id="home-calendar-title" data-i18n="home.section.calendar">发布日历</h2>
+          </div>
+          <strong class="home-calendar__month" id="home-calendar-month"></strong>
+        </div>
+        <div class="home-calendar__grid" id="home-calendar-grid"></div>
+        <p class="home-calendar__meta">
+          <span data-i18n="home.calendar.updated">最近更新</span>
+          <time id="home-last-updated" datetime="">—</time>
+        </p>
+      </section>
       </aside>
 
       <!-- 中栏连续承载长期内容：文章较少时由真实项目自然补足纵向信息量。 -->
@@ -196,36 +211,6 @@
       </section>
       </div>
 
-      <!-- 右栏只保留近期动态与发布节奏，职责比原来的四卡堆叠更清晰。 -->
-      <aside class="home-rail home-rail--right">
-        <section class="home-panel" aria-labelledby="home-now-title">
-          <div class="home-panel__header home-panel__header--compact">
-            <div>
-              <p class="home-panel__kicker" data-i18n="home.now.kicker">此刻切片</p>
-              <h2 id="home-now-title" data-i18n="home.section.now">最近在做</h2>
-            </div>
-            <a class="section__more" href="now/index.html" aria-label="查看全部近况" data-i18n="home.now.more" data-i18n-attr="aria-label">
-              <span id="now-arrow" aria-hidden="true"></span>
-            </a>
-          </div>
-          <div class="home-now-list" id="home-now"></div>
-        </section>
-
-        <section class="home-panel home-calendar" aria-labelledby="home-calendar-title">
-          <div class="home-panel__header home-panel__header--compact">
-            <div>
-              <p class="home-panel__kicker" data-i18n="home.calendar.kicker">更新轨迹</p>
-              <h2 id="home-calendar-title" data-i18n="home.section.calendar">发布日历</h2>
-            </div>
-            <strong class="home-calendar__month" id="home-calendar-month"></strong>
-          </div>
-          <div class="home-calendar__grid" id="home-calendar-grid"></div>
-          <p class="home-calendar__meta">
-            <span data-i18n="home.calendar.updated">最近更新</span>
-            <time id="home-last-updated" datetime="">—</time>
-          </p>
-        </section>
-      </aside>
     </section>
     <!-- #endregion -->
 
@@ -250,7 +235,6 @@
   <script src="assets/js/core/i18n.js"></script>
   <script src="assets/js/data/posts.js"></script>
   <script src="assets/js/data/projects.js"></script>
-  <script src="assets/js/data/now.js"></script>
   <script src="assets/js/core/main.js"></script>
 
   <!--
@@ -259,7 +243,7 @@
     这里做的事情都是前端最基础也最常用的数据驱动模式：
       1) 把配置里的文本填进封面与个人档案
       2) 从文章数据计算统计、标签和发布日历
-      3) 从共享项目与近况数据生成内容摘要
+      3) 从共享项目数据生成内容摘要
       4) 把导航项渲染成探索栏目卡片
     把它挂到 window.renderHome，main.js 在切换语言时会再调一次，保证文案同步刷新。
   -->
@@ -275,7 +259,7 @@
     // 导航 key → 图标名（icons.js 里已有的图标）。
     var NAV_ICON = {
       home: "home", blog: "book", projects: "code",
-      now: "sparkles", uses: "tool", links: "link",
+      links: "link",
       search: "search", about: "user"
     };
 
@@ -283,9 +267,7 @@
     var ENTRY_DESC = {
       blog:     { zh: "写代码、做小工具的记录与踩坑",   en: "Notes & lessons from coding and tinkering" },
       projects: { zh: "已经完成、正在制作和计划中的项目", en: "Completed, active, and planned projects" },
-      now:      { zh: "最近在玩、在看、在搞啥",         en: "What I'm playing, watching and building now" },
-      uses:     { zh: "日常在用的硬件与软件",           en: "Hardware & software I use daily" },
-      links:    { zh: "朋友们和觉得有用的站",           en: "Friends and useful sites" },
+      links:    { zh: "收藏的网站、工具与朋友站点",     en: "Bookmarked sites, tools, and friends" },
       about:    { zh: "关于我，以及这个站",             en: "About me and this site" }
     };
 
@@ -560,7 +542,7 @@
       if (tagEl && CONFIG.tagline) tagEl.textContent = CONFIG.tagline[lang] || CONFIG.tagline.zh;
 
       var bioEl   = document.getElementById("hero-bio");
-      if (bioEl && CONFIG.bio) bioEl.textContent = CONFIG.bio[lang] || CONFIG.bio.zh;
+      if (bioEl && CONFIG.summary) bioEl.textContent = CONFIG.summary[lang] || CONFIG.summary.zh;
 
       var postStat = document.getElementById("home-stat-posts");
       var tagStat = document.getElementById("home-stat-tags");
@@ -628,26 +610,7 @@
       renderClock();
       renderWeather();
 
-      // ---- 4) 最近在做：每个分类取第一项作为摘要 ----
-      var nowHost = document.getElementById("home-now");
-      if (nowHost) {
-        nowHost.innerHTML = (window.NOW || []).map(function (category) {
-          var item = category.items && category.items[0];
-          if (!item) return "";
-          return (
-            '<div class="home-now-item">' +
-              '<span class="home-now-item__icon">' + ICON(category.icon || "sparkles") + "</span>" +
-              '<span class="home-now-item__content">' +
-                '<span class="home-now-item__label">' + esc(bi(category.title, lang)) + "</span>" +
-                '<strong class="home-now-item__title">' + esc(bi(item.name, lang)) + "</strong>" +
-                '<span class="home-now-item__note">' + esc(bi(item.note, lang)) + "</span>" +
-              "</span>" +
-            "</div>"
-          );
-        }).join("");
-      }
-
-      // ---- 5) 探索栏目：把导航渲染成卡片，排除首页和搜索两项 ----
+      // ---- 4) 探索栏目：把导航渲染成卡片，排除首页和搜索两项 ----
       var grid = document.getElementById("entry-cards");
       if (grid && CONFIG.nav) {
         var cards = CONFIG.nav
@@ -669,7 +632,7 @@
       }
 
       // 三个“查看全部”链接共用相同箭头图标，集中注入可以保持 HTML 骨架简洁。
-      ["featured-arrow", "recent-arrow", "now-arrow", "profile-arrow"].forEach(function (id) {
+      ["featured-arrow", "recent-arrow", "profile-arrow"].forEach(function (id) {
         var host = document.getElementById(id);
         if (host) host.innerHTML = ICON("arrowRight");
       });

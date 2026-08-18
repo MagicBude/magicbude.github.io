@@ -38,7 +38,7 @@ const SITEMAP = path.join(ROOT, "sitemap.xml");
 // 注意：详情页在 blog/ 子目录，页面内资源用相对路径 "../"，而 RSS 用的是绝对链接。
 const SITE_BASE = "https://magicbude.github.io/";
 const SITE_TITLE = "magicbude";
-const SITE_DESC = "magicbude 的个人数字基地：汇集项目、文章、近况、工具、收藏与其他网站入口。";
+const SITE_DESC = "magicbude 的个人数字基地：汇集项目、文章、长期收藏与其他网站入口。";
 
 // #region 文本转义（防止用户内容破坏 HTML / XML）
 // 把 & < > " 转成实体。文章正文、标题、摘要都可能含这些字符，不转义会破坏页面或注入脚本。
@@ -564,8 +564,6 @@ function renderSitemap(posts) {
     "",
     "blog/",
     "projects/",
-    "now/",
-    "uses/",
     "links/",
     "about/",
     "search/",

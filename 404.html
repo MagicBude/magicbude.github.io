@@ -67,7 +67,7 @@
         <noscript>
           <p class="notfound__fallback">
             <a href="blog/index.html">博客</a> · <a href="projects/index.html">项目</a> ·
-            <a href="now/index.html">近况</a> · <a href="about/index.html">关于</a>
+            <a href="links/index.html">收藏</a> · <a href="about/index.html">关于</a>
           </p>
         </noscript>
       </aside>
@@ -86,8 +86,8 @@
     var CONFIG = window.SITE_CONFIG || {};
     var ICON = window.icon || function () { return ""; };
     var I18N = window.i18n || { t: function (key) { return key; } };
-    var FEATURED_KEYS = ["blog", "projects", "now", "about"];
-    var NAV_ICON = { blog: "book", projects: "code", now: "sparkles", about: "user" };
+    var FEATURED_KEYS = ["blog", "projects", "links", "about"];
+    var NAV_ICON = { blog: "book", projects: "code", links: "link", about: "user" };
 
     // 查询参数可能含隐私，因此这里只展示 pathname，并通过 textContent 输出。
     function renderMissingPath() {
