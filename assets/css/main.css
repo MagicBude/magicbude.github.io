@@ -3722,6 +3722,301 @@ hr {
 /* #endregion 打印样式 */
 }
 
+/* #region 导航与友链 */
+
+.links-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(330px, 0.8fr);
+  align-items: end;
+  gap: clamp(var(--space-7), 8vw, 130px);
+}
+
+.links-hero__copy {
+  min-width: 0;
+}
+
+.links-hero__copy .lead {
+  margin-bottom: 0;
+}
+
+/* 摘要采用索引卡而非普通内容卡，让“0 条友链”也成为清楚的信息而不是空缺。 */
+.links-index {
+  padding: var(--space-5);
+  border-block: 1px solid var(--color-border-strong);
+  background: linear-gradient(100deg, var(--color-accent-soft), transparent 72%);
+}
+
+.links-index__kicker {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.links-index__date {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.links-index__date time {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+}
+
+.links-index__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-4) 0 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.links-index__stats dt {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.links-index__stats dd {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+}
+
+.links-content {
+  padding-bottom: var(--space-9);
+}
+
+.links-section {
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.links-section + .links-section {
+  margin-top: clamp(var(--space-9), 10vw, 140px);
+}
+
+.links-section__heading {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.28fr) minmax(0, 1fr);
+  gap: clamp(var(--space-5), 6vw, var(--space-9));
+  padding-block: var(--space-6);
+}
+
+.links-section__index {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.links-section__heading h2 {
+  margin: 0;
+  font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+}
+
+.links-section__heading div > p {
+  max-width: 70ch;
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+}
+
+/* 空友链区留出呼吸感，但保留明确动作，避免用虚构卡片填充。 */
+.links-empty {
+  display: grid;
+  justify-items: start;
+  min-height: 310px;
+  padding: clamp(var(--space-6), 6vw, var(--space-9));
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-subtle);
+}
+
+.links-empty__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+.links-empty__title {
+  margin: auto 0 0;
+  padding-top: var(--space-7);
+  font-size: clamp(var(--text-xl), 3vw, var(--text-3xl));
+  font-weight: 700;
+}
+
+.links-empty__lead {
+  max-width: 58ch;
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+}
+
+.links-empty__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.links-empty__action .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.links-friends {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.links-friend-card {
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+}
+
+.links-friend-card h3,
+.links-friend-card p {
+  margin: 0;
+}
+
+.links-friend-card p {
+  margin-top: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.links-friend-card > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-5);
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+}
+
+.links-resources {
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.links-resource {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 132px;
+  padding: var(--space-5) var(--space-3);
+  border-bottom: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  transition: background-color var(--duration) var(--ease),
+              padding-inline var(--duration) var(--ease);
+}
+
+.links-resource:hover {
+  padding-inline: var(--space-4);
+  color: var(--color-text);
+  background-color: var(--color-bg-subtle);
+}
+
+.links-resource__number {
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.links-resource__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+.links-resource__category {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.links-resource__category .icon {
+  width: 13px;
+  height: 13px;
+}
+
+.links-resource__body strong {
+  font-size: clamp(var(--text-lg), 2.4vw, var(--text-2xl));
+}
+
+.links-resource__body > span:last-child {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.links-resource__visit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: 650;
+}
+
+.links-resource__visit .icon {
+  width: 17px;
+  height: 17px;
+}
+
+@media (max-width: 960px) {
+  .links-hero,
+  .links-section__heading {
+    grid-template-columns: 1fr;
+  }
+
+  .links-hero {
+    align-items: start;
+    gap: var(--space-6);
+  }
+
+  .links-index {
+    width: min(100%, 620px);
+  }
+
+  .links-section__heading {
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 640px) {
+  .links-friends {
+    grid-template-columns: 1fr;
+  }
+
+  .links-resource {
+    grid-template-columns: 34px minmax(0, 1fr);
+    min-height: 150px;
+  }
+
+  .links-resource__visit {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+/* #endregion 导航与友链 */
+
 /* #region 装备与工具箱 */
 
 /* Hero 与核对账本并排，左侧叙事、右侧事实；比例与 Now 页呼应但不复刻卡片。 */

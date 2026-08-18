@@ -2,7 +2,8 @@
 <!--
   links/index.html - 导航 / 友链页
   协同：assets/js/core/ 公共脚本与 assets/js/data/links.js 共享链接数据。
-  数据驱动：两类链接由 window.LINKS 经 window.renderLinks 渲染（friends / resources）。
+  数据驱动：window.LINKS 提供真实友链与资源，window.LINK_CATEGORIES 提供资源类型；
+  页面还从 SITE_CONFIG 读取公开邮箱，避免在多个页面重复维护联系方式。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -10,7 +11,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>导航 · magicbude</title>
-  <meta name="description" content="magicbude 的朋友站点与日常好用的资源/工具。">
+  <meta name="description" content="magicbude 已确认的朋友站点，以及与本站制作和发布相关的网页资源。">
 
   <script>
     (function () {
@@ -37,14 +38,32 @@
   <header id="site-header" class="site-header"></header>
 
   <main class="site-main" id="main">
-    <section class="hero container container--narrow">
-      <p class="page-eyebrow" data-i18n="links.eyebrow">导航</p>
-      <h1 class="hero__name" data-i18n="links.title">朋友们和好站</h1>
-      <p class="lead" data-i18n="links.lead">我常逛、或觉得有用的地方；也欢迎交换友链。</p>
-    </section>
+    <!-- #region 导航引言与链接摘要 -->
+    <section class="hero container links-hero">
+      <div class="links-hero__copy">
+        <p class="page-eyebrow" data-i18n="links.eyebrow">导航</p>
+        <h1 class="hero__name" data-i18n="links.title">书签与连接</h1>
+        <p class="lead" data-i18n="links.lead">真实交换的朋友站点，以及与本站制作方式直接相关、仍值得回看的网页资源。</p>
+      </div>
 
-    <!-- 两类链接由 renderLinks 按 window.LINKS 生成 -->
-    <div class="container" id="links-root"></div>
+      <!-- 数字由 links.js 的数组长度计算，空友链也会诚实显示为 0。 -->
+      <aside class="links-index" aria-labelledby="links-index-title">
+        <p class="links-index__kicker" id="links-index-title" data-i18n="links.snapshot.kicker">CURATED LINKS</p>
+        <div class="links-index__date"><span data-i18n="links.updated">最后核对</span><time id="links-updated" datetime="2026-08-18">2026.08.18</time></div>
+        <dl class="links-index__stats">
+          <div><dt data-i18n="links.friendsCount">公开友链</dt><dd id="links-friends-count">0</dd></div>
+          <div><dt data-i18n="links.resourcesCount">参考资源</dt><dd id="links-resources-count">0</dd></div>
+        </dl>
+      </aside>
+    </section>
+    <!-- #endregion 导航引言与链接摘要 -->
+
+    <!-- #region 朋友与资源列表 -->
+    <div class="container links-content" id="links-root"></div>
+    <noscript>
+      <div class="container empty-state">本站导航需要 JavaScript 读取本地链接数据。</div>
+    </noscript>
+    <!-- #endregion 朋友与资源列表 -->
   </main>
 
   <footer id="site-footer" class="site-footer"></footer>
@@ -59,9 +78,8 @@
   <script src="../assets/js/core/main.js"></script>
 
   <!--
-    导航页「数据 → DOM」。数据分两类：friends（朋友站点）/ resources（资源工具）。
-    结构上和装备页一样是「按分组渲染卡片网格」，只是分组是固定的两类，
-    所以这里直接写两个 subsection，而不是循环一个分类数组。
+    导航页「数据 → DOM」。friends 为空时生成真实邀请区，resources 生成编号资源档案；
+    语言切换由 main.js 再次调用 window.renderLinks，并同步日期、分类和说明。
   -->
   <script>
   (function () {
@@ -70,34 +88,97 @@
     var ICON = window.icon || function () { return ""; };
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
 
-    // 把一组链接渲染成「标题 + 卡片网格」。friends/resources 复用它。
-    function renderGroup(titleText, items) {
-      var cards = (items || []).map(function (it) {
-        var note = (it.note && it.note[I18N.getLang()]) ? it.note[I18N.getLang()] : (it.note && it.note.zh) || "";
-        return (
-          '<a class="card card--link" href="' + it.url + '" target="_blank" rel="noopener">' +
-            '<span class="card__title"><span>' + it.name + "</span></span>" +
-            '<span class="card__desc">' + note + "</span>" +
-            '<span class="card__link ml-auto">' + I18N.t("projects.view") + ICON("external") + "</span>" +
-          "</a>"
-        );
-      }).join("");
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function localized(value, lang) {
+      return value && (value[lang] || value.zh || value.en) || "";
+    }
+
+    function renderHeading(index, titleKey, leadKey) {
       return (
-        '<section class="subsection">' +
-          '<h2 class="subsection__title">' + ICON("link") + "<span>" + titleText + "</span></h2>" +
-          '<div class="card-grid">' + cards + "</div>" +
-        "</section>"
+        '<header class="links-section__heading"><p class="links-section__index">0' + index + "</p><div>" +
+          "<h2>" + escapeHtml(I18N.t(titleKey)) + "</h2>" +
+          "<p>" + escapeHtml(I18N.t(leadKey)) + "</p>" +
+        "</div></header>"
       );
+    }
+
+    // 邮箱来自 SITE_CONFIG 的公开社交数据；没有邮箱时不渲染无效按钮。
+    function getPublicEmail() {
+      var social = (window.SITE_CONFIG && window.SITE_CONFIG.social) || [];
+      var entry = social.find(function (item) { return item.type === "mail" && /^mailto:/.test(item.url || ""); });
+      return entry ? entry.url : "";
+    }
+
+    function renderFriends(items) {
+      var lang = I18N.getLang();
+      var content = "";
+      if (!items.length) {
+        var email = getPublicEmail();
+        content = '<div class="links-empty"><span class="links-empty__icon">' + ICON("link") + "</span>" +
+          '<p class="links-empty__title">' + escapeHtml(I18N.t("links.empty")) + "</p>" +
+          '<p class="links-empty__lead">' + escapeHtml(I18N.t("links.emptyLead")) + "</p>" +
+          (email ? '<a class="btn btn--ghost links-empty__action" href="' + escapeHtml(email) + '">' +
+            ICON("mail") + escapeHtml(I18N.t("links.contact")) + "</a>" : "") + "</div>";
+      } else {
+        content = '<div class="links-friends">' + items.map(function (item) {
+          return '<a class="links-friend-card" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' +
+            '<h3>' + escapeHtml(item.name) + "</h3><p>" + escapeHtml(localized(item.note, lang)) + "</p>" +
+            '<span>' + escapeHtml(I18N.t("links.visit")) + ICON("external") + "</span></a>";
+        }).join("") + "</div>";
+      }
+      return '<section class="links-section">' + renderHeading(1, "links.friend", "links.friendLead") + content + "</section>";
+    }
+
+    function renderResources(items) {
+      var lang = I18N.getLang();
+      var categories = window.LINK_CATEGORIES || {};
+      var cards = items.map(function (item, index) {
+        var category = categories[item.category] || { label: {}, icon: "link" };
+        return '<a class="links-resource" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' +
+          '<span class="links-resource__number">' + String(index + 1).padStart(2, "0") + "</span>" +
+          '<span class="links-resource__body"><span class="links-resource__category">' + ICON(category.icon) +
+            escapeHtml(localized(category.label, lang)) + "</span><strong>" + escapeHtml(item.name) +
+            "</strong><span>" + escapeHtml(localized(item.note, lang)) + "</span></span>" +
+          '<span class="links-resource__visit">' + escapeHtml(I18N.t("links.visit")) + ICON("arrowRight") + "</span>" +
+        "</a>";
+      }).join("");
+      return '<section class="links-section">' + renderHeading(2, "links.resource", "links.resourceLead") +
+        '<div class="links-resources">' + cards + "</div></section>";
+    }
+
+    // 手工核对日期使用本地年月日，避免 ISO 日期在部分时区显示成前一天。
+    function renderUpdatedDate(lang) {
+      var host = document.getElementById("links-updated");
+      var raw = window.LINKS_UPDATED || "";
+      if (!host || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return;
+      var parts = raw.split("-").map(Number);
+      var date = new Date(parts[0], parts[1] - 1, parts[2]);
+      host.setAttribute("datetime", raw);
+      host.textContent = new Intl.DateTimeFormat(lang === "en" ? "en-US" : "zh-CN", {
+        year: "numeric", month: "short", day: "2-digit",
+      }).format(date);
     }
 
     function renderLinks() {
       var root = document.getElementById("links-root");
       if (!root) return;
       var data = window.LINKS || {};
-      var html =
-        renderGroup(I18N.t("links.friend"), data.friends) +
-        renderGroup(I18N.t("links.resource"), data.resources);
-      root.innerHTML = html;
+      var friends = data.friends || [];
+      var resources = data.resources || [];
+      var friendsCount = document.getElementById("links-friends-count");
+      var resourcesCount = document.getElementById("links-resources-count");
+      if (friendsCount) friendsCount.textContent = friends.length;
+      if (resourcesCount) resourcesCount.textContent = resources.length;
+      renderUpdatedDate(I18N.getLang());
+      root.innerHTML = renderFriends(friends) + renderResources(resources);
     }
 
     window.renderLinks = renderLinks;
