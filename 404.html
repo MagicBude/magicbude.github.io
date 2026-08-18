@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <!--
-  404.html - 404 页
-  协同：assets/js/core/ 中的站点配置、公共渲染与多语言脚本。
-  数据驱动：快捷导航胶囊由 window.render404 从 SITE_CONFIG.nav 渲染（排除搜索）。
+  404.html - 失效路径的恢复页
+  协同：assets/js/core/ 中的站点配置、图标、公共渲染与多语言脚本。
+  数据驱动：当前失效路径来自浏览器地址栏；恢复入口从 SITE_CONFIG.nav 读取，避免导航改动后这里失同步。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>404 · 页面走丢了 · magicbude</title>
-  <meta name="description" content="找不到你要的页面。">
-
-  <!-- 防闪白内联脚本：与全站一致，CSS 加载前设好皮肤/语言 -->
+  <title>404 · 页面未找到 · magicbude</title>
+  <meta name="description" content="这个地址没有对应页面；可返回首页、搜索站内内容或继续浏览主要栏目。">
   <script>
     (function () {
       try {
@@ -26,81 +24,98 @@
       } catch (e) {}
     })();
   </script>
-
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
-<!-- #endregion -->
 </head>
-<!-- #region 页面骨架（导航 / 页脚容器 + 内容区块） -->
+<!-- #endregion -->
+<!-- #region 页面骨架（导航 / 恢复工作区 / 页脚） -->
 <body>
   <a class="skip-link" href="#main" data-i18n="common.skip">跳到主内容</a>
-
   <header id="site-header" class="site-header"></header>
 
   <main class="site-main" id="main">
-    <!--
-      notfound 布局：垂直居中、文字居中。
-      404 大字号 + 一句说明 + 回到首页按钮 + 快捷导航（避免用户卡死）。
-    -->
-    <section class="notfound container">
-      <!-- 404 是本页的唯一主标题；保留视觉类名，同时用 h1 建立正确的页面标题层级。 -->
-      <h1 class="notfound__code" data-i18n="notfound.title">404</h1>
-      <p class="notfound__text" data-i18n="notfound.text">你想找的页面走丢了。</p>
+    <section class="notfound container" aria-labelledby="notfound-title">
+      <div class="notfound__signal" aria-hidden="true">
+        <span>ERROR</span><strong>404</strong><span>NOT FOUND</span>
+      </div>
 
-      <a class="btn btn--primary" href="index.html">
-        <span data-i18n="notfound.home">回到首页</span>
-      </a>
+      <div class="notfound__copy">
+        <p class="page-eyebrow" data-i18n="notfound.eyebrow">这条路暂时没有内容</p>
+        <h1 id="notfound-title" data-i18n="notfound.title">页面没有找到</h1>
+        <p class="lead" data-i18n="notfound.text">链接可能已经改变，也可能只是多打了一个字符。你仍然可以从下面继续探索。</p>
+        <!-- 路径只通过 textContent 写入，避免地址栏内容被当成 HTML 执行。 -->
+        <div class="notfound__path" aria-live="polite">
+          <span data-i18n="notfound.path">当前地址</span>
+          <code id="notfound-path">/</code>
+        </div>
+        <div class="notfound__actions">
+          <a class="btn btn--primary" href="index.html" id="notfound-home">
+            <span id="notfound-home-icon" aria-hidden="true"></span>
+            <span data-i18n="notfound.home">回到首页</span>
+          </a>
+          <a class="btn btn--ghost" href="search/index.html" id="notfound-search">
+            <span id="notfound-search-icon" aria-hidden="true"></span>
+            <span data-i18n="notfound.search">搜索本站</span>
+          </a>
+        </div>
+      </div>
 
-      <p class="page-eyebrow" data-i18n="notfound.quick">或者去</p>
-      <!-- 快捷导航由 render404 根据 nav 生成（排除 搜索） -->
-      <div class="notfound__links" id="notfound-links"></div>
+      <aside class="notfound__routes" aria-labelledby="notfound-routes-title">
+        <p class="notfound__routes-kicker" data-i18n="notfound.quick">继续浏览</p>
+        <h2 id="notfound-routes-title" data-i18n="notfound.routesTitle">或从主要栏目重新出发</h2>
+        <nav class="notfound__links" id="notfound-links" data-i18n="notfound.routesAria" data-i18n-attr="aria-label" aria-label="可继续访问的主要栏目"></nav>
+        <noscript>
+          <p class="notfound__fallback">
+            <a href="blog/index.html">博客</a> · <a href="projects/index.html">项目</a> ·
+            <a href="now/index.html">近况</a> · <a href="about/index.html">关于</a>
+          </p>
+        </noscript>
+      </aside>
     </section>
   </main>
-
   <footer id="site-footer" class="site-footer"></footer>
-
 <!-- #endregion -->
-<!-- #region 脚本（依赖加载 + 本页数据 -> DOM 渲染） -->
+<!-- #region 脚本（公共依赖 + 安全呈现路径与恢复入口） -->
   <script src="assets/js/core/site.config.js"></script>
   <script src="assets/js/core/icons.js"></script>
   <script src="assets/js/core/i18n.js"></script>
   <script src="assets/js/core/main.js"></script>
-
-  <!--
-    404 页的「数据 → DOM」：把导航渲染成快捷入口胶囊，
-    让用户一键跳到还能用的页面。挂 window.render404 供语言切换时刷新。
-  -->
   <script>
   (function () {
     "use strict";
-
     var CONFIG = window.SITE_CONFIG || {};
-    var ICON  = window.icon  || function () { return ""; };
-    var I18N  = window.i18n  || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
+    var ICON = window.icon || function () { return ""; };
+    var I18N = window.i18n || { t: function (key) { return key; } };
+    var FEATURED_KEYS = ["blog", "projects", "now", "about"];
+    var NAV_ICON = { blog: "book", projects: "code", now: "sparkles", about: "user" };
 
-    var NAV_ICON = {
-      home: "home", blog: "book", projects: "code",
-      now: "sparkles", uses: "tool", links: "link",
-      search: "search", about: "user"
-    };
+    // 查询参数可能含隐私，因此这里只展示 pathname，并通过 textContent 输出。
+    function renderMissingPath() {
+      var path = document.getElementById("notfound-path");
+      if (path) path.textContent = window.location.pathname || "/";
+    }
 
+    // 四个核心入口足以帮助找路，也避免把完整主导航重复一遍造成选择负担。
     function render404() {
       var host = document.getElementById("notfound-links");
       if (!host || !CONFIG.nav) return;
       host.innerHTML = CONFIG.nav
-        .filter(function (it) { return it.key !== "search"; })
-        .map(function (it) {
-          var ic = NAV_ICON[it.key] || "layout";
-          return (
-            '<a class="btn btn--ghost" href="' + window.siteUrl(it.href) + '">' +
-              ICON(ic) + "<span>" + I18N.t(it.i18n) + "</span>" +
-            "</a>"
-          );
+        .filter(function (item) { return FEATURED_KEYS.indexOf(item.key) !== -1; })
+        .map(function (item) {
+          return '<a class="notfound-route" href="' + window.siteUrl(item.href) + '">' +
+            '<span class="notfound-route__icon">' + ICON(NAV_ICON[item.key] || "layout") + "</span>" +
+            '<span class="notfound-route__label">' + I18N.t(item.i18n) + "</span>" +
+            '<span class="notfound-route__arrow">' + ICON("arrowRight") + "</span></a>";
         })
         .join("");
     }
 
+    document.getElementById("notfound-home").href = window.siteUrl("index.html");
+    document.getElementById("notfound-search").href = window.siteUrl("search/index.html");
+    document.getElementById("notfound-home-icon").innerHTML = ICON("home");
+    document.getElementById("notfound-search-icon").innerHTML = ICON("search");
     window.render404 = render404;
+    renderMissingPath();
     render404();
   })();
   </script>

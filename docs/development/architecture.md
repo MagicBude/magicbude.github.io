@@ -53,7 +53,8 @@ magicbude.github.io/
 │  └─ posts/                          # Markdown 文章源文件；写文章时主要编辑这里
 │     └─ <slug>.md                    # 单篇文章源，文件名通常与文章路由一致
 ├─ tools/                             # 仅供本地维护使用的辅助工具，不在浏览器中运行
-│  └─ build.mjs                       # 将 Markdown 转成文章 HTML、文章索引和 RSS
+│  ├─ build.mjs                       # 将 Markdown 转成文章 HTML、文章索引和 RSS
+│  └─ audit.mjs                       # 发布前只读检查 HTML 结构、静态引用与脚本语法
 ├─ docs/                              # 提交到仓库的项目文档，按文档类型分类
 │  ├─ README.md                       # 文档总入口和分类导航
 │  ├─ product/                        # 网站定位、目标和功能需求
@@ -91,6 +92,10 @@ content/posts/<slug>.md
 ```
 
 这三个产物都提交到仓库，所以 GitHub Pages 只负责发布静态文件，不需要在线安装依赖或执行构建。
+
+## 发布前检查
+
+在仓库根目录运行 `node tools/audit.mjs`。脚本不写文件，也不需要安装依赖；它会检查公开页面的基础语义、可访问名称、重复 ID、本地静态引用和 JavaScript 语法。自动检查不能代替键盘、200% 缩放、四套皮肤、中英文和 320px 窄屏人工走查，但能在提交前快速拦住常见回归。
 
 ## 部署方式
 

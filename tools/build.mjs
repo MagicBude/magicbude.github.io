@@ -337,7 +337,7 @@ function iconSvg(name) {
 // 不把 <ul> 直接放在另一个 <ul> 下，保证生成结果始终是有效列表语义。
 function renderToc(toc) {
   if (!toc.length) return "";
-  let out = '<nav class="toc" aria-label="文章目录">' +
+  let out = '<nav class="toc" aria-label="文章目录" data-i18n="blog.tocAria" data-i18n-attr="aria-label">' +
     '<p class="toc__title" data-i18n="blog.toc">目录</p><ul>';
   toc.forEach(function (it) {
     out += '<li class="toc__item toc__item--h' + it.level + '"><a href="#' + it.id + '">' +

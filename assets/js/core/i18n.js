@@ -108,7 +108,8 @@ window.i18n = (function () {
       "about.contact.title": "找到我",
       "about.contact.desc": "代码与公开项目优先放在 GitHub 和 Gitee；也可以通过邮件联系，或订阅本站 RSS。",
 
-      "notfound.quick": "或者去",
+      "notfound.eyebrow": "这条路暂时没有内容",
+      "notfound.quick": "继续浏览",
 
       "section.viewAll": "查看全部",
       "common.all": "全部",
@@ -123,9 +124,13 @@ window.i18n = (function () {
       "footer.builtWith": "用原生 HTML / CSS / JS 手写",
       "footer.rss": "订阅 RSS",
 
-      "notfound.title": "404",
-      "notfound.text": "你想找的页面走丢了。",
+      "notfound.title": "页面没有找到",
+      "notfound.text": "链接可能已经改变，也可能只是多打了一个字符。你仍然可以从下面继续探索。",
+      "notfound.path": "当前地址",
       "notfound.home": "回到首页",
+      "notfound.search": "搜索本站",
+      "notfound.routesTitle": "或从主要栏目重新出发",
+      "notfound.routesAria": "可继续访问的主要栏目",
 
       "projects.eyebrow": "作品",
       "projects.title": "项目",
@@ -241,6 +246,7 @@ window.i18n = (function () {
       "blog.langEn": "English",
       "blog.back": "返回博客",
       "blog.toc": "目录",
+      "blog.tocAria": "文章目录",
       "blog.published": "发布于",
       "blog.prev": "上一篇",
       "blog.next": "下一篇",
@@ -329,7 +335,8 @@ window.i18n = (function () {
       "about.contact.title": "Find me",
       "about.contact.desc": "Code and public projects live primarily on GitHub and Gitee. You can also email me or subscribe to this site's RSS feed.",
 
-      "notfound.quick": "Or head to",
+      "notfound.eyebrow": "Nothing lives on this path yet",
+      "notfound.quick": "Keep exploring",
 
       "section.viewAll": "View all",
       "common.all": "All",
@@ -344,9 +351,13 @@ window.i18n = (function () {
       "footer.builtWith": "Hand-written with plain HTML / CSS / JS",
       "footer.rss": "RSS",
 
-      "notfound.title": "404",
-      "notfound.text": "The page you're looking for is lost.",
+      "notfound.title": "Page not found",
+      "notfound.text": "The link may have changed, or perhaps one character slipped in. You can still continue exploring below.",
+      "notfound.path": "Current address",
       "notfound.home": "Back to home",
+      "notfound.search": "Search this site",
+      "notfound.routesTitle": "Or restart from a main section",
+      "notfound.routesAria": "Main sections you can still visit",
 
       "projects.eyebrow": "Works",
       "projects.title": "Projects",
@@ -462,6 +473,7 @@ window.i18n = (function () {
       "blog.langEn": "English",
       "blog.back": "Back to blog",
       "blog.toc": "Contents",
+      "blog.tocAria": "Article contents",
       "blog.published": "Published",
       "blog.prev": "Previous",
       "blog.next": "Next",
