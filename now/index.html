@@ -2,7 +2,8 @@
 <!--
   now/index.html - 近况页
   协同：assets/js/core/ 公共脚本与 assets/js/data/now.js 共享近况数据。
-  数据驱动：分类卡片由 window.NOW 经 window.renderNow 渲染（与 uses 同结构，纯记录无外链）。
+  数据驱动：window.renderNow 读取 window.NOW / window.NOW_UPDATED，生成更新时间、
+  分类档案和状态标签；首页也读取同一份数据生成近况摘要。
 -->
 <html lang="zh" data-style="magazine" data-scheme="light">
 <!-- #region 头部 head（meta / 防闪白脚本 / 样式） -->
@@ -10,7 +11,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>近况 · magicbude</title>
-  <meta name="description" content="magicbude 最近在玩、在看、在搞的事。">
+  <meta name="description" content="magicbude 此刻正在制作、最近看过，以及屏幕之外持续保留的事。">
 
   <script>
     (function () {
@@ -37,14 +38,39 @@
   <header id="site-header" class="site-header"></header>
 
   <main class="site-main" id="main">
-    <section class="hero container container--narrow">
-      <p class="page-eyebrow" data-i18n="now.eyebrow">近况</p>
-      <h1 class="hero__name" data-i18n="now.title">最近在搞啥</h1>
-      <p class="lead" data-i18n="now.lead">不是简历，是此刻正在进行的事——会随兴趣更新。</p>
-    </section>
+    <!-- #region 近况引言与更新时间 -->
+    <section class="hero container now-hero">
+      <div class="now-hero__copy">
+        <p class="page-eyebrow" data-i18n="now.eyebrow">近况</p>
+        <h1 class="hero__name" data-i18n="now.title">此刻与最近</h1>
+        <p class="lead" data-i18n="now.lead">一份短而真实的当前切片：正在做的事、最近看过的作品，以及屏幕之外保留的日常。</p>
+      </div>
 
-    <!-- 分类由 renderNow 按 window.NOW 生成 -->
-    <div class="container" id="now-root"></div>
+      <!-- 日期来自 now.js 的人工确认值，不使用访问者当天日期冒充内容更新时间。 -->
+      <aside class="now-snapshot" aria-labelledby="now-snapshot-title">
+        <div class="now-snapshot__topline">
+          <span class="now-snapshot__signal" aria-hidden="true"></span>
+          <p id="now-snapshot-title" data-i18n="now.snapshot.kicker">NOW SNAPSHOT</p>
+        </div>
+        <p class="now-snapshot__date-label" data-i18n="now.updated">最后更新</p>
+        <time class="now-snapshot__date" id="now-updated" datetime="2026-08-18">2026.08.18</time>
+        <p class="now-snapshot__note" data-i18n="now.snapshot.note">只记录已经发生或仍在进行的事，不补写虚构进度。</p>
+      </aside>
+    </section>
+    <!-- #endregion 近况引言与更新时间 -->
+
+    <!-- #region 近况档案 -->
+    <section class="section container">
+      <!-- 每个分类及条目由 renderNow 按共享数据生成；HTML 只负责保留语义容器。 -->
+      <div class="now-feed" id="now-root"></div>
+      <p class="empty-state" id="now-empty" hidden data-i18n="now.empty">还没有公开近况。</p>
+      <noscript>
+        <div class="empty-state">
+          <p>本站近况需要 JavaScript 读取本地数据。最近记录包括：继续维护这个个人站，以及看过《蜘蛛侠：崭新之日》和《欢迎来龙餐馆》。</p>
+        </div>
+      </noscript>
+    </section>
+    <!-- #endregion 近况档案 -->
   </main>
 
   <footer id="site-footer" class="site-footer"></footer>
@@ -59,8 +85,9 @@
   <script src="../assets/js/core/main.js"></script>
 
   <!--
-    近况页结构与装备页几乎一致：window.NOW 是分类数组，
-    区别是每个 item 不跳外链（纯记录），用不同的图标区分「玩/看/搞」。
+    window.NOW 是分类数组，window.NOW_UPDATED 是最后一次人工确认日期。
+    挂到 window.renderNow 后，main.js 在切换语言时会重新调用，
+    让分类标题、条目名称、状态和日期格式一起更新。
   -->
   <script>
   (function () {
@@ -69,31 +96,93 @@
     var ICON = window.icon || function () { return ""; };
     var I18N = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; } };
 
+    var STATUS = {
+      active:  { cls: "now-status--active",  key: "now.status.active" },
+      recent:  { cls: "now-status--recent",  key: "now.status.recent" },
+      ongoing: { cls: "now-status--ongoing", key: "now.status.ongoing" },
+    };
+
+    // 近况来自人工维护的数据文件，也要在进入 innerHTML 前转义，避免特殊字符破坏结构。
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // 兼容旧数据里的普通字符串和新的双语对象，便于逐步迁移而不让首页出现 [object Object]。
+    function localize(value, lang) {
+      if (typeof value === "string") return value;
+      if (!value) return "";
+      return value[lang] != null ? value[lang] : value.zh || "";
+    }
+
+    function renderStatus(status) {
+      var item = STATUS[status];
+      return item
+        ? '<span class="now-status ' + item.cls + '">' + escapeHtml(I18N.t(item.key)) + "</span>"
+        : "";
+    }
+
+    // 用数字拆分构造本地日期，避免把 YYYY-MM-DD 当 UTC 解析后在部分时区显示成前一天。
+    function renderUpdatedDate(lang) {
+      var host = document.getElementById("now-updated");
+      var raw = window.NOW_UPDATED || "";
+      if (!host || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return;
+
+      var parts = raw.split("-").map(Number);
+      var date = new Date(parts[0], parts[1] - 1, parts[2]);
+      host.setAttribute("datetime", raw);
+      host.textContent = new Intl.DateTimeFormat(lang === "en" ? "en-US" : "zh-CN", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+      }).format(date);
+    }
+
     function renderNow() {
       var lang = I18N.getLang();
       var root = document.getElementById("now-root");
+      var empty = document.getElementById("now-empty");
       if (!root) return;
 
-      root.innerHTML = (window.NOW || []).map(function (cat) {
-        var title = (cat.title && cat.title[lang]) ? cat.title[lang] : (cat.title && cat.title.zh) || cat.icon;
-        var head =
-          '<h2 class="subsection__title">' + ICON(cat.icon || "sparkles") +
-          "<span>" + title + "</span></h2>";
+      renderUpdatedDate(lang);
 
-        var cards = (cat.items || []).map(function (it) {
-          var note = (it.note && it.note[lang]) ? it.note[lang] : (it.note && it.note.zh) || "";
+      var categories = window.NOW || [];
+      if (categories.length === 0) {
+        root.innerHTML = "";
+        if (empty) empty.hidden = false;
+        return;
+      }
+      if (empty) empty.hidden = true;
+
+      root.innerHTML = categories.map(function (cat, categoryIndex) {
+        var items = cat.items || [];
+        var title = localize(cat.title, lang) || cat.icon;
+        var cards = items.map(function (it, itemIndex) {
           return (
-            '<div class="card">' +
-              '<span class="card__title"><span>' + it.name + "</span></span>" +
-              '<span class="card__desc">' + note + "</span>" +
-            "</div>"
+            '<article class="now-entry">' +
+              '<header class="now-entry__header">' +
+                '<span class="now-entry__index">' + String(categoryIndex + 1).padStart(2, "0") + "." + String(itemIndex + 1).padStart(2, "0") + "</span>" +
+                renderStatus(it.status) +
+              "</header>" +
+              '<h3 class="now-entry__title">' + escapeHtml(localize(it.name, lang)) + "</h3>" +
+              '<p class="now-entry__meta">' + escapeHtml(localize(it.meta, lang)) + "</p>" +
+              '<p class="now-entry__note">' + escapeHtml(localize(it.note, lang)) + "</p>" +
+            "</article>"
           );
         }).join("");
 
         return (
-          '<section class="subsection">' +
-            head +
-            '<div class="card-grid">' + cards + "</div>" +
+          '<section class="now-section now-section--' + escapeHtml(cat.key || "general") + '">' +
+            '<header class="now-section__header">' +
+              '<span class="now-section__icon">' + ICON(cat.icon || "sparkles") + "</span>" +
+              '<div><h2 class="now-section__title">' + escapeHtml(title) + "</h2>" +
+                '<p class="now-section__count">' + items.length + escapeHtml(I18N.t(items.length === 1 ? "now.item" : "now.items")) + "</p></div>" +
+            "</header>" +
+            '<div class="now-section__items' + (items.length === 1 ? " now-section__items--single" : "") + '">' + cards + "</div>" +
           "</section>"
         );
       }).join("");
