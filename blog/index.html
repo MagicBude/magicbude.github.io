@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   blog/index.html - 博客列表页
-  作用：展示全部文章，支持按语言（全部/中文/English）与标签筛选。
+  作用：作为写作档案展示全部真实文章，支持按语言与标签筛选。
   协同：assets/js/core/ 中的公共脚本，以及 assets/js/data/posts.js 文章数据源。
   数据驱动：文章列表由 window.POSTS（构建脚本生成）经 window.renderBlog 渲染；
             挂到 window.renderBlog，main.js 在切换语言时会重渲染，让筛选标签/文案同步。
@@ -12,7 +12,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>博客 · magicbude</title>
-  <meta name="description" content="magicbude 的博客：写代码、做小工具的记录，以及一些碎碎念。">
+  <meta name="description" content="magicbude 的写作档案：代码、网页实践与值得复习的制作记录。">
+  <link rel="canonical" href="https://magicbude.github.io/blog/">
 
   <!-- 防闪白内联脚本：CSS 加载前先按 localStorage 设皮肤/语言（键名与 main.js / i18n.js 一致） -->
   <script>
@@ -41,34 +42,57 @@
   <header id="site-header" class="site-header"></header>
 
   <main class="site-main" id="main">
-    <!-- ============ 页面引言 ============ -->
-    <section class="hero container container--narrow">
-      <p class="page-eyebrow" data-i18n="blog.eyebrow">博客</p>
-      <h1 class="hero__name" data-i18n="blog.title">博客</h1>
-      <p class="lead" data-i18n="blog.lead">写代码、做小工具的记录，以及一些碎碎念。</p>
-    </section>
-
-    <!-- ============ 筛选栏 + 文章列表 ============ -->
-    <section class="section container">
-      <!-- 筛选栏：语言 + 标签。点击 chip 即筛选，由本页脚本处理（事件委托） -->
-      <div class="blog-filters" id="blog-filters">
-        <div class="blog-filters__group">
-          <span class="blog-filters__label" data-i18n="blog.filterLang">语言</span>
-          <button type="button" class="tag tag-btn is-active" data-type="lang" data-value="all" data-i18n="common.all">全部</button>
-          <button type="button" class="tag tag-btn" data-type="lang" data-value="zh" data-i18n="blog.langZh">中文</button>
-          <button type="button" class="tag tag-btn" data-type="lang" data-value="en" data-i18n="blog.langEn">English</button>
-        </div>
-        <div class="blog-filters__group" id="tag-group">
-          <span class="blog-filters__label" data-i18n="blog.filterTag">标签</span>
-          <!-- 标签 chip 由脚本按文章数据动态生成 -->
-        </div>
+    <!-- #region 写作档案引言与统计 -->
+    <section class="hero container blog-hero">
+      <div class="blog-hero__copy">
+        <p class="page-eyebrow" data-i18n="blog.eyebrow">写作档案</p>
+        <h1 class="hero__name" data-i18n="blog.title">文章与实践记录</h1>
+        <p class="lead" data-i18n="blog.lead">把已经做过、想明白或值得复习的内容写下来；数量可以慢慢增加，现有文章不拿占位内容凑数。</p>
       </div>
 
-      <!-- 文章列表：由 renderBlog 根据 window.POSTS 生成 -->
-      <div class="post-list" id="blog-list"></div>
-      <!-- 空态：筛选后没有任何文章时显示 -->
-      <p class="empty-state" id="blog-empty" hidden data-i18n="blog.empty">没有匹配的文章。</p>
+      <!-- 数量从 posts.js 计算，写新文章并运行构建器后会自动更新。 -->
+      <aside class="blog-ledger" aria-labelledby="blog-ledger-title">
+        <p class="blog-ledger__kicker" id="blog-ledger-title" data-i18n="blog.snapshot.kicker">WRITING ARCHIVE</p>
+        <dl class="blog-ledger__stats">
+          <div><dt data-i18n="blog.articleCount">公开文章</dt><dd id="blog-post-count">0</dd></div>
+          <div><dt data-i18n="blog.tagCount">主题标签</dt><dd id="blog-tag-count">0</dd></div>
+          <div><dt data-i18n="blog.languageCount">写作语言</dt><dd id="blog-language-count">0</dd></div>
+        </dl>
+        <a class="blog-ledger__rss" href="../feed.xml"> <span id="blog-rss-icon" aria-hidden="true"></span><span data-i18n="blog.rss">订阅 RSS</span></a>
+      </aside>
     </section>
+    <!-- #endregion 写作档案引言与统计 -->
+
+    <!-- #region 筛选与文章档案 -->
+    <section class="section container blog-archive" aria-labelledby="blog-archive-title">
+      <header class="blog-archive__heading">
+        <p class="blog-archive__index">01 / ARCHIVE</p>
+        <div>
+          <h2 id="blog-archive-title" data-i18n="blog.archiveTitle">全部文章</h2>
+          <p data-i18n="blog.archiveLead">按语言或标签缩小范围；筛选只作用于当前公开文章。</p>
+        </div>
+      </header>
+
+      <div class="blog-browser">
+        <!-- 筛选按钮完全由文章数据生成；无英文文章时不会显示无效的 English 按钮。 -->
+        <aside class="blog-filters" id="blog-filters" aria-label="文章筛选" data-i18n="blog.filtersLabel" data-i18n-attr="aria-label">
+          <div class="blog-filters__group" id="blog-language-filters"></div>
+          <div class="blog-filters__group" id="blog-tag-filters"></div>
+        </aside>
+
+        <div class="blog-browser__main">
+          <p class="blog-browser__count" id="blog-result-count" aria-live="polite"></p>
+          <div class="blog-list" id="blog-list"></div>
+          <div class="blog-empty" id="blog-empty" hidden>
+            <span id="blog-empty-icon" aria-hidden="true"></span>
+            <p class="blog-empty__title" data-i18n="blog.empty">没有匹配的文章。</p>
+            <p class="blog-empty__lead" data-i18n="blog.emptyLead">清空筛选条件即可回到完整文章档案。</p>
+            <button class="btn btn--ghost" id="blog-reset" type="button" data-i18n="blog.reset">清空筛选</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- #endregion 筛选与文章档案 -->
   </main>
 
   <!-- 页脚容器：js/main.js 注入（版权 + 社交链接） -->
@@ -96,52 +120,92 @@
     var ICON  = window.icon || function () { return ""; };
     var I18N  = window.i18n || { t: function (k) { return k; }, getLang: function () { return "zh"; }, apply: function () {} };
 
-    // 筛选状态：语言（all/zh/en）与标签（all 或具体标签名）。
-    // 注意：这是「文章语言」筛选，和界面 UI 语言是两回事，互不影响。
+    // 筛选状态是文章属性，与界面语言互不影响；事件只绑定一次。
     var langFilter = "all";
     var tagFilter = "all";
+    var filtersBound = false;
 
     // 文本转义：文章标题/摘要/标签都可能含特殊字符，必须转义后再拼进 HTML。
     function escapeHtml(s) {
-      return String(s)
+      return String(s == null ? "" : s)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
     }
 
-    // 渲染整个博客列表 + 筛选栏。幂等，可反复调用。
+    function uniqueValues(list, getValues) {
+      var seen = {};
+      list.forEach(function (item) {
+        getValues(item).forEach(function (value) { if (value) seen[value] = true; });
+      });
+      return Object.keys(seen);
+    }
+
+    function renderSummary(list, tags, languages) {
+      var postCount = document.getElementById("blog-post-count");
+      var tagCount = document.getElementById("blog-tag-count");
+      var languageCount = document.getElementById("blog-language-count");
+      var rssIcon = document.getElementById("blog-rss-icon");
+      if (postCount) postCount.textContent = list.length;
+      if (tagCount) tagCount.textContent = tags.length;
+      if (languageCount) languageCount.textContent = languages.length;
+      if (rssIcon) rssIcon.innerHTML = ICON("rss");
+    }
+
+    function filterButton(type, value, label, count, active) {
+      return '<button type="button" class="blog-filter' + (active ? " is-active" : "") +
+        '" data-type="' + type + '" data-value="' + escapeHtml(value) +
+        '" aria-pressed="' + active + '"><span>' + escapeHtml(label) +
+        '</span><span class="blog-filter__count">' + count + "</span></button>";
+    }
+
+    function renderFilters(list, tags, languages) {
+      var langHost = document.getElementById("blog-language-filters");
+      var tagHost = document.getElementById("blog-tag-filters");
+      if (langHost) {
+        var langButtons = filterButton("lang", "all", I18N.t("common.all"), list.length, langFilter === "all");
+        langButtons += languages.map(function (lang) {
+          var count = list.filter(function (post) { return post.lang === lang; }).length;
+          var label = lang === "en" ? I18N.t("blog.langEn") : I18N.t("blog.langZh");
+          return filterButton("lang", lang, label, count, langFilter === lang);
+        }).join("");
+        langHost.innerHTML = '<p class="blog-filters__label">' + escapeHtml(I18N.t("blog.filterLang")) + "</p>" + langButtons;
+      }
+      if (tagHost) {
+        var tagButtons = filterButton("tag", "all", I18N.t("common.all"), list.length, tagFilter === "all");
+        tagButtons += tags.map(function (tag) {
+          var count = list.filter(function (post) { return (post.tags || []).indexOf(tag) >= 0; }).length;
+          return filterButton("tag", tag, tag, count, tagFilter === tag);
+        }).join("");
+        tagHost.innerHTML = '<p class="blog-filters__label">' + escapeHtml(I18N.t("blog.filterTag")) + "</p>" + tagButtons;
+      }
+    }
+
+    function renderPost(post, index) {
+      var date = post.date ? String(post.date).slice(0, 10) : "";
+      var langLabel = post.lang === "en" ? "EN" : "中文";
+      var tags = (post.tags || []).map(function (tag) {
+        return '<span class="tag">' + escapeHtml(tag) + "</span>";
+      }).join("");
+      return '<article class="blog-entry"><a href="' + escapeHtml(window.siteUrl(post.url)) + '">' +
+        '<header class="blog-entry__header"><span class="blog-entry__number">' + String(index + 1).padStart(2, "0") +
+          '</span><time datetime="' + escapeHtml(date) + '">' + escapeHtml(date) + "</time></header>" +
+        '<div class="blog-entry__body"><p class="blog-entry__language">' + langLabel + "</p>" +
+          '<h3>' + escapeHtml(post.title) + "</h3>" +
+          (post.excerpt ? '<p class="blog-entry__excerpt">' + escapeHtml(post.excerpt) + "</p>" : "") +
+          '<div class="blog-entry__footer"><span class="blog-entry__tags">' + tags + "</span>" +
+            '<span class="blog-entry__action">' + escapeHtml(I18N.t("blog.read")) + ICON("arrowRight") + "</span></div>" +
+        "</div></a></article>";
+    }
+
+    // 渲染整个博客档案。幂等设计保证语言切换后可以安全重建全部文案。
     function renderBlog() {
       var list = window.POSTS || [];
+      var tags = uniqueValues(list, function (post) { return post.tags || []; });
+      var languages = uniqueValues(list, function (post) { return [post.lang || "zh"]; });
+      renderSummary(list, tags, languages);
+      renderFilters(list, tags, languages);
 
-      // ---- 1) 汇总所有出现过的标签，生成标签筛选 chip ----
-      var tagSet = {};
-      list.forEach(function (p) {
-        (p.tags || []).forEach(function (t) { tagSet[t] = 1; });
-      });
-      var tags = Object.keys(tagSet);
-
-      var tagGroup = document.getElementById("tag-group");
-      if (tagGroup) {
-        var label = tagGroup.querySelector(".blog-filters__label");
-        var chips = "";
-        // 「全部」始终在第一个；带 data-i18n 让它跟随界面语言。
-        chips += '<button type="button" class="tag tag-btn' +
-          (tagFilter === "all" ? " is-active" : "") +
-          '" data-type="tag" data-value="all" data-i18n="common.all">全部</button>';
-        chips += tags.map(function (t) {
-          return '<button type="button" class="tag tag-btn' +
-            (tagFilter === t ? " is-active" : "") +
-            '" data-type="tag" data-value="' + escapeHtml(t) + '">' +
-            escapeHtml(t) + "</button>";
-        }).join("");
-        // 保留分组标题，再追加 chip。
-        tagGroup.innerHTML = "";
-        if (label) tagGroup.appendChild(label);
-        tagGroup.insertAdjacentHTML("beforeend", chips);
-        // 新插入的 chip 带 data-i18n，补一次翻译。
-        I18N.apply(tagGroup);
-      }
-
-      // ---- 2) 按筛选条件过滤 ----
       var filtered = list.filter(function (p) {
         if (langFilter !== "all" && p.lang !== langFilter) return false;
         if (tagFilter !== "all" && (p.tags || []).indexOf(tagFilter) === -1) return false;
@@ -149,7 +213,12 @@
       });
 
       var host = document.getElementById("blog-list");
+      var count = document.getElementById("blog-result-count");
       if (!host) return;
+      if (count) {
+        var countKey = filtered.length === 1 ? "blog.browseOne" : "blog.browse";
+        count.textContent = I18N.t(countKey).replace("{n}", filtered.length);
+      }
 
       var empty = document.getElementById("blog-empty");
       if (filtered.length === 0) {
@@ -159,34 +228,23 @@
       }
       if (empty) empty.hidden = true;
 
-      // ---- 3) 渲染卡片列表（复用 .post-list / .post-item，与首页「最新动态」一致）----
-      host.innerHTML = filtered.map(function (p) {
-        var d = p.date ? String(p.date).slice(0, 10) : "";
-        var langLabel = p.lang === "en" ? "EN" : "中";
-        var tagsHtml = (p.tags || []).map(function (t) {
-          return '<span class="tag">' + escapeHtml(t) + "</span>";
-        }).join(" ");
-        return (
-          '<a class="post-item" href="' + window.siteUrl(p.url) + '">' +
-            '<div class="post-item__title">' + escapeHtml(p.title) + "</div>" +
-            (p.excerpt ? '<p class="post-item__excerpt">' + escapeHtml(p.excerpt) + "</p>" : "") +
-            '<div class="post-meta">' +
-              '<span class="post-meta__item">' + ICON("book") + d + "</span>" +
-              '<span class="post-meta__item">' + langLabel + "</span>" +
-              (tagsHtml ? '<span class="post-meta__item">' + tagsHtml + "</span>" : "") +
-            "</div>" +
-          "</a>"
-        );
-      }).join("");
+      host.innerHTML = filtered.map(renderPost).join("");
     }
 
-    // 筛选点击：事件委托，挂在容器上（chip 是动态生成的，委托最稳）。
+    function resetFilters() {
+      langFilter = "all";
+      tagFilter = "all";
+      renderBlog();
+    }
+
+    // 筛选按钮会反复重绘，所以在稳定的父容器上使用事件委托。
     function bindFilters() {
       var root = document.getElementById("blog-filters");
-      if (!root || root.dataset.bound) return;
-      root.dataset.bound = "1";
+      var reset = document.getElementById("blog-reset");
+      var emptyIcon = document.getElementById("blog-empty-icon");
+      if (!root || filtersBound) return;
       root.addEventListener("click", function (e) {
-        var btn = e.target.closest(".tag-btn");
+        var btn = e.target.closest("[data-type]");
         if (!btn) return;
         var type = btn.getAttribute("data-type");
         var val = btn.getAttribute("data-value");
@@ -194,6 +252,9 @@
         else if (type === "tag") tagFilter = val;
         renderBlog();
       });
+      if (reset) reset.addEventListener("click", resetFilters);
+      if (emptyIcon) emptyIcon.innerHTML = ICON("book");
+      filtersBound = true;
     }
 
     // 暴露给 main.js 的语言切换钩子，并立即渲染一次。

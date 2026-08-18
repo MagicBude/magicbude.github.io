@@ -317,7 +317,7 @@ function parseFrontmatter(raw) {
 // #region 详情页模板
 // 详情页是「完整静态 HTML」：正文已经转好嵌进去了，不需要运行时再 fetch。
 // 头部/页脚容器 + 四个脚本，和站内其他页面完全一致，保证导航/皮肤/语言同步。
-// 注意相对路径前缀 REL = "../"（详情页在 blog/ 子目录）。
+// 注意详情页位于 blog/<slug>/，所以回到仓库根目录需要 REL = "../../"。
 
 // 两个小图标的内联 SVG（与 js/icons.js 的 book / globe 同款路径，避免额外请求）。
 function iconSvg(name) {
@@ -333,18 +333,16 @@ function iconSvg(name) {
   );
 }
 
-// 渲染目录（TOC）：h2 / h3 两级，用嵌套 <ul> 表达层级。
+// 渲染目录（TOC）：h2 / h3 共用一个列表，h3 通过 class 视觉缩进。
+// 不把 <ul> 直接放在另一个 <ul> 下，保证生成结果始终是有效列表语义。
 function renderToc(toc) {
   if (!toc.length) return "";
   let out = '<nav class="toc" aria-label="文章目录">' +
     '<p class="toc__title" data-i18n="blog.toc">目录</p><ul>';
-  let cur = 2;
   toc.forEach(function (it) {
-    while (cur < it.level) { out += "<ul>"; cur++; }
-    while (cur > it.level) { out += "</ul>"; cur--; }
-    out += '<li><a href="#' + it.id + '">' + escapeHtml(it.text) + "</a></li>";
+    out += '<li class="toc__item toc__item--h' + it.level + '"><a href="#' + it.id + '">' +
+      escapeHtml(it.text) + "</a></li>";
   });
-  while (cur > 2) { out += "</ul>"; cur--; }
   return out + "</ul></nav>";
 }
 
@@ -362,12 +360,15 @@ function navLink(post, dir, labelKey, fallback) {
 
 function renderDetail(post, bodyHtml, toc, older, newer) {
   const REL = "../../";
+  const canonicalUrl = SITE_BASE + "blog/" + post.slug + "/";
   const langLabel = post.lang === "en" ? "English" : "中文";
   const tags = (post.tags || [])
     .map((t) => '<span class="tag">' + escapeHtml(t) + "</span>")
     .join(" ");
 
   const tocHtml = renderToc(toc);
+  const articleLayoutClass = tocHtml ? "article-layout" : "article-layout article-layout--single";
+  const railHtml = tocHtml ? '<aside class="article-rail">' + tocHtml + "</aside>" : "";
   const navHtml =
     older || newer
       ? '<nav class="post-nav">' +
@@ -391,6 +392,18 @@ function renderDetail(post, bodyHtml, toc, older, newer) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(post.title)} · ${SITE_TITLE}</title>
   <meta name="description" content="${escapeHtml(post.summary || post.title)}">
+  <link rel="canonical" href="${canonicalUrl}">
+
+  <!-- 每篇文章使用自身标题、摘要与网址，不继承列表页的分享信息；没有正文图片时不伪造封面。 -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="${escapeHtml(post.title)}">
+  <meta property="og:description" content="${escapeHtml(post.summary || post.title)}">
+  <meta property="og:url" content="${canonicalUrl}">
+  <meta property="og:locale" content="${post.lang === "en" ? "en_US" : "zh_CN"}">
+  ${post.date ? '<meta property="article:published_time" content="' + escapeHtml(post.date) + '">' : ""}
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="${escapeHtml(post.title)}">
+  <meta name="twitter:description" content="${escapeHtml(post.summary || post.title)}">
 
   <!-- 防闪白内联脚本：CSS 加载前先按 localStorage 设皮肤/语言（键名与 main.js / i18n.js 一致） -->
   <script>
@@ -419,30 +432,36 @@ function renderDetail(post, bodyHtml, toc, older, newer) {
   <header id="site-header" class="site-header"></header>
 
   <main class="site-main" id="main">
-    <article class="container container--narrow">
+    <article class="article-page container">
       <!-- 返回博客列表 -->
       <a class="post-back" href="../index.html" data-i18n="blog.back">返回博客</a>
 
-      <!-- ============ 文章头部 ============ -->
-      <header class="post-header">
+      <!-- #region 文章标题与元信息 -->
+      <header class="article-hero post-header">
+        <p class="article-hero__kicker" data-i18n="blog.article">文章</p>
         <h1 class="post-header__title">${escapeHtml(post.title)}</h1>
-        <div class="post-meta">
-          <span class="post-meta__item">${iconSvg("book")} <span data-i18n="blog.published">发布于</span> ${escapeHtml(post.date)}</span>
+        ${post.summary ? '<p class="article-hero__summary">' + escapeHtml(post.summary) + "</p>" : ""}
+        <div class="post-meta article-hero__meta">
+          <span class="post-meta__item">${iconSvg("book")} <span data-i18n="blog.published">发布于</span> <time datetime="${escapeHtml(post.date)}">${escapeHtml(post.date)}</time></span>
           <span class="post-meta__item">${iconSvg("globe")} ${langLabel}</span>
           ${(post.tags || []).length ? '<span class="post-meta__item">' + tags + "</span>" : ""}
         </div>
       </header>
+      <!-- #endregion 文章标题与元信息 -->
 
-      <!-- ============ 目录 ============ -->
-      ${tocHtml}
-
-      <!-- ============ 正文（Markdown 转换结果）============ -->
-      <div class="prose">
+      <!-- #region 目录与正文 -->
+      <div class="${articleLayoutClass}">
+        ${railHtml}
+        <div class="article-reading">
+          <div class="prose">
 ${bodyHtml}
-      </div>
+          </div>
 
-      <!-- ============ 上一篇 / 下一篇 ============ -->
-      ${navHtml}
+          <!-- 上一篇 / 下一篇由构建时排序决定；只有一篇文章时不生成空导航。 -->
+${navHtml}
+        </div>
+      </div>
+      <!-- #endregion 目录与正文 -->
     </article>
   </main>
 
@@ -499,6 +518,12 @@ function renderPostsJs(list) {
 
 // 生成 feed.xml（RSS 2.0）。链接用绝对地址，方便订阅器直接抓取。
 function renderFeed(posts) {
+  // RSS 的 lastBuildDate 取最新文章日期，而不是每次运行脚本的当前时间。
+  // 这样正文没有变化时重复构建不会制造只改时间戳的无意义 diff。
+  const latestPost = posts.find((post) => post.date);
+  const lastBuildDate = latestPost
+    ? new Date(latestPost.date + "T00:00:00Z").toUTCString()
+    : new Date(0).toUTCString();
   const items = posts
     .map(function (p) {
       const link = SITE_BASE + "blog/" + p.slug + "/";
@@ -525,7 +550,7 @@ function renderFeed(posts) {
     "    <link>" + SITE_BASE + "</link>\n" +
     "    <description>" + SITE_DESC + "</description>\n" +
     "    <language>zh-CN</language>\n" +
-    "    <lastBuildDate>" + new Date().toUTCString() + "</lastBuildDate>\n" +
+    "    <lastBuildDate>" + lastBuildDate + "</lastBuildDate>\n" +
     "    <generator>magicbude static blog builder</generator>\n" +
     items + "\n" +
     "  </channel>\n" +
